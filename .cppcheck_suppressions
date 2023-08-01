@@ -1,0 +1,17 @@
+
+*:database\fal-v0.5.0\*
+*:database\FlashDB-v1.1.1\*
+*:tuya-ble-sdk\*
+*:aliIOT\*
+*:miwear-sdk_0.2.13\*
+*:music_player\app_playback.c
+*:music_player\mp3_parser.c
+*:VGLite\*
+*:rt-thread\*
+
+
+
+
+
+
+
