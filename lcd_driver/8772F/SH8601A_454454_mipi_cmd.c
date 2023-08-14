@@ -1174,7 +1174,7 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
 }
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
-#define DMA_LINKLIST 1
+#define DMA_LINKLIST 0
 #if (DMA_LINKLIST == 0)
     GDMA_InitTypeDef LCDC_DMA_InitStruct = {0};
     LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);

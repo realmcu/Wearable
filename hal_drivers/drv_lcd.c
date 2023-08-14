@@ -56,7 +56,7 @@ uint32_t drv_lcd_get_screen_height(void)
 
 uint32_t drv_lcd_get_fb_width(void)
 {
-    return ((rtk_lcd_hal_get_width() + 15) >> 4) << 4;
+    return rtk_lcd_hal_get_width();
 }
 uint32_t drv_lcd_get_fb_height(void)
 {

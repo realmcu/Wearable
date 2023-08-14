@@ -91,12 +91,11 @@ void lv_port_disp_init(void)
 
     static lv_disp_draw_buf_t draw_buf_dsc_1;
     buffer0 = os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM,
-                           drv_lcd_get_fb_width() * drv_lcd_get_fb_height() * drv_lcd_get_pixel_bits() / 8 + 63);
+                           drv_lcd_get_fb_width() * drv_lcd_get_fb_height() * drv_lcd_get_pixel_bits() / 8);
     if (buffer0 == NULL)
     {
         DBG_DIRECT("!!!LCD framebuffer alloc Fail\r\n");
     }
-    buffer0 = buffer0 + 64 - (int)buffer0 % 64;
 
     lv_disp_draw_buf_init(&draw_buf_dsc_1, (void *)buffer0, NULL,
                           MY_DISP_HOR_RES * MY_DISP_VER_RES);   /*Initialize the display buffer*/
