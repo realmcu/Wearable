@@ -1,0 +1,150 @@
+/*
+ * @Author: your name
+ * @Date: 2021-10-12 10:06:44
+ * @LastEditTime: 2022-04-15 14:49:03
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \wristband_rttd:\project\Bee3Pro\HoneyComb\sdk\src\mcu\peripheral\rtl876x_edpi.c
+ */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* @file     rtl_edpi.c
+* @brief    This file provides all the eDPI firmware functions.
+* @details
+* @author   boris yue
+* @date     2021-09-01
+* @version  v0.1
+*********************************************************************************************************
+*/
+
+/* Includes ------------------------------------------------------------------*/
+#include "rtl_lcdc_edpi.h"
+
+
+void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg)
+{
+    /* Check the parameters */
+    assert_param(IS_EDPI_HSPOL(eDPICfg->eDPI_HoriSyncPolarity));
+    assert_param(IS_EDPI_VSPOL(eDPICfg->eDPI_VeriSyncPolarity));
+    assert_param(IS_EDPI_DEPOL(eDPICfg->eDPI_DataEnPolarity));
+    assert_param(IS_EDPI_PIXELFORMAT(eDPICfg->eDPI_ColorMap));
+    assert_param(IS_EDPI_OP_MODE(eDPICfg->eDPI_OperateMode));
+
+    EDPI_DIV_PAR_t edpi_reg_0x50 = {.d32 = EDPI->EDPI_DIV_PAR};
+    edpi_reg_0x50.b.edpi_div_par = eDPICfg->eDPI_ClockDiv;
+    EDPI->EDPI_DIV_PAR = edpi_reg_0x50.d32;
+
+    EDPI_SYNC_WIDTH_t edpi_reg_0x04 = {.d32 = EDPI->EDPI_SYNC_WIDTH};
+    edpi_reg_0x04.b.hsw = eDPICfg->eDPI_HoriSyncWidth;
+    edpi_reg_0x04.b.vsh = eDPICfg->eDPI_VeriSyncHeight;
+    EDPI->EDPI_SYNC_WIDTH = edpi_reg_0x04.d32;
+
+    EDPI_ABACK_PORCH_t edpi_reg_0x08 = {.d32 = EDPI->EDPI_ABACK_PORCH};
+    edpi_reg_0x08.b.ahbp = eDPICfg->eDPI_AccumulatedHBP;
+    edpi_reg_0x08.b.avbp = eDPICfg->eDPI_AccumulatedVBP;
+    EDPI->EDPI_ABACK_PORCH = edpi_reg_0x08.d32;
+
+    EDPI_AACTIVE_t edpi_reg_0x0C = {.d32 = EDPI->EDPI_AACTIVE};
+    edpi_reg_0x0C.b.aah = eDPICfg->eDPI_AccumulatedActiveH;
+    edpi_reg_0x0C.b.aaw = eDPICfg->eDPI_AccumulatedActiveW;
+    EDPI->EDPI_AACTIVE = edpi_reg_0x0C.d32;
+
+    EDPI_TOTAL_t edpi_reg_0x10 = {.d32 = EDPI->EDPI_TOTAL};
+    edpi_reg_0x10.b.totalh = eDPICfg->eDPI_TotalHeight;
+    edpi_reg_0x10.b.totalw = eDPICfg->eDPI_TotalWidth;
+    EDPI->EDPI_TOTAL = edpi_reg_0x10.d32;
+
+    EDPI_SYNC_POL_t edpi_reg_0x14 = {.d32 = EDPI->EDPI_SYNC_POL};
+    edpi_reg_0x14.b.hspol = eDPICfg->eDPI_HoriSyncPolarity;
+    edpi_reg_0x14.b.depol = eDPICfg->eDPI_DataEnPolarity;
+    edpi_reg_0x14.b.vspol = eDPICfg->eDPI_VeriSyncPolarity;
+    EDPI->EDPI_SYNC_POL = edpi_reg_0x14.d32;
+
+    EDPI_COLOR_MAP_t edpi_reg_0x30 = {.d32 = EDPI->EDPI_COLOR_MAP};
+    edpi_reg_0x30.b.color_map = eDPICfg->eDPI_ColorMap;
+    EDPI->EDPI_COLOR_MAP = edpi_reg_0x30.d32;
+
+    if (eDPICfg->eDPI_OperateMode == EDPI_ADAPTED_COMMAND_MODE)
+    {
+        EDPI_CMD_CTL_t edpi_reg_0x3c = {.d32 = EDPI->EDPI_CMD_CTL};
+        edpi_reg_0x3c.b.tear_req = eDPICfg->eDPI_TearReq;
+        EDPI->EDPI_CMD_CTL = edpi_reg_0x3c.d32;
+
+        EDPI_CMD_MAX_LATENCY_t edpi_reg_0x40 = {.d32 = EDPI->EDPI_CMD_MAX_LATENCY};
+        edpi_reg_0x40.b.max_latency = eDPICfg->eDPI_CmdMaxLatency;
+        EDPI->EDPI_CMD_MAX_LATENCY = edpi_reg_0x40.d32;
+    }
+    else if (eDPICfg->eDPI_OperateMode == EDPI_STANDARD_VIDEO_MODE)
+    {
+        EDPI_VIDEO_CTL_t edpi_reg_0x38 = {.d32 = EDPI->EDPI_VIDEO_CTL};
+        edpi_reg_0x38.b.lcd_arc = eDPICfg->eDPI_LcdArc;
+        edpi_reg_0x38.b.sd_pol = eDPICfg->eDPI_ShutdnPolarity;
+        edpi_reg_0x38.b.clm_pol = eDPICfg->eDPI_ColorModePolarity;
+        edpi_reg_0x38.b.sd_en = eDPICfg->eDPI_ShutdnEn;
+        edpi_reg_0x38.b.clm_en = eDPICfg->eDPI_ColorModeEn;
+        edpi_reg_0x38.b.up_en = eDPICfg->eDPI_UpdateCfgEn;
+        EDPI->EDPI_VIDEO_CTL = edpi_reg_0x38.d32;
+    }
+
+    EDPI_OP_MODE_t edpi_reg_0x34 = {.d32 = EDPI->EDPI_OP_MODE};
+    edpi_reg_0x34.b.op_mode = eDPICfg->eDPI_OperateMode;
+    EDPI->EDPI_OP_MODE = edpi_reg_0x34.d32;
+
+    DPI_LINE_BUFFER_PIXEL_THRESHOLD_t edpi_reg_0x48 = {.d32 = EDPI->DPI_LINE_BUFFER_PIXEL_THRESHOLD};
+    edpi_reg_0x48.b.line_buffer_pixel_threshold = eDPICfg->eDPI_LineBufferPixelThreshold;
+    EDPI->DPI_LINE_BUFFER_PIXEL_THRESHOLD = edpi_reg_0x48.d32;
+}
+
+ITStatus EDPI_GetLineINTStatus(void)
+{
+    ITStatus bit_status = RESET;
+
+    EDPI_INT_FLAG_t edpi_reg_0x1c = {.d32 = EDPI->EDPI_INT_FLAG};
+    if (edpi_reg_0x1c.b.lif)
+    {
+        bit_status = SET;
+    }
+
+    return  bit_status;
+}
+
+ITStatus EDPI_GetSyncStatus(uint32_t signal)
+{
+    ITStatus bit_status = RESET;
+    EDPI_SYNC_STATUS_t edpi_reg_0x2c = {.d32 = EDPI->EDPI_SYNC_STATUS};
+    switch (signal)
+    {
+    case EDPI_HSYNCS:
+        if (edpi_reg_0x2c.b.hsyncs)
+        {
+            bit_status = SET;
+        }
+        break;
+    case EDPI_VSYNCS:
+        if (edpi_reg_0x2c.b.vsyncs)
+        {
+            bit_status = SET;
+        }
+        break;
+    case EDPI_VDES:
+        if (edpi_reg_0x2c.b.vdes)
+        {
+            bit_status = SET;
+        }
+        break;
+    case EDPI_HDES:
+        if (edpi_reg_0x2c.b.hdes)
+        {
+            bit_status = SET;
+        }
+        break;
+    }
+
+    /* Return the EDPI_SIGNAL status */
+    return  bit_status;
+}
+
+/******************* (C) COPYRIGHT 2021 Realtek Semiconductor Corporation *****END OF FILE****/
+
