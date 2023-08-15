@@ -736,7 +736,24 @@ __STATIC_INLINE void LCDC_SET_INFINITE_ADDR(uint32_t addr1, uint32_t addr2)
     LCDC_DMA_LINKLIST->GRP2_SAR_FOR_INFINITE_MODE = addr2;
 }
 
+__STATIC_INLINE void LCDC_DMA_SetSourceAddress(LCDC_DMA_ChannelTypeDef *LCDC_DMA_Channelx,
+                                               uint32_t Address)
+{
+    /* Check the parameters */
+    assert_param(IS_DMA_ALL_PERIPH(DMA_Channelx));
 
+    LCDC_DMA_Channelx->LCDC_DMA_SARx = Address;
+}
+
+__STATIC_INLINE void LCDC_DMA_SetBufferSize(LCDC_DMA_ChannelTypeDef *LCDC_DMA_Channelx,
+                                            uint32_t buffer_size)
+{
+    /* Check the parameters */
+    assert_param(IS_DMA_ALL_PERIPH(DMA_Channelx));
+
+    /* configure high 32 bit of CTL register */
+    LCDC_DMA_Channelx->LCDC_DMA_CTL_HIGHx = buffer_size;
+}
 
 void LCDC_Init(LCDC_InitTypeDef *LCDC_Init);
 

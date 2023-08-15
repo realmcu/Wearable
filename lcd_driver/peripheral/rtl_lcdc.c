@@ -374,6 +374,12 @@ void LCDC_DMA_LinkList_Init(LCDC_DMALLI_InitTypeDef *LCDC_DMA_LLIConfig,
     LCDC_DMA_LINKLIST->DMA_CFG = dmall_reg_0x44.d32;
 }
 
+void LCDC_DMA_Infinite_Buf_Update(uint8_t *G1_SAR_buf, uint8_t *G2_SAR_buf)
+{
+    LCDC_DMA_LINKLIST->GRP1_SAR_FOR_INFINITE_MODE = (uint32_t)G1_SAR_buf;
+    LCDC_DMA_LINKLIST->GRP2_SAR_FOR_INFINITE_MODE = (uint32_t)G2_SAR_buf;
+}
+
 
 
 /******************* (C) COPYRIGHT 2021 Realtek Semiconductor Corporation *****END OF FILE****/

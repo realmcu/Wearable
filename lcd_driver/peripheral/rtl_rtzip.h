@@ -187,9 +187,9 @@ typedef union
 #define IS_RTZIP_ALGORITHM(ALGO)             (((ALGO) == RTZIP_ALGO_RLE) || ((ALGO) == RTZIP_ALGO_FASTLZ)      ||\
                                               ((ALGO) == RTZIP_ALGO_YUV_BLUR_FASTLZ) || ((ALGO) == RTZIP_ALGO_YUV_BLUR))
 
-#define RTZIP_PIXEL_16BIT                   (BIT(0))
-#define RTZIP_PIXEL_24BIT                   (BIT(1))
-#define RTZIP_PIXEL_32BIT                   (BIT(0)|BIT(1))
+#define RTZIP_PIXEL_16BIT                   (0)
+#define RTZIP_PIXEL_24BIT                   (BIT(0))
+#define RTZIP_PIXEL_32BIT                   (BIT(1))
 #define IS_RTZIP_PIXEL_BYTES(NUM)           (((NUM) == RTZIP_PIXEL_16BIT) || ((NUM) == RTZIP_PIXEL_24BIT) || ((NUM) == RTZIP_PIXEL_32BIT))
 
 #define RTZIP_RLE_1BYTE_LEN                 (BIT(0))
