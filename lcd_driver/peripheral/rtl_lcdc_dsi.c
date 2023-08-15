@@ -2,7 +2,7 @@
 *********************************************************************************************************
 *               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
-* @file     rtl_lcdc_dsi.c
+* @file     rtl876x_dsi.c
 * @brief    This file provides all the I2C firmware functions.
 * @details
 * @author   howie wang

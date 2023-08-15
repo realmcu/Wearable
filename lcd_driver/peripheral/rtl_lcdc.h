@@ -20,7 +20,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "rtl_lcdc_dma.h"
 #include "rtl_lcdc_handler_reg.h"
-#include "rtl_lcdc_dma_link_reg.h"
+#include "rtl_lcdc_dma_ll_reg.h"
 
 typedef enum
 {
@@ -62,6 +62,7 @@ typedef enum
 typedef struct
 {
     uint32_t LCDC_Interface;
+    uint32_t LCDC_GroupSel;
     uint32_t LCDC_PixelInputFarmat;
     uint32_t LCDC_PixelOutpuFarmat;
     uint32_t LCDC_PixelBitSwap;
@@ -133,7 +134,17 @@ typedef struct
 
 
 *===============================================================*/
+#undef  DISPLAY_CTRL_REG_BASE
+
+#if defined RTL8762G
+
+#define DISPLAY_CTRL_REG_BASE              0x40023000UL
+
+#elif defined BB2PLUS
+
 #define DISPLAY_CTRL_REG_BASE                0x40017000UL
+
+#endif
 #define LCDC_DMA_CHANNEL_REG_BASE           (DISPLAY_CTRL_REG_BASE + 0)
 #define LCDC_DMA_Channel0_BASE              (DISPLAY_CTRL_REG_BASE + 0x000)
 #define LCDC_DMA_REG_BASE                   (DISPLAY_CTRL_REG_BASE + 0x2c0)
@@ -147,8 +158,8 @@ typedef struct
 #define LCDC_DMA_Channel0                   ((LCDC_DMA_ChannelTypeDef *) LCDC_DMA_Channel0_BASE)
 #define LCDC_DMA_BASE                       ((LCDC_DMA_TypeDef *) LCDC_DMA_REG_BASE)
 #define DBIC                                ((LCDC_DBIC_TypeDef *)DBIC_REG_BASE)
-#define LCDC_DMA_LINKLIST                   ((DMA_Link_TypeDef *)LCDC_DMA_LINKLIST_REG_BASE)
-#define EDPI                                ((LCDC_eDPI_TypeDef *)EDPI_REG_BASE)
+#define LCDC_DMA_LINKLIST                   ((LCDC_DMA_LinkList_TypeDef *)LCDC_DMA_LINKLIST_REG_BASE)
+#define EDPI                                ((LCDC_EDPI_TypeDef *)EDPI_REG_BASE)
 #define DBIB                                ((LCDC_DBIB_TypeDef *)DBIB_REG_BASE)
 #define LCDC_HANDLER                        ((LCDC_Handler_TypeDef *)LCDC_HANDLER_REG_BASE)
 
@@ -458,7 +469,7 @@ typedef enum
 
 __STATIC_INLINE void LCDC_LCD_SET_RST(bool reset)
 {
-    INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
+    LCDC_HANDLER_INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
     if (reset)
     {
         handler_reg_0x00.b.reset_lcd_display_module = 0;
@@ -472,7 +483,7 @@ __STATIC_INLINE void LCDC_LCD_SET_RST(bool reset)
 
 __STATIC_INLINE void LCDC_Cmd(FunctionalState NewState)
 {
-    INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
+    LCDC_HANDLER_INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
     if (NewState)
     {
         handler_reg_0x00.b.display_controller_enable = 1;
@@ -488,7 +499,7 @@ __STATIC_INLINE void LCDC_SwitchIF(uint32_t InterFace)
 {
     assert_param(IS_LCDC_IF_SEL(InterFace));
 
-    INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
+    LCDC_HANDLER_INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
     handler_reg_0x00.b.interface_select = InterFace;
     LCDC_HANDLER->INTERFACE_SELECT = handler_reg_0x00.d32;
 }
@@ -496,7 +507,7 @@ __STATIC_INLINE void LCDC_SwitchIF(uint32_t InterFace)
 __STATIC_INLINE void LCDC_SwitchMode(uint32_t mode)
 {
     assert_param(IS_LCDC_MODE(mode));
-    OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
+    LCDC_HANDLER_OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
     handler_reg_0x14.b.access_mode = mode;
     LCDC_HANDLER->OPERATE_CTR = handler_reg_0x14.d32;
 }
@@ -504,7 +515,7 @@ __STATIC_INLINE void LCDC_SwitchMode(uint32_t mode)
 __STATIC_INLINE void LCDC_SwitchDirect(uint32_t dir)
 {
     assert_param(IS_LCDC_DIR(dir));
-    OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
+    LCDC_HANDLER_OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
     handler_reg_0x14.b.data_rw = dir;
     LCDC_HANDLER->OPERATE_CTR = handler_reg_0x14.d32;
 }
@@ -512,7 +523,7 @@ __STATIC_INLINE void LCDC_SwitchDirect(uint32_t dir)
 __STATIC_INLINE void LCDC_DmaCmd(FunctionalState NewState)
 {
     assert_param(IS_FUNCTIONAL_STATE(NewState));
-    DMA_FIFO_CTRL_t handler_reg_0x18 = {.d32 = LCDC_HANDLER->DMA_FIFO_CTRL};
+    LCDC_HANDLER_DMA_FIFO_CTRL_t handler_reg_0x18 = {.d32 = LCDC_HANDLER->DMA_FIFO_CTRL};
     if (NewState == ENABLE)
     {
         handler_reg_0x18.b.dma_enable = 1;
@@ -527,7 +538,7 @@ __STATIC_INLINE void LCDC_DmaCmd(FunctionalState NewState)
 __STATIC_INLINE void LCDC_TeCmd(FunctionalState NewState)
 {
     assert_param(IS_FUNCTIONAL_STATE(NewState));
-    TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
+    LCDC_HANDLER_TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
     if (NewState == ENABLE)
     {
         handler_reg_0x10.b.tear_auto_turn_on_autowritestart = 1;
@@ -542,7 +553,7 @@ __STATIC_INLINE void LCDC_TeCmd(FunctionalState NewState)
 __STATIC_INLINE void LCDC_AutoWriteCmd(FunctionalState NewState)
 {
     assert_param(IS_FUNCTIONAL_STATE(NewState));
-    OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
+    LCDC_HANDLER_OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
     if (NewState == ENABLE)
     {
         handler_reg_0x14.b.auto_write_start = 1;
@@ -557,7 +568,7 @@ __STATIC_INLINE void LCDC_AutoWriteCmd(FunctionalState NewState)
 __STATIC_INLINE void LCDC_AutoReadCmd(FunctionalState NewState)
 {
     assert_param(IS_FUNCTIONAL_STATE(NewState));
-    OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
+    LCDC_HANDLER_OPERATE_CTR_t handler_reg_0x14 = {.d32 = LCDC_HANDLER->OPERATE_CTR};
     if (NewState == ENABLE)
     {
         handler_reg_0x14.b.auto_read_start = 1;
@@ -581,7 +592,7 @@ __STATIC_INLINE uint32_t LCDC_ReadFIFO(void)
 
 __STATIC_INLINE void LCDC_ClearDmaFifo(void)
 {
-    DMA_FIFO_ICR_t handler_reg_0x24 = {.d32 = LCDC_HANDLER->DMA_FIFO_ICR};
+    LCDC_HANDLER_DMA_FIFO_ICR_t handler_reg_0x24 = {.d32 = LCDC_HANDLER->DMA_FIFO_ICR};
     handler_reg_0x24.b.fifo_clr = 1;
     LCDC_HANDLER->DMA_FIFO_ICR = handler_reg_0x24.d32;
 }
@@ -607,7 +618,7 @@ __STATIC_INLINE uint32_t LCDC_GetTxPixelCnt(void)
 
 __STATIC_INLINE void LCDC_ClearTxPixelCnt(void)
 {
-    DMA_FIFO_ICR_t handler_reg_0x24 = {.d32 = LCDC_HANDLER->DMA_FIFO_ICR};
+    LCDC_HANDLER_DMA_FIFO_ICR_t handler_reg_0x24 = {.d32 = LCDC_HANDLER->DMA_FIFO_ICR};
     handler_reg_0x24.b.tx_output_cnt_clr = 1;
     LCDC_HANDLER->DMA_FIFO_ICR = handler_reg_0x24.d32;
 }
@@ -629,7 +640,7 @@ __STATIC_INLINE uint32_t LCDC_GetRxCounter(void)
 
 __STATIC_INLINE void LCDC_ClearRxCounter(void)
 {
-    DMA_FIFO_ICR_t handler_reg_0x24 = {.d32 = LCDC_HANDLER->DMA_FIFO_ICR};
+    LCDC_HANDLER_DMA_FIFO_ICR_t handler_reg_0x24 = {.d32 = LCDC_HANDLER->DMA_FIFO_ICR};
     handler_reg_0x24.b.rx_output_cnt_clr = 1;
     LCDC_HANDLER->DMA_FIFO_ICR = handler_reg_0x24.d32;
 }
@@ -637,41 +648,41 @@ __STATIC_INLINE void LCDC_ClearRxCounter(void)
 __STATIC_INLINE void LCDC_AXIMUXMode(uint32_t mode)
 {
     assert_param(IS_LCDC_AXI_MUX_MODE(mode));
-    AXI_MUX_MODE_t handler_reg_0x40 = {.d32 = LCDC_HANDLER->AXI_MUX_MODE};
+    LCDC_HANDLER_AXI_MUX_MODE_t handler_reg_0x40 = {.d32 = LCDC_HANDLER->AXI_MUX_MODE};
     handler_reg_0x40.b.axi_mux_mode = mode;
     LCDC_HANDLER->AXI_MUX_MODE = handler_reg_0x40.d32;
 }
 
 __STATIC_INLINE void LCDC_SPICCmd(uint8_t cmd)
 {
-    SPIC_CMD_t handler_reg_0x44 = {.d32 = LCDC_HANDLER->SPIC_CMD};
+    LCDC_HANDLER_SPIC_CMD_t handler_reg_0x44 = {.d32 = LCDC_HANDLER->SPIC_CMD};
     handler_reg_0x44.b.spic_cmd = cmd;
     LCDC_HANDLER->SPIC_CMD = handler_reg_0x44.d32;
 }
 
 __STATIC_INLINE void LCDC_SPICAddr(uint32_t addr)
 {
-    SPIC_ADDR_t handler_reg_0x44 = {.d32 = 0};
+    LCDC_HANDLER_SPIC_ADDR_t handler_reg_0x44 = {.d32 = 0};
     handler_reg_0x44.b.spic_addr = addr;
     LCDC_HANDLER->SPIC_ADDR = handler_reg_0x44.d32;
 }
 
 __STATIC_INLINE uint32_t LCDC_SPICRXFIFOReadSize(void)
 {
-    SPIC_RX_FIFO_READ_SIZE_t handler_reg_0x68 = {.d32 = LCDC_HANDLER->SPIC_RX_FIFO_READ_SIZE};
+    LCDC_HANDLER_SPIC_RX_FIFO_READ_SIZE_t handler_reg_0x68 = {.d32 = LCDC_HANDLER->SPIC_RX_FIFO_READ_SIZE};
     return handler_reg_0x68.b.spic_rx_fifo_read_size;
 }
 
 __STATIC_INLINE uint32_t LCDC_DMA_LOAD_CNT(void)
 {
-    DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
+    LCDC_HANDLER_DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
     return (handler_reg_0x4c.b.dma_load_cnt);
 }
 
 __STATIC_INLINE void LCDC_DMA_MultiBlockCmd(FunctionalState NewState)
 {
     assert_param(IS_FUNCTIONAL_STATE(NewState));
-    DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
+    LCDC_HANDLER_DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
     if (NewState == ENABLE)
     {
         handler_reg_0x4c.b.dma_multi_block_en = 1;
@@ -686,7 +697,7 @@ __STATIC_INLINE void LCDC_DMA_MultiBlockCmd(FunctionalState NewState)
 __STATIC_INLINE void LCDC_DMA_LinkListCmd(FunctionalState NewState)
 {
     assert_param(IS_FUNCTIONAL_STATE(NewState));
-    DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
+    LCDC_HANDLER_DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
     if (NewState == ENABLE)
     {
         handler_reg_0x4c.b.link_list_enable = 1;
@@ -700,21 +711,21 @@ __STATIC_INLINE void LCDC_DMA_LinkListCmd(FunctionalState NewState)
 
 __STATIC_INLINE void LCDC_DMA_LOAD_CNT_CLR(void)
 {
-    DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
+    LCDC_HANDLER_DMA_MULTI_BLOCK_CTRL_t handler_reg_0x4c = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL};
     handler_reg_0x4c.b.reg_dma_load_cnt_clr = 1;
     LCDC_HANDLER->DMA_MULTI_BLOCK_CTRL = handler_reg_0x4c.d32;
 }
 
 __STATIC_INLINE void LCDC_SET_GROUP1_BLOCKSIZE(uint32_t size)
 {
-    DMA_MULTI_BLOCK_SIZE1_t handler_reg_0x50 = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_SIZE1};
+    LCDC_HANDLER_DMA_MULTI_BLOCK_SIZE1_t handler_reg_0x50 = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_SIZE1};
     handler_reg_0x50.b.block_size_group_1 = size;
     LCDC_HANDLER->DMA_MULTI_BLOCK_SIZE1 = handler_reg_0x50.d32;
 }
 
 __STATIC_INLINE void LCDC_SET_GROUP2_BLOCKSIZE(uint32_t size)
 {
-    DMA_MULTI_BLOCK_SIZE2_t handler_reg_0x54 = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_SIZE2};
+    LCDC_HANDLER_DMA_MULTI_BLOCK_SIZE2_t handler_reg_0x54 = {.d32 = LCDC_HANDLER->DMA_MULTI_BLOCK_SIZE2};
     handler_reg_0x54.b.block_size_group_2 = size;
     LCDC_HANDLER->DMA_MULTI_BLOCK_SIZE2 = handler_reg_0x54.d32;
 }

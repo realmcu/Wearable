@@ -16,6 +16,16 @@
 #include "rtl_lcdc_dbib.h"
 #include "rtl_lcdc_edpi.h"
 
+typedef struct
+{
+    LCDC_DMA_LinkList_TypeDef *link;
+    LCDC_Handler_TypeDef *handler;
+    LCDC_DBIB_TypeDef *DBI_B;
+    LCDC_EDPI_TypeDef *eDPI;
+} LCDC_TypeDef;
+
+LCDC_TypeDef LCDCdef = {LCDC_DMA_LINKLIST, LCDC_HANDLER, DBIB, EDPI};
+LCDC_TypeDef *LCDC = &LCDCdef;
 
 void LCDC_Init(LCDC_InitTypeDef *cfg)
 {
@@ -27,62 +37,45 @@ void LCDC_Init(LCDC_InitTypeDef *cfg)
     assert_param(IS_LCDC_TE_CMD(cfg->LCDC_TeEn));
     assert_param(IS_LCDC_TE_SIGNAL_VALID(cfg->LCDC_TePolarity));
 
-#if 0
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel0 = 0;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel1 = 1;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_mux_clk_cg_en = 1;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_div_en = 1;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_div_sel = 1;
-
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_mipi_rx_div_sel = 5;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_mipi_rx_div_en = 1;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_mipi_rx_mux_clk_cg_en = 1;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_mipi_rx_clk_src_sel = 0;
-#endif
-
-
     /* Configure mask interrupt */
-    DMA_FIFO_IMR_t handler_reg_0x1c = {.d32 = LCDC_HANDLER->DMA_FIFO_IMR};
-    handler_reg_0x1c.b.tx_fifo_transfer_error_int_msk = 1;
-    handler_reg_0x1c.b.tx_fifo_threshold_int_msk = 1;
-    handler_reg_0x1c.b.tx_fifo_overflow_int_msk = 1;
-    handler_reg_0x1c.b.tx_fifo_empty_int_msk = 1;
-    handler_reg_0x1c.b.tx_auto_done_int_msk = 1;
-    handler_reg_0x1c.b.rx_fifo_overflow_int_msk = 1;
-    handler_reg_0x1c.b.rx_auto_done_int_msk = 1;
-    handler_reg_0x1c.b.tear_trigger_int_msk = 1;
+    LCDC_HANDLER_DMA_FIFO_IMR_t handler_reg_0x1c = {.d32 = LCDC_HANDLER->DMA_FIFO_IMR};
     handler_reg_0x1c.b.display_controller_waveform_finish_int_msk = 1;
-    handler_reg_0x1c.b.multi_block_last_block_start_int_msk = 1;
-    LCDC_HANDLER->DMA_FIFO_IMR = handler_reg_0x1c.d32;
+    handler_reg_0x1c.b.rx_auto_done_int_msk = 1;
+    handler_reg_0x1c.b.rx_fifo_overflow_int_msk = 1;
+    handler_reg_0x1c.b.tear_trigger_int_msk = 1;
+    handler_reg_0x1c.b.tx_auto_done_int_msk = 1;
+    handler_reg_0x1c.b.tx_fifo_empty_int_msk = 1;
+    handler_reg_0x1c.b.tx_fifo_overflow_int_msk = 1;
+    handler_reg_0x1c.b.tx_fifo_threshold_int_msk = 1;
 
-    INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
-    handler_reg_0x00.b.interface_select = cfg->LCDC_Interface;
-    LCDC_HANDLER->INTERFACE_SELECT = handler_reg_0x00.d32;
-
-    FT_IN_t handler_reg_0x04 = {.d32 = LCDC_HANDLER->FT_IN};
+    LCDC_HANDLER_FT_IN_t handler_reg_0x04 = {.d32 = LCDC_HANDLER->FT_IN};
     handler_reg_0x04.b.input_format = cfg->LCDC_PixelInputFarmat;
     LCDC_HANDLER->FT_IN = handler_reg_0x04.d32;
 
-    FT_OUT_t handler_reg_0x08 = {.d32 = LCDC_HANDLER->FT_OUT};
+    LCDC_HANDLER_INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
+    handler_reg_0x00.b.interface_select = cfg->LCDC_Interface;
+    handler_reg_0x00.b.group_sel = cfg->LCDC_GroupSel;
+    LCDC_HANDLER->INTERFACE_SELECT = handler_reg_0x00.d32;
+
+    LCDC_HANDLER_FT_OUT_t handler_reg_0x08 = {.d32 = LCDC_HANDLER->FT_OUT};
     handler_reg_0x08.b.output_format = cfg->LCDC_PixelOutpuFarmat;
     LCDC_HANDLER->FT_OUT = handler_reg_0x08.d32;
 
-    BIT_SWAP_t handler_reg_0x0c = {.d32 = LCDC_HANDLER->BIT_SWAP};
+    LCDC_HANDLER_BIT_SWAP_t handler_reg_0x0c = {.d32 = LCDC_HANDLER->BIT_SWAP};
     handler_reg_0x0c.b.bit_swap = cfg->LCDC_PixelBitSwap;
     LCDC_HANDLER->BIT_SWAP = handler_reg_0x0c.d32;
 
-    TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
-    handler_reg_0x10.b.tear_auto_turn_on_autowritestart = cfg->LCDC_TeEn;
+    LCDC_HANDLER_TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
+    handler_reg_0x10.b.tear_logic_enable = cfg->LCDC_TeEn;
     handler_reg_0x10.b.tear_polarity = cfg->LCDC_TePolarity;
     handler_reg_0x10.b.tear_input_mux = cfg->LCDC_TeInputMux;
-    handler_reg_0x10.b.tear_auto_turn_on_dma_en = 0;
     LCDC_HANDLER->TEAR_CTR = handler_reg_0x10.d32;
 
-    DMA_FIFO_CTRL_t handler_reg_0x18 = {.d32 = LCDC_HANDLER->DMA_FIFO_CTRL};
+    LCDC_HANDLER_DMA_FIFO_CTRL_t handler_reg_0x18 = {.d32 = LCDC_HANDLER->DMA_FIFO_CTRL};
     handler_reg_0x18.b.dma_fifo_threshold = cfg->LCDC_DmaThreshold;
     LCDC_HANDLER->DMA_FIFO_CTRL = handler_reg_0x18.d32;
 
-    INFINITE_MODE_CTR_t handler_reg_0x64 = {.d32 = LCDC_HANDLER->INFINITE_MODE_CTR};
+    LCDC_HANDLER_INFINITE_MODE_CTR_t handler_reg_0x64 = {.d32 = LCDC_HANDLER->INFINITE_MODE_CTR};
     if (cfg->LCDC_InfiniteModeEn == ENABLE)
     {
         handler_reg_0x64.b.infinite_mode_en = 1;
@@ -92,18 +85,6 @@ void LCDC_Init(LCDC_InitTypeDef *cfg)
         handler_reg_0x64.b.infinite_mode_en = 0;
     }
     LCDC_HANDLER->INFINITE_MODE_CTR = handler_reg_0x64.d32;
-}
-
-void LCDC_clk_src_sel(CLK_DISPLAY_SRC_MUX0 src_mux0, CLK_DISPLAY_SRC_MUX1 src_mux1,
-                      CLK_DISPLAY_MUX_CG_EN mux_cg_en, LCDC_DIV_EN div_en, LCDC_DIV_SEL div_sel)
-{
-#if 0
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel0 = src_mux0;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel1 = src_mux1;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_mux_clk_cg_en = mux_cg_en;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_div_en = div_en;
-    PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_div_sel = div_sel;
-#endif
 }
 
 void LCDC_MaskINTConfig(uint32_t LCDC_INT_MSK, FunctionalState NewState)
@@ -348,7 +329,7 @@ void LCDC_DMA_LinkList_Init(LCDC_DMALLI_InitTypeDef *LCDC_DMA_LLIConfig,
 {
     LCDC_DMA_InitTypeDef *LCDC_DMA_Init = (LCDC_DMA_InitTypeDef *)LCDC_DMA_cfg;
     /* Disable WP */
-    DMA_CFG_t dmall_reg_0x44 = {.d32 = LCDC_DMA_LINKLIST->DMA_CFG};
+    LCDC_DMALL_DMA_CFG_t dmall_reg_0x44 = {.d32 = LCDC_DMA_LINKLIST->DMA_CFG};
     dmall_reg_0x44.b.reg_dma_g1_wp = 0;
     dmall_reg_0x44.b.reg_dma_g2_wp = 0;
     LCDC_DMA_LINKLIST->DMA_CFG = dmall_reg_0x44.d32;

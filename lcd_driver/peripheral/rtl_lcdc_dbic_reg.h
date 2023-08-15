@@ -10,90 +10,90 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ================================================================================ */
-/* ============= Refence: [REG]Bee3pro_Display_controller_register_table_20221130.xlsx =============== */
+/* ============= Refence: DC.xlsx =============== */
 /* ================================================================================ */
 typedef struct
 {
-    __IO uint32_t CTRLR0;                  /*!< 0x00 */
-    __IO uint32_t RX_NDF;                  /*!< 0x04 */
-    __IO uint32_t SSIENR;                  /*!< 0x08 */
-    __IO uint32_t RESERVED[1];             /*!< 0x0C */
-    __IO uint32_t SER;                     /*!< 0x10 */
-    __IO uint32_t BAUDR;                   /*!< 0x14 */
-    __IO uint32_t TXFTLR;                  /*!< 0x18 */
-    __IO uint32_t RXFTLR;                  /*!< 0x1C */
-    __IO uint32_t TXFLR;                   /*!< 0x20 */
-    __IO uint32_t RXFLR;                   /*!< 0x24 */
-    __IO uint32_t SR;                      /*!< 0x28 */
-    __IO uint32_t IMR;                     /*!< 0x2C */
-    __IO uint32_t ISR;                     /*!< 0x30 */
-    __IO uint32_t RISR;                    /*!< 0x34 */
-    __IO uint32_t TXOICR;                  /*!< 0x38 */
-    __IO uint32_t RXOICR;                  /*!< 0x3C */
-    __IO uint32_t RXUICR;                  /*!< 0x40 */
-    __IO uint32_t MSTICR;                  /*!< 0x44 */
-    __IO uint32_t ICR;                     /*!< 0x48 */
-    __IO uint32_t DMACR;                   /*!< 0x4C */
-    __IO uint32_t DMATDLR;                 /*!< 0x50 */
-    __IO uint32_t DMARDLR;                 /*!< 0x54 */
-    __IO uint32_t IDR;                     /*!< 0x58 */
-    __IO uint32_t SPIC_VERSION;            /*!< 0x5C */
+    __IO uint32_t  CTRLR0;                  //0X00
+    __IO uint32_t  RX_NDF;                  //0X04
+    __IO uint32_t  SSIENR;                  //0X08
+    __IO uint32_t  RESERVED[1];             //0X0C
+    __IO uint32_t  SER;                     //0X10
+    __IO uint32_t  BAUDR;                   //0X14
+    __IO uint32_t  TXFTLR;                  //0X18
+    __IO uint32_t  RXFTLR;                  //0X1C
+    __IO uint32_t  TXFLR;                   //0X20
+    __IO uint32_t  RXFLR;                   //0X24
+    __IO uint32_t  SR;                      //0X28
+    __IO uint32_t  IMR;                     //0X2C
+    __IO uint32_t  ISR;                     //0X30
+    __IO uint32_t  RISR;                    //0X34
+    __IO uint32_t  TXOICR;                  //0X38
+    __IO uint32_t  RXOICR;                  //0X3C
+    __IO uint32_t  RXUICR;                  //0X40
+    __IO uint32_t  MSTICR;                  //0X44
+    __IO uint32_t  ICR;                     //0X48
+    __IO uint32_t  DMACR;                   //0X4C
+    __IO uint32_t  DMATDLR;                 //0X50
+    __IO uint32_t  DMARDLR;                 //0X54
+    __IO uint32_t  IDR;                     //0X58
+    __IO uint32_t  SPIC_VERSION;            //0X5C
     union
     {
         __IO uint8_t  byte;
         __IO uint16_t half;
         __IO uint32_t word;
-    } DR[16];                               /*!< 0x060~0x09C */
-    __IO uint32_t DM_DR[16];                   /*!< 0x0A0~0x0DC */
-    __IO uint32_t READ_FAST_SINGLE;         /*!< 0xE0 */
-    __IO uint32_t READ_DUAL_DATA;          /*!< 0xE4 */
-    __IO uint32_t READ_DUAL_ADDR_DATA;     /*!< 0xE8 */
-    __IO uint32_t READ_QUAD_DATA;          /*!< 0xEC */
-    __IO uint32_t READ_QUAD_ADDR_DATA;     /*!< 0xF0 */
-    __IO uint32_t WRITE_SINGLE;             /*!< 0xF4 */
-    __IO uint32_t WRITE_DUAL_DATA;         /*!< 0xF8 */
-    __IO uint32_t WRITE_DUAL_ADDR_DATA;    /*!< 0xFC */
-    __IO uint32_t WRITE_QUAD_DATA;         /*!< 0x100 */
-    __IO uint32_t WRITE_QUAD_ADDR_DATA;    /*!< 0x104 */
-    __IO uint32_t WRITE_ENABLE;            /*!< 0x108 */
-    __IO uint32_t READ_STATUS;             /*!< 0x10C */
-    __IO uint32_t CTRLR2;                  /*!< 0x110 */
-    __IO uint32_t FBAUDR;                  /*!< 0x114 */
-    __IO uint32_t USER_LENGTH;             /*!< 0x118 */
-    __IO uint32_t AUTO_LENGTH;             /*!< 0x11C */
-    __IO uint32_t VALID_CMD;               /*!< 0x120 */
-    __IO uint32_t FLASH_SIZE;              /*!< 0x124 */
-    __IO uint32_t FLUSH_FIFO;              /*!< 0x128 */
-    __IO uint32_t DUM_BYTE;                /*!< 0x12C */
-    __IO uint32_t TX_NDF;                  /*!< 0x130 */
-    __IO uint32_t DEVICE_INFO;             /*!< 0x134 */
-    __IO uint32_t TPR0;                    /*!< 0x138 */
-    __IO uint32_t AUTO_LENGTH2;            /*!< 0x13C */
-    __IO uint32_t TPR1;                     /*!< 0x140 */
-    __IO uint32_t RESERVED1[15];             /*!< 0x144~17C */
-    __IO uint32_t ST_DR[16];                   /*!< 0x180~0x1BC */
-    __IO uint32_t STFLR;                   /*!< 0x1C0 */
-    __IO uint32_t RESERVED2[3];             /*!< 0x1C4~1CC */
-    __IO uint32_t PAGE_READ;               /*!< 0x1D0 */
+    } DR[16];                               //0x60-0x9C
+    __IO uint32_t  DM_DR[16];               //0XA0-0xDC
+    __IO uint32_t  READ_FAST_SINGLE;        //0XE0
+    __IO uint32_t  READ_DUAL_DATA;          //0XE4
+    __IO uint32_t  READ_DUAL_ADDR_DATA;     //0XE8
+    __IO uint32_t  READ_QUAD_DATA;          //0XEC
+    __IO uint32_t  READ_QUAD_ADDR_DATA;     //0XF0
+    __IO uint32_t  WRITE_SINGLE;            //0XF4
+    __IO uint32_t  WRITE_DUAL_DATA;         //0XF8
+    __IO uint32_t  WRITE_DUAL_ADDR_DATA;    //0XFC
+    __IO uint32_t  WRITE_QUAD_DATA;         //0X100
+    __IO uint32_t  WRITE_QUAD_ADDR_DATA;    //0X104
+    __IO uint32_t  WRITE_ENABLE;            //0X108
+    __IO uint32_t  READ_STATUS;             //0X10C
+    __IO uint32_t  CTRLR2;                  //0X110
+    __IO uint32_t  FBAUDR;                  //0X114
+    __IO uint32_t  USER_LENGTH;             //0X118
+    __IO uint32_t  AUTO_LENGTH;             //0X11C
+    __IO uint32_t  VALID_CMD;               //0X120
+    __IO uint32_t  FLASH_SIZE;              //0X124
+    __IO uint32_t  FLUSH_FIFO;              //0X128
+    __IO uint32_t  DUM_BYTE;                //0X12C
+    __IO uint32_t  TX_NDF;                  //0X130
+    __IO uint32_t  DEVICE_INFO;             //0X134
+    __IO uint32_t  TPR0;                    //0X138
+    __IO uint32_t  AUTO_LENGTH2;            //0X13C
+    __IO uint32_t  TPR1;                    //0X140
+    __IO uint32_t  RESERVED1[15];            //0x144-0x17C
+    __IO uint32_t  ST_DR[16];               //0X180-0x1BC
+    __IO uint32_t  STFLR;                   //0X1C0
+    __IO uint32_t  RESERVED2[3];            //0x1C4-0x1CC
+    __IO uint32_t  PAGE_READ;               //0X1D0
 } LCDC_DBIC_TypeDef;
 
 /* 0x00
-   4:0     R/W    sipol                   0x1F
-   5       R/W    sipol_en                0x0
-   6       R/W    scph                    0x0
-   7       R/W    scpol                   0x0
-   9:8     R/W    tmod                    0x0
-   10      R/W    gclk_dis                0x0
-   12:11   R      reserved2               0x0
-   15:13   R/W    ddr_en                  0x0
-   17:16   R/W    addr_ch                 0x0
-   19:18   R/W    data_ch                 0x0
-   21:20   R/W    cmd_ch                  0x0
-   22      R/W    fast_rd                 0x0
-   27:23   R/W    ck_mtimes               0x2
-   29:28   R      reserved1               0x0
-   30      R/W    uar                     0x0
-   31      R/W    user_mode               0x0
+    4:0     R/W    sipol                   0x1F
+    5       R/W    sipol_en                0x0
+    6       R/W    scph                    0x0
+    7       R/W    scpol                   0x0
+    9:8     R/W    tmod                    0x0
+    10      R/W    gclk_dis                0x0
+    12:11   R      reserved2               0x0
+    15:13   R/W    ddr_en                  0x0
+    17:16   R/W    addr_ch                 0x0
+    19:18   R/W    data_ch                 0x0
+    21:20   R/W    cmd_ch                  0x0
+    22      R/W    fast_rd                 0x0
+    27:23   R/W    ck_mtimes               0x2
+    29:28   R      reserved1               0x0
+    30      R/W    uar                     0x0
+    31      R/W    user_mode               0x0
 */
 typedef union
 {
@@ -123,8 +123,8 @@ typedef union
 
 
 /* 0x04
-   23:0    R/W    rx_ndf                  0x0
-   31:24   R      reserved                0x0
+    23:0    R/W    rx_ndf                  0x0
+    31:24   R      reserved                0x0
 */
 typedef union
 {
@@ -140,11 +140,11 @@ typedef union
 
 
 /* 0x08
-   0       R/W    spic_en                 0x0
-   1       R/W    atck_cmd                0x0
-   3:2     R      reserved2               0x0
-   4       W      pgm_rst_test_en         0x0
-   31:5    R      reserved1               0x0
+    0       R/W    spic_en                 0x0
+    1       R/W    atck_cmd                0x0
+    3:2     R      reserved2               0x0
+    4       W      pgm_rst_test_en         0x0
+    31:5    R      reserved1               0x0
 */
 typedef union
 {
@@ -163,8 +163,8 @@ typedef union
 
 
 /* 0x10
-   0       R/W    ser                     0x1
-   31:1    R      reserved                0x0
+    0       R/W    ser                     0x1
+    31:1    R      reserved                0x0
 */
 typedef union
 {
@@ -180,8 +180,8 @@ typedef union
 
 
 /* 0x14
-   11:0    R/W    sckdv                   0x6
-   31:12   R      reserved                0x0
+    11:0    R/W    sckdv                   0x6
+    31:12   R      reserved                0x0
 */
 typedef union
 {
@@ -197,8 +197,8 @@ typedef union
 
 
 /* 0x18
-   5: 0    R/W    tft                     0x0
-   31:6    R      reserved                0x0
+    5: 0    R/W    tft                     0x0
+    31:6    R      reserved                0x0
 */
 typedef union
 {
@@ -214,8 +214,8 @@ typedef union
 
 
 /* 0x1C
-   2: 0    R/W    rft                     0x7
-   31:3    R      reserved                0x0
+    2: 0    R/W    rft                     0x7
+    31:3    R      reserved                0x0
 */
 typedef union
 {
@@ -231,8 +231,8 @@ typedef union
 
 
 /* 0x20
-   6: 0    R      txflr                   0x0
-   31: 7   R      reserved                0x0
+    6: 0    R      txflr                   0x0
+    31: 7   R      reserved                0x0
 */
 typedef union
 {
@@ -248,8 +248,8 @@ typedef union
 
 
 /* 0x24
-   3: 0    R      rxflr                   0x0
-   31: 4   R      reserved                0x0
+    3: 0    R      rxflr                   0x0
+    31: 4   R      reserved                0x0
 */
 typedef union
 {
@@ -265,16 +265,16 @@ typedef union
 
 
 /* 0x28
-   0       R      busy                    0x0
-   1       R      tfnf                    0x1
-   2       R      tfe                     0x1
-   3       R      rfne                    0x0
-   4       R      rff                     0x0
-   5       R      txe                     0x0
-   6       R      dcol                    0x0
-   7       R      boot_fin                0x0
-   8       R/W    atwr_rdsr_n             0x0
-   31:9    R      reserved                0x0
+    0       R      busy                    0x0
+    1       R      tfnf                    0x1
+    2       R      tfe                     0x1
+    3       R      rfne                    0x0
+    4       R      rff                     0x0
+    5       R      txe                     0x0
+    6       R      dcol                    0x0
+    7       R      boot_fin                0x0
+    8       R/W    atwr_rdsr_n             0x0
+    31:9    R      reserved                0x0
 */
 typedef union
 {
@@ -298,24 +298,24 @@ typedef union
 
 
 /* 0x2C
-   0       R/W    txeim                   0x0
-   1       R/W    txoim                   0x1
-   2       R/W    rxuim                   0x1
-   3       R/W    rxoim                   0x1
-   4       R/W    rxfim                   0x0
-   5       R/W    fseim                   0x1
-   6       R/W    wbeim                   0x1
-   7       R/W    byeim                   0x1
-   8       R/W    aceim                   0x1
-   9       R/W    useim                   0x0
-   10      R/W    tfsim                   0x0
-   11      R/W    acsim                   0x0
-   12      R/W    dreim                   0x0
-   13      R/W    stuim                   0x0
-   14      R/W    stoim                   0x0
-   15      R/W    stfim                   0x0
-   16      R/W    nweim                   0x0
-   31:17   R      reserved                0x0
+    0       R/W    txeim                   0x0
+    1       R/W    txoim                   0x1
+    2       R/W    rxuim                   0x1
+    3       R/W    rxoim                   0x1
+    4       R/W    rxfim                   0x0
+    5       R/W    fseim                   0x1
+    6       R/W    wbeim                   0x1
+    7       R/W    byeim                   0x1
+    8       R/W    aceim                   0x1
+    9       R/W    useim                   0x0
+    10      R/W    tfsim                   0x0
+    11      R/W    acsim                   0x0
+    12      R/W    dreim                   0x0
+    13      R/W    stuim                   0x0
+    14      R/W    stoim                   0x0
+    15      R/W    stfim                   0x0
+    16      R/W    nweim                   0x0
+    31:17   R      reserved                0x0
 */
 typedef union
 {
@@ -347,24 +347,24 @@ typedef union
 
 
 /* 0x30
-   0       R      txeis                   0x0
-   1       R      txois                   0x0
-   2       R      rxuis                   0x0
-   3       R      rxois                   0x0
-   4       R      rxfis                   0x0
-   5       R      fseis                   0x0
-   6       R      wbeis                   0x0
-   7       R      byeis                   0x0
-   8       R      aceis                   0x0
-   9       R      useis                   0x0
-   10      R      tfsis                   0x0
-   11      R      acsis                   0x0
-   12      R      dreis                   0x0
-   13      R      stuis                   0x0
-   14      R      stois                   0x0
-   15      R      stfis                   0x0
-   16      R      nweis                   0x0
-   31:17   R      reserved                0x0
+    0       R      txeis                   0x0
+    1       R      txois                   0x0
+    2       R      rxuis                   0x0
+    3       R      rxois                   0x0
+    4       R      rxfis                   0x0
+    5       R      fseis                   0x0
+    6       R      wbeis                   0x0
+    7       R      byeis                   0x0
+    8       R      aceis                   0x0
+    9       R      useis                   0x0
+    10      R      tfsis                   0x0
+    11      R      acsis                   0x0
+    12      R      dreis                   0x0
+    13      R      stuis                   0x0
+    14      R      stois                   0x0
+    15      R      stfis                   0x0
+    16      R      nweis                   0x0
+    31:17   R      reserved                0x0
 */
 typedef union
 {
@@ -396,24 +396,24 @@ typedef union
 
 
 /* 0x34
-   0       R      txeir                   0x0
-   1       R      txoir                   0x0
-   2       R      rxuir                   0x0
-   3       R      rxoir                   0x0
-   4       R      rxfir                   0x0
-   5       R      fseir                   0x0
-   6       R      wbeir                   0x0
-   7       R      byeir                   0x0
-   8       R      aceir                   0x0
-   9       R      useir                   0x0
-   10      R      tfsir                   0x0
-   11      R      acsir                   0x0
-   12      R      dreir                   0x0
-   13      R      stuir                   0x0
-   14      R      stoir                   0x0
-   15      R      stfir                   0x0
-   16      R      nweir                   0x0
-   31:17   R      reserved                0x0
+    0       R      txeir                   0x0
+    1       R      txoir                   0x0
+    2       R      rxuir                   0x0
+    3       R      rxoir                   0x0
+    4       R      rxfir                   0x0
+    5       R      fseir                   0x0
+    6       R      wbeir                   0x0
+    7       R      byeir                   0x0
+    8       R      aceir                   0x0
+    9       R      useir                   0x0
+    10      R      tfsir                   0x0
+    11      R      acsir                   0x0
+    12      R      dreir                   0x0
+    13      R      stuir                   0x0
+    14      R      stoir                   0x0
+    15      R      stfir                   0x0
+    16      R      nweir                   0x0
+    31:17   R      reserved                0x0
 */
 typedef union
 {
@@ -445,8 +445,8 @@ typedef union
 
 
 /* 0x38
-   0       R/W    txoicr                  0x0
-   31:1    R      reserved                0x0
+    0       R/W    txoicr                  0x0
+    31:1    R      reserved                0x0
 */
 typedef union
 {
@@ -462,8 +462,8 @@ typedef union
 
 
 /* 0x3C
-   0       R/W    rxoicr                  0x0
-   31:1    R      reserved                0x0
+    0       R/W    rxoicr                  0x0
+    31:1    R      reserved                0x0
 */
 typedef union
 {
@@ -479,8 +479,8 @@ typedef union
 
 
 /* 0x40
-   0       R/W    rxuicr                  0x0
-   31:1    R      reserved                0x0
+    0       R/W    rxuicr                  0x0
+    31:1    R      reserved                0x0
 */
 typedef union
 {
@@ -496,8 +496,8 @@ typedef union
 
 
 /* 0x44
-   0       R/W    msticr                  0x0
-   31:1    R      reserved                0x0
+    0       R/W    msticr                  0x0
+    31:1    R      reserved                0x0
 */
 typedef union
 {
@@ -513,8 +513,8 @@ typedef union
 
 
 /* 0x48
-   0       R/W    icr                     0x0
-   31:1    R      reserved                0x0
+    0       R/W    icr                     0x0
+    31:1    R      reserved                0x0
 */
 typedef union
 {
@@ -530,9 +530,9 @@ typedef union
 
 
 /* 0x4C
-   0       R/W    rx_dmac_en              0x0
-   1       R/W    tx_dmac_en              0x0
-   31:2    R      reserved                0x0
+    0       R/W    rx_dmac_en              0x0
+    1       R/W    tx_dmac_en              0x0
+    31:2    R      reserved                0x0
 */
 typedef union
 {
@@ -549,8 +549,8 @@ typedef union
 
 
 /* 0x50
-   5: 0    R/W    dmatdl                  0x0
-   31: 6   R      reserved                0x0
+    5: 0    R/W    dmatdl                  0x0
+    31: 6   R      reserved                0x0
 */
 typedef union
 {
@@ -566,8 +566,8 @@ typedef union
 
 
 /* 0x54
-   2: 0    R/W    dmardl                  0x0
-   31: 3   R      reserved                0x0
+    2: 0    R/W    dmardl                  0x0
+    31: 3   R      reserved                0x0
 */
 typedef union
 {
@@ -583,7 +583,7 @@ typedef union
 
 
 /* 0x58
-   31:0    R      idcode                  0x303FF01
+    31:0    R      idcode                  0x303FF01
 */
 typedef union
 {
@@ -598,7 +598,7 @@ typedef union
 
 
 /* 0x5C
-   31:0    R      spic_version            0x30530
+    31:0    R      spic_version            0x30530
 */
 typedef union
 {
@@ -613,7 +613,7 @@ typedef union
 
 
 /* 0x60
-   31:0    R/W    dr                      0x0
+    31:0    R/W    dr                      0x0
 */
 typedef union
 {
@@ -628,9 +628,9 @@ typedef union
 
 
 /* 0xA0
-   0       W      data_mask_dr            0x0
-   1       W      data_en_dr              0x0
-   31: 2   R      reserved                0x0
+    0       W      data_mask_dr            0x0
+    1       W      data_en_dr              0x0
+    31: 2   R      reserved                0x0
 */
 typedef union
 {
@@ -646,9 +646,10 @@ typedef union
 
 
 
+
 /* 0xE0
-   15: 0   R/W    frd_cmd                 0x0B0B
-   31: 16  R      reserved                0x0
+    15: 0   R/W    frd_cmd                 0x0B0B
+    31: 16  R      reserved                0x0
 */
 typedef union
 {
@@ -664,8 +665,8 @@ typedef union
 
 
 /* 0xE4
-   7: 0    R/W    rd_dual_o_cmd           0x3B
-   31: 8   R      reserved                0x0
+    7: 0    R/W    rd_dual_o_cmd           0x3B
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -681,8 +682,8 @@ typedef union
 
 
 /* 0xE8
-   7: 0    R/W    rd_dual_io_cmd          0xBB
-   31: 8   R      reserved                0x0
+    7: 0    R/W    rd_dual_io_cmd          0xBB
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -698,8 +699,8 @@ typedef union
 
 
 /* 0xEC
-   7: 0    R/W    rd_quad_o_cmd           0x6B
-   31: 8   R      reserved                0x0
+    7: 0    R/W    rd_quad_o_cmd           0x6B
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -715,10 +716,10 @@ typedef union
 
 
 /* 0xF0
-   7: 0    R/W    rd_quad_io_cmd          0xEB
-   15: 8   R      exit_prm_dum_len        0x0
-   23: 16  R/W    prm_val                 0xA5
-   31: 24  R      exit_prm_cmd            0xFF
+    7: 0    R/W    rd_quad_io_cmd          0xEB
+    15: 8   R      exit_prm_dum_len        0x0
+    23: 16  R/W    prm_val                 0xA5
+    31: 24  R      exit_prm_cmd            0xFF
 */
 typedef union
 {
@@ -736,8 +737,8 @@ typedef union
 
 
 /* 0xF4
-   15: 0   R/W    wr_cmd                  0x0202
-   31: 16  R      reserved                0x0
+    15: 0   R/W    wr_cmd                  0x0202
+    31: 16  R      reserved                0x0
 */
 typedef union
 {
@@ -753,8 +754,8 @@ typedef union
 
 
 /* 0xF8
-   7: 0    R/W    wr_dual_i_cmd           0xA2
-   31: 8   R      reserved                0x0
+    7: 0    R/W    wr_dual_i_cmd           0xA2
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -770,8 +771,8 @@ typedef union
 
 
 /* 0xFC
-   7: 0    R/W    wr_dual_ii_cmd          0x0
-   31: 8   R      reserved                0x0
+    7: 0    R/W    wr_dual_ii_cmd          0x0
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -787,8 +788,8 @@ typedef union
 
 
 /* 0x100
-   7: 0    R/W    wr_quad_i_cmd           0x32
-   31: 8   R      reserved                0x0
+    7: 0    R/W    wr_quad_i_cmd           0x32
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -804,8 +805,8 @@ typedef union
 
 
 /* 0x104
-   7: 0    R/W    wr_quad_ii_cmd          0x38
-   31: 8   R      reserved                0x0
+    7: 0    R/W    wr_quad_ii_cmd          0x38
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -821,9 +822,9 @@ typedef union
 
 
 /* 0x108
-   7: 0    R/W    wr_en_cmd_1st_byte      0x06
-   15: 8   R/W    wr_en_cmd_2nd_byte      0x06
-   31: 16  R      reserved                0x0
+    7: 0    R/W    wr_en_cmd_1st_byte      0x06
+    15: 8   R/W    wr_en_cmd_2nd_byte      0x06
+    31: 16  R      reserved                0x0
 */
 typedef union
 {
@@ -840,15 +841,15 @@ typedef union
 
 
 /* 0x10C
-   7: 0    R/W    rd_st_cmd_1st_byte      0x05
-   15: 8   R/W    rd_st_cmd_2nd_byte      0x05
-   23: 16  R/W    rd_st_cmd_3rd_byte      0x0
-   24      R      reserved                0x0
-   25      R/W    st_cmd_ddr_en           0x0
-   27:26   R/W    st_cmd_ch               0x0
-   29:28   R/W    st_cmd_len              0x1
-   30      R/W    interval_odd            0x0
-   31      R/W    interval_en             0x0
+    7: 0    R/W    rd_st_cmd_1st_byte      0x05
+    15: 8   R/W    rd_st_cmd_2nd_byte      0x05
+    23: 16  R/W    rd_st_cmd_3rd_byte      0x0
+    24      R      reserved                0x0
+    25      R/W    st_cmd_ddr_en           0x0
+    27:26   R/W    st_cmd_ch               0x0
+    29:28   R/W    st_cmd_len              0x1
+    30      R/W    interval_odd            0x0
+    31      R/W    interval_en             0x0
 */
 typedef union
 {
@@ -871,17 +872,17 @@ typedef union
 
 
 /* 0x110
-   0       R/W    so_dnum                 0x1
-   1       R/W    wpn_set                 0x0
-   2       R/W    wpn_dnum                0x0
-   3       R/W    dr_fixed                0x0
-   7: 4    R/W    tx_fifo_entry           0x6
-   11: 8   R/W    rx_fifo_entry           0x3
-   12      R/W    dm_act                  0x1
-   13      R/W    full_wr                 0x1
-   14      R/W    dis_dm_ca               0x0
-   15      R/W    dis_wrap_align          0x0
-   31: 16  R      reserved                0x0
+    0       R/W    so_dnum                 0x1
+    1       R/W    wpn_set                 0x0
+    2       R/W    wpn_dnum                0x0
+    3       R/W    dr_fixed                0x0
+    7: 4    R/W    tx_fifo_entry           0x6
+    11: 8   R/W    rx_fifo_entry           0x3
+    12      R/W    dm_act                  0x1
+    13      R/W    full_wr                 0x1
+    14      R/W    dis_dm_ca               0x0
+    15      R/W    dis_wrap_align          0x0
+    31: 16  R      reserved                0x0
 */
 typedef union
 {
@@ -906,8 +907,8 @@ typedef union
 
 
 /* 0x114
-   11: 0   R/W    fsckdv                  0x01
-   31: 12  R      reserved                0x0
+    11: 0   R/W    fsckdv                  0x01
+    31: 12  R      reserved                0x0
 */
 typedef union
 {
@@ -923,11 +924,11 @@ typedef union
 
 
 /* 0x118
-   11: 0   R/W    user_rd_dummy_length    0x0
-   13: 12  R/W    user_cmd_lenght         0x0
-   15: 14  R      reserved2               0x0
-   19: 16  R/W    user_addr_length        0x3
-   31: 20  R      reserved1               0x0
+    11: 0   R/W    user_rd_dummy_length    0x0
+    13: 12  R/W    user_cmd_lenght         0x0
+    15: 14  R      reserved2               0x0
+    19: 16  R/W    user_addr_length        0x3
+    31: 20  R      reserved1               0x0
 */
 typedef union
 {
@@ -936,7 +937,7 @@ typedef union
     struct
     {
         __IO uint32_t user_rd_dummy_length: 12;
-        __IO uint32_t user_cmd_lenght: 2;
+        __IO uint32_t user_cmd_length: 2;
         __I uint32_t reserved_1: 2;
         __IO uint32_t user_addr_length: 4;
         __I uint32_t reserved_0: 12;
@@ -946,11 +947,11 @@ typedef union
 
 
 /* 0x11C
-   11: 0   R/W    rd_dummy_length         0x0
-   15: 12  R/W    in_physical_cyc         0x0
-   19: 16  R/W    auto_addr_length        0x3
-   27: 20  R/W    rdsr_dummy_length       0x0
-   31: 28  R      reserved                0x0
+    11: 0   R/W    rd_dummy_length         0x0
+    15: 12  R/W    in_physical_cyc         0x0
+    19: 16  R/W    auto_addr_length        0x3
+    27: 20  R/W    rdsr_dummy_length       0x0
+    31: 28  R      reserved                0x0
 */
 typedef union
 {
@@ -969,23 +970,23 @@ typedef union
 
 
 /* 0x120
-   0       R/W    frd_single              0x0
-   1       R/W    rd_dual_i               0x0
-   2       R/W    rd_dual_io              0x0
-   3       R/W    rd_quad_o               0x0
-   4       R/W    rd_quad_io              0x0
-   5       R/W    wr_dual_i               0x0
-   6       R/W    wr_dual_ii              0x0
-   7       R/W    wr_quad_i               0x0
-   8       R/W    wr_quad_ii              0x0
-   9       R/W    rm_rdsr                 0x0
-   10      R/W    rm_wen                  0x0
-   11      R/W    prm_en                  0x0
-   12      R/W    ctrlr0_ch               0x0
-   13      R/W    dum_en                  0x0
-   14      R/W    seq_rd_en               0x1
-   15      R/W    seq_wr_en               0x0
-   31: 16  R      reserved                0x0
+    0       R/W    frd_single              0x0
+    1       R/W    rd_dual_i               0x0
+    2       R/W    rd_dual_io              0x0
+    3       R/W    rd_quad_o               0x0
+    4       R/W    rd_quad_io              0x0
+    5       R/W    wr_dual_i               0x0
+    6       R/W    wr_dual_ii              0x0
+    7       R/W    wr_quad_i               0x0
+    8       R/W    wr_quad_ii              0x0
+    9       R/W    rm_rdsr                 0x0
+    10      R/W    rm_wen                  0x0
+    11      R/W    prm_en                  0x0
+    12      R/W    ctrlr0_ch               0x0
+    13      R/W    dum_en                  0x0
+    14      R/W    seq_rd_en               0x1
+    15      R/W    seq_wr_en               0x0
+    31: 16  R      reserved                0x0
 */
 typedef union
 {
@@ -1016,8 +1017,8 @@ typedef union
 
 
 /* 0x124
-   3: 0    R/W    flash_size              0xD
-   31: 4   R      reserved                0x0
+    3: 0    R/W    flash_size              0xD
+    31: 4   R      reserved                0x0
 */
 typedef union
 {
@@ -1033,10 +1034,10 @@ typedef union
 
 
 /* 0x128
-   0       W      flush_all               0x0
-   1       W      flush_dr_fifo           0x0
-   2       W      flush_st_fifo           0x0
-   31: 3   R      reserved                0x0
+    0       W      flush_all               0x0
+    1       W      flush_dr_fifo           0x0
+    2       W      flush_st_fifo           0x0
+    31: 3   R      reserved                0x0
 */
 typedef union
 {
@@ -1054,8 +1055,8 @@ typedef union
 
 
 /* 0x12C
-   7: 0    R/W    dum_byte_val            0x00
-   31: 8   R      reserved                0x0
+    7: 0    R/W    dum_byte_val            0x00
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -1071,8 +1072,8 @@ typedef union
 
 
 /* 0x130
-   23: 0   R/W    tx_ndf                  0x00
-   31: 24  R      reserved                0x0
+    23: 0   R/W    tx_ndf                  0x00
+    31: 24  R      reserved                0x0
 */
 typedef union
 {
@@ -1088,17 +1089,17 @@ typedef union
 
 
 /* 0x134
-   3: 0    R/W    page_size               0x08
-   4       R/W    wr_page_en              0x1
-   5       R/W    rd_page_en              0x0
-   6       R/W    atom_size               0x0
-   7       R      reserved2               0x0
-   8       R/W    nor_flash               0x1
-   9       R/W    nand_flash              0x0
-   10      R/W    psram                   0x0
-   11      R/W    jedec_p2cmf             0x0
-   12      R/W    data_unit_2b            0x0
-   31: 13  R      reserved1               0x0
+    3: 0    R/W    page_size               0x08
+    4       R/W    wr_page_en              0x1
+    5       R/W    rd_page_en              0x0
+    6       R/W    atom_size               0x0
+    7       R      reserved2               0x0
+    8       R/W    nor_flash               0x1
+    9       R/W    nand_flash              0x0
+    10      R/W    psram                   0x0
+    11      R/W    jedec_p2cmf             0x0
+    12      R/W    data_unit_2b            0x0
+    31: 13  R      reserved1               0x0
 */
 typedef union
 {
@@ -1123,11 +1124,11 @@ typedef union
 
 
 /* 0x138
-   5: 0    R/W    cs_h_rd_dum_len         0x30
-   11: 6   R/W    cs_h_wr_dum_len         0x30
-   15: 12  R/W    cs_active_hold          0x00
-   23: 16  R/W    cs_seq_timeout          0x10
-   31: 24  R/W    cs_tcem                 0x0
+    5: 0    R/W    cs_h_rd_dum_len         0x30
+    11: 6   R/W    cs_h_wr_dum_len         0x30
+    15: 12  R/W    cs_active_hold          0x00
+    23: 16  R/W    cs_seq_timeout          0x10
+    31: 24  R/W    cs_tcem                 0x0
 */
 typedef union
 {
@@ -1146,8 +1147,8 @@ typedef union
 
 
 /* 0x13C
-   11: 0   R/W    wr_dummy_length         0x0
-   31: 12  R      reserved                0x0
+    11: 0   R/W    wr_dummy_length         0x0
+    31: 12  R      reserved                0x0
 */
 typedef union
 {
@@ -1163,11 +1164,11 @@ typedef union
 
 
 /* 0x140
-   3:0     R/W    cr_active_setup         0x1
-   7:4     R      reserved2               0x0
-   15:8    R/W    cr_idle_window          0x10
-   23:16   R/W    cr_tpwr                 0x40
-   31:24   R      reserved1               0x0
+    3:0     R/W    cr_active_setup         0x1
+    7:4     R      reserved2               0x0
+    15:8    R/W    cr_idle_window          0x10
+    23:16   R/W    cr_tpwr                 0x40
+    31:24   R      reserved1               0x0
 */
 typedef union
 {
@@ -1186,8 +1187,8 @@ typedef union
 
 
 /* 0x180
-   7:0     R      st_dr                   0x0
-   31: 8   R      reserved                0x0
+    7:0     R      st_dr                   0x0
+    31: 8   R      reserved                0x0
 */
 typedef union
 {
@@ -1198,13 +1199,13 @@ typedef union
         __I uint32_t st_dr: 8;
         __I uint32_t reserved_0: 24;
     } b;
-} DBIC_ST_DR__t;
+} DBIC_ST_DR_t;
 
 
 
 /* 0x1C0
-   2: 0    R     stflr                  0x0
-   31: 3   R      reserved               0x0
+    2: 0    R     stflr                  0x0
+    31: 3   R      reserved               0x0
 */
 typedef union
 {
@@ -1215,16 +1216,16 @@ typedef union
         __IO uint32_t stflr: 3;
         __I uint32_t reserved: 29;
     } b;
-} DBIC_STFLR__t;
+} DBIC_STFLR_t;
 
 
 
 /* 0x1D0
-   7: 0    R/W    page_rd_cmd             0x13
-   15: 8   R      reserved2               0x0
-   17: 16  R/W    page_rd_ch              0x0
-   19: 18  R/W    page_rd_addr_len        0x3
-   31: 20  R      reserved1               0x0
+    7: 0    R/W    page_rd_cmd             0x13
+    15: 8   R      reserved2               0x0
+    17: 16  R/W    page_rd_ch              0x0
+    19: 18  R/W    page_rd_addr_len        0x3
+    31: 20  R      reserved1               0x0
 */
 typedef union
 {
@@ -1242,6 +1243,5 @@ typedef union
 
 
 #ifdef  __cplusplus
-}
 #endif /* __cplusplus */
 #endif /* RTL_DBIC_REG_H */

@@ -2,7 +2,7 @@
 *********************************************************************************************************
 *               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
-* @file     rtl_dbib.c
+* @file     rtl876x_dbib.c
 * @brief    This file provides all the DBI firmware functions.
 * @details
 * @author   boris yue
@@ -12,6 +12,7 @@
 */
 
 /* Includes ------------------------------------------------------------------*/
+#include "rtl_lcdc.h"
 #include "rtl_lcdc_dbib.h"
 
 
@@ -30,12 +31,12 @@ void DBIB_Init(LCDC_DBIBCfgTypeDef *DBIBCfg)
     /* Configure clock divider, bypass guard time*/
     DBIB_CTRL0_t dbib_reg_0x00 = {.d32 = DBIB->DBIB_CTRL0};
     dbib_reg_0x00.b.speed_sel = DBIBCfg->DBIB_SPEED_SEL;
-    dbib_reg_0x00.b.bypass_init_guard_time = DBIBCfg->DBIB_InitGuardTimeCmd;
-    dbib_reg_0x00.b.init_guard_time = DBIBCfg->DBIB_InitGuardTime;
-    dbib_reg_0x00.b.bypass_cmd_guard_time = DBIBCfg->DBIB_CmdGuardTimeCmd;
+    dbib_reg_0x00.b.init_guard_time = DBIBCfg->DBIB_InitGuardTimeCmd;
     dbib_reg_0x00.b.cmd_guard_time = DBIBCfg->DBIB_CmdGuardTime;
-    dbib_reg_0x00.b.bypass_guard_time = DBIBCfg->DBIB_GuardTimeCmd;
     dbib_reg_0x00.b.guard_time = DBIBCfg->DBIB_GuardTime;
+    dbib_reg_0x00.b.bypass_guard_time = DBIBCfg->DBIB_CmdGuardTimeCmd;
+    dbib_reg_0x00.b.bypass_cmd_guard_time = DBIBCfg->DBIB_CmdGuardTimeCmd;
+    dbib_reg_0x00.b.bypass_init_guard_time = DBIBCfg->DBIB_InitGuardTimeCmd;
     DBIB->DBIB_CTRL0 = dbib_reg_0x00.d32;
 
     /* Configure WR Delay */
@@ -44,17 +45,19 @@ void DBIB_Init(LCDC_DBIBCfgTypeDef *DBIBCfg)
     DBIB->DBIB_CFG = dbib_reg_0x04.d32;
 }
 
-/**
-  * @brief  Send command in manual mode.
-  * @param  cmd: command which to be sent.
-  * @retval None
-  */
+void DBIB_auto_write_set_window(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd,
+                                uint16_t xOffset, uint16_t yOffset)
+{
+
+}
+
 void DBIB_SendCmd(uint8_t cmd)
 {
     /* Fill command */
     DBIB->DBIB_CMD_REG1 = cmd;
 
-    /* Enable command control & Send command */
+    /* Enable command control */
+    /* Send command */
     DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
     dbib_reg_0x04.b.reg_d_cb_manual = 0;
     dbib_reg_0x04.b.reg_wr_trig_manual = 1;
@@ -67,12 +70,7 @@ void DBIB_SendCmd(uint8_t cmd)
     }
     while (dbib_reg_0x04.b.reg_wr_trig_manual);
 }
-/**
-  * @brief  Send data in manual mode.
-  * @param  pBuf: buffer address to be sent.
-  * @param  len:  data length.
-  * @retval None
-  */
+
 void DBIB_SendData(uint8_t *pBuf, uint32_t len)
 {
     while (len--)
@@ -80,7 +78,7 @@ void DBIB_SendData(uint8_t *pBuf, uint32_t len)
         /* Fill data */
         DBIB->DBIB_CMD_REG1 = *pBuf++;
 
-        /* Send data */
+        /* Send command */
         DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
         dbib_reg_0x04.b.reg_d_cb_manual = 1;
         dbib_reg_0x04.b.reg_wr_trig_manual = 1;
@@ -94,16 +92,11 @@ void DBIB_SendData(uint8_t *pBuf, uint32_t len)
         while (dbib_reg_0x04.b.reg_wr_trig_manual);
     }
 }
-/**
-  * @brief  Receive data in manual mode.
-  * @param  pBuf: buffer address to be received.
-  * @param  len: data length.
-  * @retval None
-  */
+
 void DBIB_ReceiveData(uint8_t *pBuf, uint32_t len)
 {
+    uint32_t reg_value = 0;
     DBIB_RXDATA_t dbib_reg_0x08;
-
     while (len--)
     {
         /* Select read data control */
@@ -127,17 +120,11 @@ void DBIB_ReceiveData(uint8_t *pBuf, uint32_t len)
         }
         else
         {
-            //rt_kprintf("[LCDC] DBIB_ReceiveData invalid 0x%x", reg_value);
+            //APP_PRINT_INFO1("[LCDC] DBIB_ReceiveData invalid 0x%x", reg_value);
         }
     }
 }
-/**
-  * @brief  Send command and data buffer in manual mode.
-  * @param  cmd: command which to be sent.
-  * @param  pBuf: buffer address to be sent.
-  * @param  len:  data length.
-  * @retval None
-  */
+
 void DBIB_Write(uint8_t cmd, uint8_t *pBuf, uint32_t len)
 {
     /* Pull CS down */
@@ -151,6 +138,49 @@ void DBIB_Write(uint8_t cmd, uint8_t *pBuf, uint32_t len)
 
     /* Pull CS up */
     DBIB_SetCS();
+}
+
+void DBIB_BypassCmdByteCmd(FunctionalState NewState)
+{
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
+    DBIB_CTRL0_t dbib_reg_0x00 = {.d32 = DBIB->DBIB_CTRL0};
+    if (NewState == ENABLE)
+    {
+        dbib_reg_0x00.b.bypass_cmd = 1;
+    }
+    else
+    {
+        dbib_reg_0x00.b.bypass_cmd = 0;
+    }
+    DBIB->DBIB_CTRL0 = dbib_reg_0x00.d32;
+}
+
+void DBIB_ResetCS(void)
+{
+    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
+    dbib_reg_0x04.b.reg_cs_manual = 0;
+    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
+}
+
+void DBIB_SetCS(void)
+{
+    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
+    dbib_reg_0x04.b.reg_cs_manual = 1;
+    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
+}
+
+void DBIB_ResetDC(void)
+{
+    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
+    dbib_reg_0x04.b.reg_d_cb_manual = 0;
+    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
+}
+
+void DBIB_SetDC(void)
+{
+    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
+    dbib_reg_0x04.b.reg_d_cb_manual = 1;
+    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
 }
 
 /**
@@ -194,6 +224,7 @@ FlagStatus LCDC_DBIB_SetCmdSequence(uint8_t *pCmdBuf, uint8_t len)
     /* Configure command number */
     DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
     dbib_reg_0x04.b.reg_cmd_num = len - 1;
+    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
 
     /* Fill command sequence */
     DBIB->DBIB_CMD_REG1 = 0;

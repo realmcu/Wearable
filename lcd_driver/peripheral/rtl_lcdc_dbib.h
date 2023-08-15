@@ -2,7 +2,7 @@
 *********************************************************************************************************
 *               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
-* @file     rtl_dbib.h
+* @file     rtl876x_dbib.h
 * @brief    The header file of the peripheral DBIB driver
 * @details
 * @author   boris yue
@@ -11,8 +11,8 @@
 *********************************************************************************************************
 */
 
-#ifndef __RTL_DBIB_H
-#define __RTL_DBIB_H
+#ifndef __RTL876X_DBIB_H
+#define __RTL876X_DBIB_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +20,6 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "rtl_lcdc.h"
 #include "rtl_lcdc_dbib_reg.h"
-
 
 typedef struct
 {
@@ -41,134 +40,183 @@ typedef struct
 } LCDC_DBIBCfgTypeDef;
 
 
+
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/
 
 /**
  * \defgroup    DBIB_ClockDiv DBIB clock div
- *
+ * \{
  * \ingroup     DBIB_Exported_Constants
  */
-typedef enum
-{
-    DBIB_CLOCK_DIV_2 = 1,
-    DBIB_CLOCK_DIV_3 = 2,
-    DBIB_CLOCK_DIV_4 = 3,
-    DBIB_CLOCK_DIV_5 = 4,
-    DBIB_CLOCK_DIV_6 = 5,
-    DBIB_CLOCK_DIV_7 = 6,
-    DBIB_CLOCK_DIV_8 = 7,
-    DBIB_CLOCK_DIV_64 = 0x3F,
-} DBIB_CLOCK_DIV_T;
+#define DBIB_CLOCK_DIV_2                             ((uint32_t)0x1)
+#define DBIB_CLOCK_DIV_3                             ((uint32_t)0x2)
+#define DBIB_CLOCK_DIV_4                             ((uint32_t)0x3)
+#define DBIB_CLOCK_DIV_5                             ((uint32_t)0x4)
+#define DBIB_CLOCK_DIV_6                             ((uint32_t)0x5)
+#define DBIB_CLOCK_DIV_7                             ((uint32_t)0x6)
+#define DBIB_CLOCK_DIV_8                             ((uint32_t)0x7)
+#define DBIB_CLOCK_DIV_64                            ((uint32_t)0x3F)
+/** \} */
 
 #define IS_DBIB_CLOCK_DIV(DIV)   (((DIV) == DBIB_CLOCK_DIV_2) || ((DIV) == DBIB_CLOCK_DIV_3) || \
                                   ((DIV) == DBIB_CLOCK_DIV_4) || ((DIV) == DBIB_CLOCK_DIV_5) || \
                                   ((DIV) == DBIB_CLOCK_DIV_6) || ((DIV) == DBIB_CLOCK_DIV_7) || \
-                                  ((DIV) == DBIB_CLOCK_DIV_8) || ((DIV) == DBIB_CLOCK_DIV_64))
+                                  ((DIV) == DBIB_CLOCK_DIV_8))
 
 /**
  * \defgroup    DBIB_InitGuardTime_Cmd DBIB Init Guard Time Cmd
- *
+ * \{
  * \ingroup     DBIB_Exported_Constants
  */
-typedef enum
-{
-    DBIB_GUARD_TIME_ENABLE,
-    DBIB_GUARD_TIME_BYPASS,
-} DBIB_GUARD_TIME_BYPASS_T;
+#define DBIB_INIT_GUARD_TIME_ENABLE                   (0)
+#define DBIB_INIT_GUARD_TIME_DISABLE                  (1)
+/** \} */
 
-#define IS_DBIB_GUARD_TIME_CMD(CMD) (((CMD) == DBIB_GUARD_TIME_ENABLE) || ((CMD) == DBIB_GUARD_TIME_BYPASS))
+#define IS_DBIB_INIT_GUARD_TIME_CMD(CMD) (((CMD) == DBIB_INIT_GUARD_TIME_ENABLE) || ((CMD) == DBIB_INIT_GUARD_TIME_DISABLE))
 
 /**
  * \defgroup    DBIB_InitGuardTime DBIB Init Guard Time
- *
+ * \{
  * \ingroup     DBIB_Exported_Constants
  */
-typedef enum
-{
-    DBIB_GUARD_TIME_1T,
-    DBIB_GUARD_TIME_2T,
-    DBIB_GUARD_TIME_3T,
-    DBIB_GUARD_TIME_4T,
-} DBIB_GUARD_TIME_T;
+#define DBIB_INIT_GUARD_TIME_1T                       (0)
+#define DBIB_INIT_GUARD_TIME_2T                       ((uint32_t)0x1)
+#define DBIB_INIT_GUARD_TIME_3T                       ((uint32_t)0x2)
+#define DBIB_INIT_GUARD_TIME_4T                       ((uint32_t)0x3)
+/** \} */
 
-#define IS_DBIB_GUARD_TIME(TIME)   (((TIME) == DBIB_GUARD_TIME_1T) || ((TIME) == DBIB_GUARD_TIME_2T) || \
-                                    ((TIME) == DBIB_GUARD_TIME_3T) || ((TIME) == DBIB_GUARD_TIME_4T))
+#define IS_DBIB_INIT_GUARD_TIME(TIME)   (((TIME) == DBIB_INIT_GUARD_TIME_1T) || ((TIME) == DBIB_INIT_GUARD_TIME_2T) || \
+                                         ((TIME) == DBIB_INIT_GUARD_TIME_3T) || ((TIME) == DBIB_INIT_GUARD_TIME_4T))
 
 /**
- * \defgroup    DBIB_WRDelay DBIB WR Delay
- *
+ * \defgroup    DBIB_CmdGuardTime_Cmd DBIB Cmd Guard Time Cmd
+ * \{
  * \ingroup     DBIB_Exported_Constants
  */
-typedef enum
-{
-    DBIB_WR_HALF_DELAY = 1,
-    DBIB_WR_ONE_DELAY = 2,
-} DBIB_WR_DELAY_T;
+#define DBIB_CMD_GUARD_TIME_ENABLE                   (0)
+#define DBIB_CMD_GUARD_TIME_DISABLE                  (1)
+/** \} */
+
+#define IS_DBIB_CMD_GUARD_TIME_CMD(CMD) (((CMD) == DBIB_CMD_GUARD_TIME_ENABLE) || ((CMD) == DBIB_CMD_GUARD_TIME_DISABLE))
+
+/**
+ * \defgroup    DBIB_CmdGuardTime DBIB Cmd Guard Time
+ * \{
+ * \ingroup     DBIB_Exported_Constants
+ */
+#define DBIB_CMD_GUARD_TIME_1T                       (0)
+#define DBIB_CMD_GUARD_TIME_2T                       ((uint32_t)0x1)
+#define DBIB_CMD_GUARD_TIME_3T                       ((uint32_t)0x2)
+#define DBIB_CMD_GUARD_TIME_4T                       ((uint32_t)0x3)
+/** \} */
+
+#define IS_DBIB_CMD_GUARD_TIME(TIME)   (((TIME) == DBIB_CMD_GUARD_TIME_1T) || ((TIME) == DBIB_CMD_GUARD_TIME_2T) || \
+                                        ((TIME) == DBIB_CMD_GUARD_TIME_3T) || ((TIME) == DBIB_CMD_GUARD_TIME_4T))
+
+/**
+ * \defgroup   DBIB_GuardTime_Cmd DBIB Guard Time Cmd
+ * \{
+ * \ingroup    DBIB_Exported_Constants
+ */
+
+#define DBIB_GUARD_TIME_ENABLE                       (0)
+#define DBIB_GUARD_TIME_DISABLE                      (1)
+/** \} */
+
+#define IS_DBIB_GUARD_TIME_CMD(CMD) (((CMD) == DBIB_GUARD_TIME_ENABLE) || ((CMD) == DBIB_GUARD_TIME_DISABLE))
+
+/**
+ * \defgroup    DBIB_GuardTime DBIB Guard Time
+ * \{
+ * \ingroup     DBIB_Exported_Constants
+ */
+
+#define DBIB_GUARD_TIME_1T                           (0)
+#define DBIB_GUARD_TIME_2T                           ((uint32_t)0x1)
+#define DBIB_GUARD_TIME_3T                           ((uint32_t)0x2)
+#define DBIB_GUARD_TIME_4T                           ((uint32_t)0x3)
+/** \} */
+
+#define IS_DBIB_GUARD_TIME(TIME) (((TIME) == DBIB_GUARD_TIME_1T) || ((TIME) == DBIB_GUARD_TIME_2T) || \
+                                  ((TIME) == DBIB_GUARD_TIME_3T) || ((TIME) == DBIB_GUARD_TIME_4T))
+/**
+ * \defgroup    DBIB_WRDelay DBIB WR Delay
+ * \{
+ * \ingroup     DBIB_Exported_Constants
+ */
+#define DBIB_WR_HALF_DELAY          ((uint32_t)0x1)
+#define DBIB_WR_ONE_DELAY           ((uint32_t)0x2)
+/** \} */
 
 #define IS_DBIB_WR_DELAY_TIME(TIME) (((TIME) == DBIB_WR_HALF_DELAY) || \
                                      ((TIME) == DBIB_WR_ONE_DELAY))
 
 /** \} */ /* End of group DBIB_Exported_Constants */
 
-__STATIC_INLINE void DBIB_BypassCmdByteCmd(FunctionalState NewState)
-{
-    assert_param(IS_FUNCTIONAL_STATE(NewState));
-
-    DBIB_CTRL0_t dbib_reg_0x00 = {.d32 = DBIB->DBIB_CTRL0};
-    if (NewState == ENABLE)
-    {
-        dbib_reg_0x00.b.bypass_cmd = 1;
-    }
-    else
-    {
-        dbib_reg_0x00.b.bypass_cmd = 0;
-    }
-    DBIB->DBIB_CTRL0 = dbib_reg_0x00.d32;
-}
-
-__STATIC_INLINE void DBIB_ResetCS(void)
-{
-    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
-    dbib_reg_0x04.b.reg_cs_manual = 0;
-    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
-}
-
-__STATIC_INLINE void DBIB_SetCS(void)
-{
-    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
-    dbib_reg_0x04.b.reg_cs_manual = 1;
-    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
-}
-
-__STATIC_INLINE void DBIB_ResetDC(void)
-{
-    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
-    dbib_reg_0x04.b.reg_d_cb_manual = 0;
-    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
-}
-
-__STATIC_INLINE void DBIB_SetDC(void)
-{
-    DBIB_CFG_t dbib_reg_0x04 = {.d32 = DBIB->DBIB_CFG};
-    dbib_reg_0x04.b.reg_d_cb_manual = 1;
-    DBIB->DBIB_CFG = dbib_reg_0x04.d32;
-}
-
+void DBIB_BypassCmdByteCmd(FunctionalState NewState);
+void DBIB_ResetCS(void);
+void DBIB_SetCS(void);
+void DBIB_ResetDC(void);
+void DBIB_SetDC(void);
 void DBIB_Init(LCDC_DBIBCfgTypeDef *DBIBCfg);
+
+/**
+  * @brief  Send command in manual mode.
+  * @param  cmd: command which to be sent.
+  * @retval None
+  */
 void DBIB_SendCmd(uint8_t cmd);
+
+/**
+  * @brief  Send data in manual mode.
+  * @param  pBuf: buffer address to be sent.
+  * @param  len:  data length.
+  * @retval None
+  */
 void DBIB_SendData(uint8_t *pBuf, uint32_t len);
+
+/**
+  * @brief  Receive data in manual mode.
+  * @param  pBuf: buffer address to be received.
+  * @param  len: data length.
+  * @retval None
+  */
 void DBIB_ReceiveData(uint8_t *pBuf, uint32_t len);
+
+/**
+  * @brief  Send command and data buffer in manual mode.
+  * @param  cmd: command which to be sent.
+  * @param  pBuf: buffer address to be sent.
+  * @param  len:  data length.
+  * @retval None
+  */
 void DBIB_Write(uint8_t cmd, uint8_t *pBuf, uint32_t len);
+
+/**
+  * @brief  Send command and read data buffer in manual mode.
+  * @param  cmd: command which to be sent.
+  * @param  pBuf: buffer address to be sent.
+  * @param  len:  data length.
+  * @retval None
+  */
 void DBIB_Read(uint8_t cmd, uint8_t *pBuf, uint32_t len);
+
+/**
+  * @brief  Configure command sequences in auto mode.
+  * @param  pCmdBuf: buffer address which store command sequence.
+  * @param  len:  command length.
+  * @retval None
+  */
 FlagStatus LCDC_DBIB_SetCmdSequence(uint8_t *pCmdBuf, uint8_t len);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*__RTL_DBIB_H*/
+#endif /*__RTL8762X_DBIB_H*/
 
 
 /******************* (C) COPYRIGHT 2021 Realtek Semiconductor Corporation *****END OF FILE****/

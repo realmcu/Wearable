@@ -48,13 +48,7 @@ extern "C" {
  * \ingroup     GDMA_Exported_Constants
  */
 
-typedef enum
-{
-    LCDC_DMA_DIR_MemoryToMemory = 0x0,
-    LCDC_DMA_DIR_MemoryToPeripheral = 0x1,
-    LCDC_DMA_DIR_PeripheralToMemory = 0x2,
-    LCDC_DMA_DIR_PeripheralToPeripheral = 0x3,
-} LCDC_DMA_DIRECTION_T;
+
 /** \} */ /** End of Group GDMA_Data_Transfer_Direction */
 
 #define IS_GDMA_DIR(DIR) (((DIR) == GDMA_DIR_MemoryToMemory) || \

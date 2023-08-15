@@ -2,7 +2,7 @@
 *********************************************************************************************************
 *               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
-* @file     rtl_dbic.h
+* @file     rtl876x_dbic.h
 * @brief    The header file of the peripheral DBIB driver
 * @details
 * @author   boris yue
@@ -11,8 +11,8 @@
 *********************************************************************************************************
 */
 
-#ifndef __RTL_DBIC_H
-#define __RTL_DBIC_H
+#ifndef __RTL876X_DBIC_H
+#define __RTL876X_DBIC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +20,6 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "rtl_lcdc.h"
 #include "rtl_lcdc_dbic_reg.h"
-
 
 typedef struct
 {
@@ -31,128 +30,113 @@ typedef struct
     uint32_t SCPH;
 } LCDC_DBICCfgTypeDef;
 
-typedef enum
-{
-    DBIC_AUTO_MODE,
-    DBIC_USER_MODE,
-} DBIC_MODE_T;
 
-typedef enum
-{
-    DBIC_CH_SINGLE,
-    DBIC_CH_DUAL,
-    DBIC_CH_QUAD,
-    DBIC_CH_OCTAL,
-} DBIC_CH_T;
+#define DBIC_AUTO_MODE              ((uint32_t)0x0)
+#define DBIC_USER_MODE              ((uint32_t)0x1)
+#define IS_DBIC_MODE(mode)          ((mode == DBIC_AUTO_MODE) || (mode == DBIC_USER_MODE))
 
-typedef enum
-{
-    DBIC_TMODE_TX = 0,
-    DBIC_TMODE_RX = 3,
-} DBIC_TMODE_T;
+#define DBIC_CMD_CH_SINGLE          ((uint32_t)0x0)
+#define DBIC_CMD_CH_DUAL            ((uint32_t)0x1)
+#define DBIC_CMD_CH_QUAD            ((uint32_t)0x2)
+#define DBIC_CMD_CH_OCTAL           ((uint32_t)0x3)
+#define IS_DBIC_CMD_CH_NUM(num)     ((num == DBIC_CMD_CH_SINGLE) || (num == DBIC_CMD_CH_DUAL) ||\
+                                     (num == DBIC_CMD_CH_QUAD) || (num == DBIC_CMD_CH_OCTAL))
 
-typedef enum
-{
-    DBIC_SCPOL_LOW,
-    DBIC_SCPOL_HIGH,
-} DBIC_SCPOL_T;
+#define DBIC_DATA_CH_SINGLE         ((uint32_t)0x0)
+#define DBIC_DATA_CH_DUAL           ((uint32_t)0x1)
+#define DBIC_DATA_CH_QUAD           ((uint32_t)0x2)
+#define DBIC_DATA_CH_OCTAL          ((uint32_t)0x3)
+#define IS_DBIC_DATA_CH_NUM(num)    ((num == DBIC_DATA_CH_SINGLE) || (num == DBIC_DATA_CH_DUAL) ||\
+                                     (num == DBIC_DATA_CH_QUAD) || (num == DBIC_DATA_CH_OCTAL))
 
-typedef enum
-{
-    DBIC_SCPH_1Edge,
-    DBIC_SCPH_2Edge,
-} DBIC_SCPH_T;
+#define DBIC_ADDR_CH_SINGLE         ((uint32_t)0x0)
+#define DBIC_ADDR_CH_DUAL           ((uint32_t)0x1)
+#define DBIC_ADDR_CH_QUAD           ((uint32_t)0x2)
+#define DBIC_ADDR_CH_OCTAL          ((uint32_t)0x3)
+#define IS_DBIC_DATA_CH_NUM(num)    ((num == DBIC_DATA_CH_SINGLE) || (num == DBIC_DATA_CH_DUAL) ||\
+                                     (num == DBIC_DATA_CH_QUAD) || (num == DBIC_DATA_CH_OCTAL))
 
-#if 0
-#define BIT_CK_MTIMES(x)        (((x) & 0x0000001F) << 23)
-#define BIT_FAST_RD(x)          (((x) & 0x00000001) << 22)
-#define BIT_CMD_CH(x)           (((x) & 0x00000003) << 20)
-#define BIT_DATA_CH(x)          (((x) & 0x00000003) << 18)
-#define BIT_ADDR_CH(x)          (((x) & 0x00000003) << 16)
-#define BIT_TMOD(x)             (((x) & 0x00000003) << 8)
-#define BIT_SCPOL               (0x00000001 << 7)
-#define BIT_SCPH                (0x00000001 << 6)
+#define DBIC_TMODE_TX               ((uint32_t)0x0)
+#define DBIC_TMODE_RX               ((uint32_t)0x3)
+#define IS_DBIC_DIR(dir)            ((dir == DBIC_TMODE_TX) || (dir == DBIC_TMODE_RX))
 
-#define BIT_TXSIM               (0x00000001 << 9)
-#define BIT_SEQ_EN              (0x00000001 << 3)
-/********************  Bits definition for SPIC_SR register  *******************/
-#define BIT_TXE                 (0x00000001 << 5)
-#define BIT_RFF                 (0x00000001 << 4)
-#define BIT_RFNE                (0x00000001 << 3)
-#define BIT_TFE                 (0x00000001 << 2)
-#define BIT_TFNF                    (0x00000001 << 1)
-#define BIT_BUSY                    (0x00000001)
-#define BIT_RD_DUMMY_LENGTH(x)  (((x) & 0x00000fff))
-#endif
+#define DBIC_SCPOL_LOW              ((uint32_t)0x0)
+#define DBIC_SCPOL_HIGH             ((uint32_t)0x1)
+#define IS_DBIC_SCPOL(pol)          ((pol == DBIC_SCPOL_LOW) || (pol == DBIC_SCPOL_HIGH))
 
-__STATIC_INLINE void DBIC_Cmd(FunctionalState NewState)
-{
-    assert_param(IS_FUNCTIONAL_STATE(NewState));
+#define DBIC_SCPH_1Edge             ((uint32_t)0x0)
+#define DBIC_SCPH_2Edge             ((uint32_t)0x1)
+#define IS_DBIC_SCPH(phase)         ((phase == DBIC_SCPH_1Edge) || (phase == DBIC_SCPH_2Edge))
 
-    DBIC_SSIENR_t dbic_reg_0x08 = {.d32 = DBIC->SSIENR};
-    if (NewState == ENABLE)
-    {
-        dbic_reg_0x08.b.spic_en = 1;//enable
-    }
-    else
-    {
-        dbic_reg_0x08.b.spic_en = 0;
-    }
-    DBIC->SSIENR = dbic_reg_0x08.d32;
-}
+/**
+  * @brief  Enable/disable DBIC interface.
+  * @param  NewState: state of DBIC
+  * @retval None
+  */
+void DBIC_Cmd(FunctionalState NewState);
 
-__STATIC_INLINE void DBIC_SwitchMode(uint32_t mode)
-{
-    assert_param(IS_DBIC_MODE(mode));
-    DBIC_CTRLR0_t dbic_reg_0x00 = {.d32 = DBIC->CTRLR0};
-    dbic_reg_0x00.b.user_mode = mode;
-    DBIC->CTRLR0 = dbic_reg_0x00.d32;
-}
+/**
+  * @brief  Switch to user/auto mode.
+  * @param  mode: DBIC mode
+  * @retval None
+  */
+void DBIC_SwitchMode(uint32_t mode);
 
-__STATIC_INLINE void DBIC_SwitchDirect(uint32_t dir)
-{
-    assert_param(IS_DBIC_DIR(dir));
-    DBIC_CTRLR0_t dbic_reg_0x00 = {.d32 = DBIC->CTRLR0};
-    dbic_reg_0x00.b.tmod = dir;
-    DBIC->CTRLR0 = dbic_reg_0x00.d32;
-}
+/**
+  * @brief  Switch TX/RX direction .
+  * @param  dir: TX/RX
+  * @retval None
+  */
+void DBIC_SwitchDirect(uint32_t dir);
 
-__STATIC_INLINE void DBIC_CmdLength(uint32_t len)
-{
-    DBIC_USER_LENGTH_t dbic_reg_0x118 = {.d32 = DBIC->USER_LENGTH};
-    dbic_reg_0x118.b.user_cmd_lenght = len;
-    DBIC->USER_LENGTH = dbic_reg_0x118.d32;
-}
+/**
+  * @brief  Configure length of CMD.
+  * @param  len: command length
+  * @retval None
+  */
+void DBIC_CmdLength(uint32_t len);
 
-__STATIC_INLINE void DBIC_AddrLength(uint32_t len)
-{
-    DBIC_USER_LENGTH_t dbic_reg_0x118 = {.d32 = DBIC->USER_LENGTH};
-    dbic_reg_0x118.b.user_addr_length = len;
-    DBIC->USER_LENGTH = dbic_reg_0x118.d32;
-}
+/**
+  * @brief  Configure length of address.
+  * @param  len: address length
+  * @retval None
+  */
+void DBIC_AddrLength(uint32_t len);
 
-__STATIC_INLINE void DBIC_Select()
-{
-    DBIC_SER_t dbic_reg_0x10 = {.d32 = DBIC->SER};
-    dbic_reg_0x10.b.ser = 1;
-    DBIC->SER = dbic_reg_0x10.d32;
-}
+/**
+  * @brief  Each bit in the register corresponds to one SPI Flash. In user mode
+  *         user program the register to select target flash. .
+  * @retval None
+  */
+void DBIC_Select(void);
 
-__STATIC_INLINE void DBIC_TX_NDF(uint32_t len)
-{
-    DBIC_TX_NDF_t dbic_reg_0x130 = {.d32 = DBIC->TX_NDF};
-    dbic_reg_0x130.b.tx_ndf = len;
-    DBIC->TX_NDF = dbic_reg_0x130.d32;
-}
+/**
+  * @brief  Configure num of data frames in bytes.
+  * @param  len: data length
+  * @retval None
+  */
+void DBIC_TX_NDF(uint32_t len);
 
+/**
+  * @brief  Initialize DBIC.
+  * @param  DBICCfg: configuration structure of DBIC
+  * @retval None
+  */
 void DBIC_Init(LCDC_DBICCfgTypeDef *DBICCfg);
+
+/**
+  * @brief  Send data through DBIC interface.
+  * @param  buf: data to be sent.
+  * @param  len:  data length.
+  * @retval None
+  */
 void DBIC_SendBuf(uint8_t *buf, uint32_t len);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*__RTL_DBIC_H*/
+#endif /*__RTL8762X_DBIC_H*/
 
 
 /******************* (C) COPYRIGHT 2021 Realtek Semiconductor Corporation *****END OF FILE****/

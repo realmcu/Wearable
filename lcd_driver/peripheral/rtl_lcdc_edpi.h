@@ -11,8 +11,8 @@
 *********************************************************************************************************
 */
 
-#ifndef __RTL_EDPI_H
-#define __RTL_EDPI_H
+#ifndef __RTL876X_EDPI_H
+#define __RTL876X_EDPI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +20,6 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "rtl_lcdc.h"
 #include "rtl_lcdc_edpi_reg.h"
-
 
 typedef struct
 {
@@ -54,6 +53,13 @@ typedef struct
     uint32_t eDPI_LineBufferPixelThreshold;
 } LCDC_eDPICfgTypeDef;
 
+typedef enum
+{
+    EDPI_HSYNCS = 0,
+    EDPI_VSYNCS,
+    EDPI_HDES,
+    EDPI_VDES,
+} EDPI_SIGNAL_t;
 
 /*============================================================================*
  *                         Constants
@@ -61,176 +67,252 @@ typedef struct
 
 /**
  * \defgroup    EDPI_ClockDiv clock div
- *
+ * \{
  * \ingroup     EDPI_Exported_Constants
  */
-typedef enum
-{
-    EDPI_CLOCKDIV2 = 1,
-    EDPI_CLOCKDIV3 = 2,
-    EDPI_CLOCKDIV4 = 3,
-    EDPI_CLOCKDIV5 = 4,
-    EDPI_CLOCKDIV6 = 5,
-    EDPI_CLOCKDIV7 = 6,
-    EDPI_CLOCKDIV8 = 7,
-} EDPI_CLOCKDIV_T;
+#define EDPI_CLOCKDIV2                             ((uint32_t)0x1)               //temp
+#define EDPI_CLOCKDIV3                             ((uint32_t)0x2)
+#define EDPI_CLOCKDIV4                             ((uint32_t)0x3)
+#define EDPI_CLOCKDIV5                             ((uint32_t)0x4)
+#define EDPI_CLOCKDIV6                             ((uint32_t)0x5)
+#define EDPI_CLOCKDIV7                             ((uint32_t)0x6)
+#define EDPI_CLOCKDIV8                             ((uint32_t)0x7)
+/** \} */
 
 #define IS_EDPI_CLOCKDIV(DIV)   (((DIV) == EDPI_CLOCKDIV2) || ((DIV) == EDPI_CLOCKDIV3) || \
                                  ((DIV) == EDPI_CLOCKDIV4) || ((DIV) == EDPI_CLOCKDIV5) || \
                                  ((DIV) == EDPI_CLOCKDIV6) || ((DIV) == EDPI_CLOCKDIV7) || \
                                  ((DIV) == EDPI_CLOCKDIV8))
 
-#define EDPI_HSYNCS                     BIT3
-#define EDPI_VSYNCS                     BIT2
-#define EDPI_HDES                       BIT1
-#define EDPI_VDES                       BIT0
+
+/**
+ * \defgroup    EDPI_HS_POLARITY  HS POLARITY
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_HSPOL_AL                (0)            /*!< Horizontal Synchronization is active low. */
+#define EDPI_HSPOL_AH                (1)            /*!< Horizontal Synchronization is active high. */
 /** \} */
 
-#define IS_EDPI_SYNC_SIGNAL_STATUS(SIGNAL)       (((SIGNAL) == EDPI_HSYNCS)         || \
-                                                  ((SIGNAL) == EDPI_VSYNCS)  || \
-                                                  ((SIGNAL) == EDPI_HDES)         || \
-                                                  ((SIGNAL) == EDPI_VDES))
+#define IS_EDPI_HSPOL(POLARITY)   ((POLARITY) == EDPI_HSPOL_AL) || ((POLARITY) == EDPI_HSPOL_AH)
+
+/**
+ * \defgroup    EDPI_VS_POLARITY  VS POLARITY
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_VSPOL_AL                (0)            /*!< Vertical Synchronization is active low. */
+#define EDPI_VSPOL_AH                (1)            /*!< Vertical Synchronization is active high. */
+/** \} */
+
+#define IS_EDPI_VSPOL(POLARITY)   ((POLARITY) == EDPI_VSPOL_AL) || ((POLARITY) == EDPI_VSPOL_AH)
+
+/**
+ * \defgroup    EDPI_DE_POLARITY  DE POLARITY
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_DEPOL_AL                (0)            /*!< Data Enable, is active low. */
+#define EDPI_DEPOL_AH                (1)            /*!< Data Enable, is active high. */
+/** \} */
+
+#define IS_EDPI_DEPOL(POLARITY)   ((POLARITY) == EDPI_DEPOL_AL) || ((POLARITY) == EDPI_DEPOL_AH)
+
+/**
+ * \defgroup    EDPI_INT_MASK
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_LIM_UNMASK            (0)              /*!< pixel clock polarity is active low. */
+#define EDPI_LIM_MASK              (1)              /*!< pixel clock is active high. */
+/** \} */
+
+#define IS_EDPI_LIM(LIM)   ((LIM) == EDPI_LIM_UNMASK) || ((LIM) == EDPI_LIM_MASK)
 
 /**
  * \defgroup    EDPI_COLOR_MAP
- *
+ * \{
  * \ingroup     EDPI_Exported_Constants
  */
-typedef enum
-{
-    EDPI_PIXELFORMAT_RGB888,
-    EDPI_PIXELFORMAT_RGB565_1,
-    EDPI_PIXELFORMAT_RGB565_2,
-    EDPI_PIXELFORMAT_RGB565_3,
-} EDPI_PIXELFORMAT_T;
+#define EDPI_PIXELFORMAT_RGB888            (0)
+#define EDPI_PIXELFORMAT_RGB565_1          ((uint32_t)0x1)   /*!<RGB565_1(R[D21:D17]G[D13:D8]B[D5:D1])*/
+#define EDPI_PIXELFORMAT_RGB565_2          ((uint32_t)0x2)   /*!<RGB565_2(R[D20:D16]G[D13:D8]B[D4:D0])*/
+#define EDPI_PIXELFORMAT_RGB565_3          ((uint32_t)0x3)   /*!<RGB565_3(R[D15:D11]G[D10:D5]B[D4:D0])*/
+/** \} */
 
 #define IS_EDPI_PIXELFORMAT(FORMAT)   (((FORMAT) == EDPI_PIXELFORMAT_RGB888) || ((FORMAT) == EDPI_PIXELFORMAT_RGB565_1) || \
                                        ((FORMAT) == EDPI_PIXELFORMAT_RGB565_2) || ((FORMAT) == EDPI_PIXELFORMAT_RGB565_3))
 
 /**
  * \defgroup    EDPI_OP_MODE
- *
+ * \{
  * \ingroup     EDPI_Exported_Constants
  */
-typedef enum
-{
-    EDPI_STANDARD_VIDEO_MODE,
-    EDPI_ADAPTED_COMMAND_MODE,
-} EDPI_MODE_T;
+#define EDPI_STANDARD_VIDEO_MODE            (0)             /*!< Standard Video mode. */
+#define EDPI_ADAPTED_COMMAND_MODE           (1)             /*!< Adapted Command mode. */
+/** \} */
 
 #define IS_EDPI_OP_MODE(MDOE)   ((MODE) == EDPI_STANDARD_VIDEO_MODE) || ((MODE) == EDPI_ADAPTED_COMMAND_MODE)
 
 /**
  * \defgroup    EDPI_LCD_ARC
- *
+ * \{
  * \ingroup     EDPI_Exported_Constants
  */
-typedef enum
-{
-    EDPI_LCD_ARC_TYPE123,
-    EDPI_LCD_ARC_TYPE4,
-} EDPI_LCD_ARC_T;
+#define EDPI_LCD_ARC_TYPE123            (0)             /*!< LCD Display Driver is of Type 1 or 2or3. */
+#define EDPI_LCD_ARC_TYPE4              (1)             /*!< LCD Display Driver is of Type 4. */
+/** \} */
 
 #define IS_EDPI_LCD_ARC_TYPE(TYPE)   ((TYPE) == EDPI_LCD_ARC_TYPE123) || ((TYPE) == EDPI_LCD_ARC_TYPE4)
 
 /**
  * \defgroup    EDPI_SD_EN_FCOLOR
- *
+ * \{
  * \ingroup     EDPI_Exported_Constants
  */
-typedef enum
-{
-    EDPI_SD_EN_FCOLOR_BLACK,
-    EDPI_SD_EN_FCOLOR_WHITE,
-} EDPI_SD_EN_FCOLOR_T;
+#define EDPI_SD_EN_FCOLOR_BLACK            (0)   /*!< this bit defines the color of the 4 frames is black. */
+#define EDPI_SD_EN_FCOLOR_WHITE            (1)   /*!< this bit defines the color of the 4 frames is white. */
+/** \} */
 
 #define IS_EDPI_SD_EN_FCOLOR(FCOLOR)   ((FCOLOR) == EDPI_SD_EN_FCOLOR_BLACK) || ((FCOLOR) == EDPI_SD_EN_FCOLOR_WHITE)
 
 /**
  * \defgroup    EDPI_SD_DIS_FCOLOR
- *
+ * \{
  * \ingroup     EDPI_Exported_Constants
  */
-typedef enum
-{
-    EDPI_SD_DIS_FCOLOR_BLACK,
-    EDPI_SD_DIS_FCOLOR_WHITE,
-} EDPI_SD_DIS_FCOLOR_T;
+#define EDPI_SD_DIS_FCOLOR_BLACK              (0)           /*!< this bit defines the color of the 12 frames is black. */
+#define EDPI_SD_DIS_FCOLOR_WHITE              (1)           /*!< this bit defines the color of the 12 frames is white. */
+/** \} */
 
 #define IS_EDPI_SD_DIS_FCOLOR(FCOLOR)   ((FCOLOR) == EDPI_SD_DIS_FCOLOR_BLACK) || ((FCOLOR) == EDPI_SD_DIS_FCOLOR_WHITE)
 
 /**
  * \defgroup    EDPI_SHUTDN_POLARITY  SD POLARITY
- *
+ * \{
  * \ingroup     EDPI_Exported_Constants
  */
-typedef enum
-{
-    EDPI_AL,
-    EDPI_AH,
-} EDPI_ACTIVE_POL_T;
+#define EDPI_SDPOL_AL                (0)            /*!< ShutDown is active low. */
+#define EDPI_SDPOL_AH                (1)            /*!< ShutDown is active high. */
+/** \} */
 
-#define IS_EDPI_ACTIVE_POL(POLARITY)   ((POLARITY) == EDPI_AL) || ((POLARITY) == EDPI_AH)
+#define IS_EDPI_SDPOL(POLARITY)   ((POLARITY) == EDPI_SDPOL_AL) || ((POLARITY) == EDPI_SDPOL_AH)
 
+/**
+ * \defgroup    EDPI_COLORMODE_POLARITY  HS POLARITY
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_CLMPOL_AL                (0)               /*!< ColorMode is active low. */
+#define EDPI_CLMPOL_AH                (1)               /*!< ColorMode is active high. */
+/** \} */
 
-typedef enum
-{
-    EDPI_CONSTANT_LOW,
-    EDPI_CONSTANT_NONE1,
-    EDPI_CONSTANT_NONE2,
-    EDPI_CONSTANT_HIGH,
-} EDPI_CONSTANT_T;
+#define IS_EDPI_CLMPOL(POLARITY)   ((POLARITY) == EDPI_CLMPOL_AL) || ((POLARITY) == EDPI_CLMPOL_AH)
 
+/**
+ * \defgroup    EDPI_SHUTDOWN_ENABLE  SD ENABLE
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_SD_DISABLE                (0)            /*!< ShutDown DISABLE. */
+#define EDPI_SD_ENABLE                 (1)            /*!< ShutDown ENABLE. */
+/** \} */
+
+#define IS_EDPI_SD_CMD(CMD)             ((CMD) == EDPI_SD_DISABLE) || ((CMD) == EDPI_SD_ENABLE)
+
+/**
+ * \defgroup    EDPI_COLORMODE_ENABLE  CLM ENABLE
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_CLM_DISABLE                (0)             /*!< ShutDown is active low. */
+#define EDPI_CLM_ENABLE                 (1)             /*!< ShutDown is active high. */
+/** \} */
+
+#define IS_EDPI_CLM_CMD(CMD)   ((CMD) == EDPI_CLM_DISABLE) || ((CMD) == EDPI_CLM_ENABLE)
+
+/**
+ * \defgroup    EDPI_UPDATECFG_ENABLE  UP ENABLE
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_UPEN_DISABLE                (0)            /*!< ShutDown is active low. */
+#define EDPI_UPEN_ENABLE                 (1)            /*!< ShutDown is active high. */
+/** \} */
+
+#define IS_EDPI_UPEN_CMD(CMD)   ((CMD) == EDPI_UPEN_DISABLE) || ((CMD) == EDPI_UPEN_ENABLE)
+
+/**
+ * \defgroup    EDPI_TEAR_REQ  CLM ENABLE
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_TEARREQ_AL                (0)              /*!< ShutDown is active low. */
+#define EDPI_TEARREQ_AH                (1)              /*!< ShutDown is active high. */
+/** \} */
+
+#define IS_EDPI_TEARREQ_POLARITY(POLARITY)   ((POLARITY) == EDPI_TEARREQ_AL) || ((POLARITY) == EDPI_TEARREQ_AH)
+
+/**
+ * \defgroup    EDPI_HALT_POLARITY  HALT POLARITY
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_HALT_AL                (0)             /*!< ShutDown is active low. */
+#define EDPI_HALT_AH                (1)             /*!< ShutDown is active high. */
+/** \} */
+
+#define IS_EDPI_HALT_POLARITY(POLARITY)   ((POLARITY) == EDPI_HALT_AL) || ((POLARITY) == EDPI_HALT_AH)
+
+/**
+ * \defgroup    EDPI_RGB_COMPATIBLE
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_DE_CONSTANT_NONE                (0x1)   /*!< 0x1 or 0x2: No constant value for DE, it can be drive by display controller*/
+#define EDPI_DE_CONSTANT_LOW                 (0x0)      /*!< constant low for DE. */
+#define EDPI_DE_CONSTANT_HIGH                (0x3)      /*!< constant high for DE */
+/** \} */
+
+#define IS_EDPI_DE_CONSTANT_VALUE(VALUE)   ((VALUE) == EDPI_DE_CONSTANT_NONE) || ((VALUE) == EDPI_DE_CONSTANT_LOW) || ((VALUE) == EDPI_DE_CONSTANT_HIGH)
+
+/**
+ * \defgroup    EDPI_RGB_COMPATIBLE
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_VSYNC_CONSTANT_NONE                (0x1)   /*!< 0x1 or 0x2: No constant value for VSYNC, it can be drive by display controller*/
+#define EDPI_VSYNC_CONSTANT_LOW                 (0x0)      /*!< constant low for VSYNC. */
+#define EDPI_VSYNC_CONSTANT_HIGH                (0x3)      /*!< constant high for VSYNC */
+/** \} */
+
+#define IS_EDPI_VSYNC_CONSTANT_VALUE(VALUE)   ((VALUE) == EDPI_VSYNC_CONSTANT_NONE) || ((VALUE) == EDPI_VSYNC_CONSTANT_LOW) || ((VALUE) == EDPI_VSYNC_CONSTANT_HIGH)
+
+/**
+ * \defgroup    EDPI_RGB_COMPATIBLE
+ * \{
+ * \ingroup     EDPI_Exported_Constants
+ */
+#define EDPI_HSYNC_CONSTANT_NONE                (0x1)   /*!< 0x1 or 0x2: No constant value for HSYNC, it can be drive by display controller*/
+#define EDPI_HSYNC_CONSTANT_LOW                 (0x0)      /*!< constant low for HSYNC. */
+#define EDPI_HSYNC_CONSTANT_HIGH                (0x3)      /*!< constant high for HSYNC */
+/** \} */
+
+#define IS_EDPI_HSYNC_CONSTANT_VALUE(VALUE)   ((VALUE) == EDPI_HSYNC_CONSTANT_NONE) || ((VALUE) == EDPI_HSYNC_CONSTANT_LOW)  || ((VALUE) == EDPI_HSYNC_CONSTANT_HIGH)
 
 /** \} */ /* End of group EDPI_Exported_Constants */
 
-__STATIC_INLINE void EDPI_MaskLineINTConfig(FunctionalState state)
-{
-    assert_param(IS_FUNCTIONAL_STATE(state));
-    EDPI_INT_MASK_t edpi_reg_0x18 = {.d32 = EDPI->EDPI_INT_MASK};
-    if (state == ENABLE)
-    {
-        edpi_reg_0x18.b.lim = 1;
-    }
-    else
-    {
-        edpi_reg_0x18.b.lim = 0;
-    }
-    EDPI->EDPI_INT_MASK = edpi_reg_0x18.d32;
-}
+void EDPI_MaskLineINTConfig(FunctionalState state);
 
-__STATIC_INLINE void LCDC_ClearLineINTPendingBit(void)
-{
-    EDPI_INT_CLR_t edpi_reg_0x20 = {.d32 = EDPI->EDPI_INT_CLR};
-    edpi_reg_0x20.b.clif = 0;
-    EDPI->EDPI_INT_CLR = edpi_reg_0x20.d32;
-}
+void LCDC_ClearLineINTPendingBit(void);
 
-__STATIC_INLINE uint16_t EDPI_GetLineINTPos(void)
-{
-    EDPI_LINE_INT_POS_t edpi_reg_0x24 = {.d32 = EDPI->EDPI_LINE_INT_POS};
-    return edpi_reg_0x24.b.lipos;
-}
+uint16_t EDPI_GetLineINTPos(void);
 
-__STATIC_INLINE uint16_t EDPI_GetXPos(void)
-{
-    EDPI_PIXEL_POS_t edpi_reg_0x28 = {.d32 = EDPI->EDPI_PIXEL_POS};
-    return edpi_reg_0x28.b.cxpos;
-}
+uint16_t EDPI_GetXPos(void);
 
-__STATIC_INLINE uint16_t EDPI_GetYPos(void)
-{
-    EDPI_PIXEL_POS_t edpi_reg_0x28 = {.d32 = EDPI->EDPI_PIXEL_POS};
-    return edpi_reg_0x28.b.cypos;
-}
+uint16_t EDPI_GetYPos(void);
 
-__STATIC_INLINE void EDPI_OPMODE_CONFIG(uint32_t mode)
-{
-    assert_param(IS_EDPI_OP_MODE(mode));
-    EDPI_OP_MODE_t edpi_reg_0x34 = {.d32 = EDPI->EDPI_OP_MODE};
-    edpi_reg_0x34.b.op_mode = mode;
-    EDPI->EDPI_OP_MODE = edpi_reg_0x34.d32;
-}
+void EDPI_OPMODE_CONFIG(uint32_t mode);
 
 void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg);
 
@@ -238,7 +320,7 @@ void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg);
 }
 #endif
 
-#endif /*__RTL_EDPI_H*/
+#endif /*__RTL8762X_EDPI_H*/
 
 
 /******************* (C) COPYRIGHT 2021 Realtek Semiconductor Corporation *****END OF FILE****/

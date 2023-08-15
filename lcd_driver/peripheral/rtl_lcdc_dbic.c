@@ -10,7 +10,7 @@
 *********************************************************************************************************
 *               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
-* @file     rtl_dbic.c
+* @file     rtl876x_dbic.c
 * @brief    This file provides all the DBI firmware functions.
 * @details
 * @author   boris yue
@@ -20,6 +20,7 @@
 */
 
 /* Includes ------------------------------------------------------------------*/
+#include "rtl_lcdc.h"
 #include "rtl_lcdc_dbic.h"
 
 
@@ -27,6 +28,7 @@ void DBIC_Init(LCDC_DBICCfgTypeDef *DBICCfg)
 {
     LCDC_AXIMUXMode(LCDC_FW_MODE);
 
+//    DBIC->SSIENR &= DBIC_EN_CLR;//disable
     /* set cs and baudrate */
     DBIC_CTRLR0_t dbic_reg_0x00 = {.d32 = DBIC->CTRLR0};
     dbic_reg_0x00.b.user_mode = DBIC_USER_MODE;
@@ -62,21 +64,22 @@ void DBIC_SendBuf(uint8_t *buf, uint32_t len)
     DBIC->SSIENR = dbic_reg_0x08.d32;//disable DBIC
 
     DBIC_CTRLR0_t dbic_reg_0x00 = {.d32 = DBIC->CTRLR0};
-    dbic_reg_0x00.b.cmd_ch = DBIC_CH_SINGLE;
-    dbic_reg_0x00.b.data_ch = DBIC_CH_SINGLE;
-    dbic_reg_0x00.b.addr_ch = DBIC_CH_SINGLE;
-    dbic_reg_0x00.b.tmod = DBIC_TMODE_TX;//tx mode
-    DBIC->CTRLR0 = dbic_reg_0x00.d32;
+    dbic_reg_0x00.b.cmd_ch = DBIC_CMD_CH_SINGLE;
+    dbic_reg_0x00.b.data_ch = DBIC_DATA_CH_SINGLE;
+    dbic_reg_0x00.b.addr_ch = DBIC_ADDR_CH_SINGLE;
+    dbic_reg_0x00.b.tmod = DBIC_TMODE_TX;
+    DBIC->CTRLR0 = dbic_reg_0x00.d32;//tx mode
 
     DBIC_FLUSH_FIFO_t dbic_reg_0x128 = {.d32 = DBIC->FLUSH_FIFO};
     dbic_reg_0x128.b.flush_dr_fifo = 1;
     DBIC->FLUSH_FIFO = dbic_reg_0x128.d32;
 
-    //DBIC_TX_NDF(4);
-    //LCDC_SetTxPixelLen(2);
+//    DBIC_TX_NDF(4);
+//    LCDC_SetTxPixelLen(2);
     DBIC_CmdLength(1);
     DBIC_AddrLength(3);
 
+//    LCDC_AutoWriteCmd(ENABLE);
     for (uint32_t i = 0; i < 4; i++)
     {
         DBIC->DR[0].byte = buf[i];
@@ -91,8 +94,11 @@ void DBIC_SendBuf(uint8_t *buf, uint32_t len)
     }
     while (dbic_reg_0x28.b.busy);  // wait bus busy
 
-    dbic_reg_0x08.b.spic_en = 0;
+    dbic_reg_0x08.b.spic_en = 1;
     DBIC->SSIENR = dbic_reg_0x08.d32;//disable DBIC
+    //LCDC_AutoWriteCmd(ENABLE);
+    //while (DBIC->SR & BIT0); // wait bus busy
+//    while ((LCDC_HANDLER->OPERATE_CTR & LCDC_AUTO_WRITE_START_MSK) != RESET);
 }
 
 void DBIC_ReceiveBuf(uint16_t addr, uint16_t data_len, uint8_t *data)
@@ -104,11 +110,11 @@ void DBIC_ReceiveBuf(uint16_t addr, uint16_t data_len, uint8_t *data)
 
     //set addr channel and data channel in ctrl0 register.
     DBIC_CTRLR0_t dbic_reg_0x00 = {.d32 = DBIC->CTRLR0};
-    dbic_reg_0x00.b.cmd_ch = DBIC_CH_SINGLE;
-    dbic_reg_0x00.b.data_ch = DBIC_CH_SINGLE;
-    dbic_reg_0x00.b.addr_ch = DBIC_CH_SINGLE;
+    dbic_reg_0x00.b.cmd_ch = DBIC_CMD_CH_SINGLE;
+    dbic_reg_0x00.b.data_ch = DBIC_DATA_CH_SINGLE;
+    dbic_reg_0x00.b.addr_ch = DBIC_ADDR_CH_SINGLE;
     dbic_reg_0x00.b.tmod = DBIC_TMODE_RX;
-    DBIC->CTRLR0 = dbic_reg_0x00.d32;//rx mode
+    DBIC->CTRLR0 = dbic_reg_0x00.d32;//tx mode
 
     //spic_set_ctrl1(data_len);
     DBIC_RX_NDF_t dbic_reg_0x04 = {.d32 = DBIC->RX_NDF};
@@ -141,5 +147,62 @@ void DBIC_ReceiveBuf(uint16_t addr, uint16_t data_len, uint8_t *data)
     DBIC->SSIENR = dbic_reg_0x08.d32;
 }
 
+void DBIC_Cmd(FunctionalState NewState)
+{
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
+    DBIC_SSIENR_t dbic_reg_0x08 = {.d32 = DBIC->SSIENR};
+    if (NewState == ENABLE)
+    {
+        dbic_reg_0x08.b.spic_en = 1;//enable
+    }
+    else
+    {
+        dbic_reg_0x08.b.spic_en = 0;
+    }
+    DBIC->SSIENR = dbic_reg_0x08.d32;
+}
 
+void DBIC_SwitchMode(uint32_t mode)
+{
+    assert_param(IS_DBIC_MODE(mode));
+    DBIC_CTRLR0_t dbic_reg_0x00 = {.d32 = DBIC->CTRLR0};
+    dbic_reg_0x00.b.user_mode = mode;
+    DBIC->CTRLR0 = dbic_reg_0x00.d32;
+}
+
+void DBIC_SwitchDirect(uint32_t dir)
+{
+    assert_param(IS_DBIC_DIR(dir));
+    DBIC_CTRLR0_t dbic_reg_0x00 = {.d32 = DBIC->CTRLR0};
+    dbic_reg_0x00.b.tmod = dir;
+    DBIC->CTRLR0 = dbic_reg_0x00.d32;//tx mode
+}
+
+void DBIC_CmdLength(uint32_t len)
+{
+    DBIC_USER_LENGTH_t dbic_reg_0x118 = {.d32 = DBIC->USER_LENGTH};
+    dbic_reg_0x118.b.user_cmd_length = len;
+    DBIC->USER_LENGTH = dbic_reg_0x118.d32;
+}
+
+void DBIC_AddrLength(uint32_t len)
+{
+    DBIC_USER_LENGTH_t dbic_reg_0x118 = {.d32 = DBIC->USER_LENGTH};
+    dbic_reg_0x118.b.user_addr_length = len;
+    DBIC->USER_LENGTH = dbic_reg_0x118.d32;
+}
+
+void DBIC_Select(void)
+{
+    DBIC_SER_t dbic_reg_0x10 = {.d32 = DBIC->SER};
+    dbic_reg_0x10.b.ser = 1;
+    DBIC->SER = dbic_reg_0x10.d32;
+}
+
+void DBIC_TX_NDF(uint32_t len)
+{
+    DBIC_TX_NDF_t dbic_reg_0x130 = {.d32 = DBIC->TX_NDF};
+    dbic_reg_0x130.b.tx_ndf = len;
+    DBIC->TX_NDF = dbic_reg_0x130.d32;
+}
 

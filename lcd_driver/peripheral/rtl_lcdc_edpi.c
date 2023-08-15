@@ -10,7 +10,7 @@
 *********************************************************************************************************
 *               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
-* @file     rtl_edpi.c
+* @file     rtl876x_edpi.c
 * @brief    This file provides all the eDPI firmware functions.
 * @details
 * @author   boris yue
@@ -23,6 +23,16 @@
 #include "rtl_lcdc_edpi.h"
 
 
+void EDPI_Videocfg()
+{
+
+}
+
+void EDPI_Cmdcfg()
+{
+
+}
+
 void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg)
 {
     /* Check the parameters */
@@ -31,6 +41,7 @@ void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg)
     assert_param(IS_EDPI_DEPOL(eDPICfg->eDPI_DataEnPolarity));
     assert_param(IS_EDPI_PIXELFORMAT(eDPICfg->eDPI_ColorMap));
     assert_param(IS_EDPI_OP_MODE(eDPICfg->eDPI_OperateMode));
+
 
     EDPI_DIV_PAR_t edpi_reg_0x50 = {.d32 = EDPI->EDPI_DIV_PAR};
     edpi_reg_0x50.b.edpi_div_par = eDPICfg->eDPI_ClockDiv;
@@ -46,10 +57,10 @@ void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg)
     edpi_reg_0x08.b.avbp = eDPICfg->eDPI_AccumulatedVBP;
     EDPI->EDPI_ABACK_PORCH = edpi_reg_0x08.d32;
 
-    EDPI_AACTIVE_t edpi_reg_0x0C = {.d32 = EDPI->EDPI_AACTIVE};
-    edpi_reg_0x0C.b.aah = eDPICfg->eDPI_AccumulatedActiveH;
-    edpi_reg_0x0C.b.aaw = eDPICfg->eDPI_AccumulatedActiveW;
-    EDPI->EDPI_AACTIVE = edpi_reg_0x0C.d32;
+    EDPI_AACTIVE_t edpi_reg_0x0c = {.d32 = EDPI->EDPI_AACTIVE};
+    edpi_reg_0x0c.b.aaw = eDPICfg->eDPI_AccumulatedActiveW;
+    edpi_reg_0x0c.b.aah = eDPICfg->eDPI_AccumulatedActiveH;
+    EDPI->EDPI_AACTIVE = edpi_reg_0x0c.d32;
 
     EDPI_TOTAL_t edpi_reg_0x10 = {.d32 = EDPI->EDPI_TOTAL};
     edpi_reg_0x10.b.totalh = eDPICfg->eDPI_TotalHeight;
@@ -81,18 +92,16 @@ void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg)
         EDPI_VIDEO_CTL_t edpi_reg_0x38 = {.d32 = EDPI->EDPI_VIDEO_CTL};
         edpi_reg_0x38.b.lcd_arc = eDPICfg->eDPI_LcdArc;
         edpi_reg_0x38.b.sd_pol = eDPICfg->eDPI_ShutdnPolarity;
-        edpi_reg_0x38.b.clm_pol = eDPICfg->eDPI_ColorModePolarity;
         edpi_reg_0x38.b.sd_en = eDPICfg->eDPI_ShutdnEn;
         edpi_reg_0x38.b.clm_en = eDPICfg->eDPI_ColorModeEn;
         edpi_reg_0x38.b.up_en = eDPICfg->eDPI_UpdateCfgEn;
         EDPI->EDPI_VIDEO_CTL = edpi_reg_0x38.d32;
     }
-
     EDPI_OP_MODE_t edpi_reg_0x34 = {.d32 = EDPI->EDPI_OP_MODE};
     edpi_reg_0x34.b.op_mode = eDPICfg->eDPI_OperateMode;
     EDPI->EDPI_OP_MODE = edpi_reg_0x34.d32;
 
-    DPI_LINE_BUFFER_PIXEL_THRESHOLD_t edpi_reg_0x48 = {.d32 = EDPI->DPI_LINE_BUFFER_PIXEL_THRESHOLD};
+    EDPI_LINE_BUFFER_PIXEL_THRESHOLD_t edpi_reg_0x48 = {.d32 = EDPI->DPI_LINE_BUFFER_PIXEL_THRESHOLD};
     edpi_reg_0x48.b.line_buffer_pixel_threshold = eDPICfg->eDPI_LineBufferPixelThreshold;
     EDPI->DPI_LINE_BUFFER_PIXEL_THRESHOLD = edpi_reg_0x48.d32;
 }
@@ -100,7 +109,6 @@ void EDPI_Init(LCDC_eDPICfgTypeDef *eDPICfg)
 ITStatus EDPI_GetLineINTStatus(void)
 {
     ITStatus bit_status = RESET;
-
     EDPI_INT_FLAG_t edpi_reg_0x1c = {.d32 = EDPI->EDPI_INT_FLAG};
     if (edpi_reg_0x1c.b.lif)
     {
@@ -110,7 +118,7 @@ ITStatus EDPI_GetLineINTStatus(void)
     return  bit_status;
 }
 
-ITStatus EDPI_GetSyncStatus(uint32_t signal)
+ITStatus EDPI_GetSyncStatus(EDPI_SIGNAL_t signal)
 {
     ITStatus bit_status = RESET;
     EDPI_SYNC_STATUS_t edpi_reg_0x2c = {.d32 = EDPI->EDPI_SYNC_STATUS};
@@ -146,5 +154,52 @@ ITStatus EDPI_GetSyncStatus(uint32_t signal)
     return  bit_status;
 }
 
+void EDPI_MaskLineINTConfig(FunctionalState state)
+{
+    assert_param(IS_FUNCTIONAL_STATE(state));
+    EDPI_INT_MASK_t edpi_reg_0x18 = {.d32 = EDPI->EDPI_INT_MASK};
+    if (state == ENABLE)
+    {
+        edpi_reg_0x18.b.lim = 1;
+    }
+    else
+    {
+        edpi_reg_0x18.b.lim = 0;
+    }
+    EDPI->EDPI_INT_MASK = edpi_reg_0x18.d32;
+}
+
+void LCDC_ClearLineINTPendingBit(void)
+{
+    EDPI_INT_CLR_t edpi_reg_0x20 = {.d32 = EDPI->EDPI_INT_CLR};
+    edpi_reg_0x20.b.clif = 0;
+    EDPI->EDPI_INT_CLR = edpi_reg_0x20.d32;
+}
+
+uint16_t EDPI_GetLineINTPos(void)
+{
+    EDPI_LINE_INT_POS_t edpi_reg_0x24 = {.d32 = EDPI->EDPI_LINE_INT_POS};
+    return edpi_reg_0x24.b.lipos;
+}
+
+uint16_t EDPI_GetXPos(void)
+{
+    EDPI_PIXEL_POS_t edpi_reg_0x28 = {.d32 = EDPI->EDPI_PIXEL_POS};
+    return edpi_reg_0x28.b.cxpos;
+}
+
+uint16_t EDPI_GetYPos(void)
+{
+    EDPI_PIXEL_POS_t edpi_reg_0x28 = {.d32 = EDPI->EDPI_PIXEL_POS};
+    return edpi_reg_0x28.b.cypos;
+}
+
+void EDPI_OPMODE_CONFIG(uint32_t mode)
+{
+    assert_param(IS_EDPI_OP_MODE(mode));
+    EDPI_OP_MODE_t edpi_reg_0x34 = {.d32 = EDPI->EDPI_OP_MODE};
+    edpi_reg_0x34.b.op_mode = mode;
+    EDPI->EDPI_OP_MODE = edpi_reg_0x34.d32;
+}
 /******************* (C) COPYRIGHT 2021 Realtek Semiconductor Corporation *****END OF FILE****/
 
