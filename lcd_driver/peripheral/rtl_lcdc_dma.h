@@ -137,7 +137,7 @@ typedef enum
 typedef struct
 {
     uint8_t  LCDC_DMA_ChannelNum;               /*!< Specifies channel number for GDMA. */
-    LCDC_DMA_DIRECTION_T LCDC_DMA_DIR;              /*!< Specifies transfer direction. */
+    uint8_t  LCDC_DMA_DIR;              /*!< Specifies transfer direction. */
     uint32_t LCDC_DMA_BufferSize;               /*!< Specifies the buffer size(<=65535).
                                                  The data unit is equal to the configuration set in DMA_PeripheralDataSize
                                                  or DMA_MemoryDataSize members depending in the transfer direction. */

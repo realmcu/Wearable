@@ -133,15 +133,15 @@ typedef struct
 
 
 *===============================================================*/
-
-#define LCDC_DMA_CHANNEL_REG_BASE           DISPLAY_CTRL_REG_BASE//0x40603000UL        
-#define LCDC_DMA_Channel0_BASE              (LCDC_DMA_CHANNEL_REG_BASE + 0x000)
-#define LCDC_DMA_REG_BASE                   (LCDC_DMA_CHANNEL_REG_BASE + 0x2c0)
-#define DBIC_REG_BASE                       (LCDC_DMA_CHANNEL_REG_BASE + 0x400)//0x40603400UL        
-#define LCDC_DMA_LINKLIST_REG_BASE          (LCDC_DMA_CHANNEL_REG_BASE + 0x600)//0x40603600UL        
-#define EDPI_REG_BASE                       (LCDC_DMA_CHANNEL_REG_BASE + 0x700)//0x40603700UL
-#define DBIB_REG_BASE                       (LCDC_DMA_CHANNEL_REG_BASE + 0x800)//0x40603800UL        
-#define LCDC_HANDLER_REG_BASE               (LCDC_DMA_CHANNEL_REG_BASE + 0x900)//0x40603900UL        
+#define DISPLAY_CTRL_REG_BASE                0x40017000UL
+#define LCDC_DMA_CHANNEL_REG_BASE           (DISPLAY_CTRL_REG_BASE + 0)
+#define LCDC_DMA_Channel0_BASE              (DISPLAY_CTRL_REG_BASE + 0x000)
+#define LCDC_DMA_REG_BASE                   (DISPLAY_CTRL_REG_BASE + 0x2c0)
+#define DBIC_REG_BASE                       (DISPLAY_CTRL_REG_BASE + 0x400)
+#define LCDC_DMA_LINKLIST_REG_BASE          (DISPLAY_CTRL_REG_BASE + 0x600)
+#define EDPI_REG_BASE                       (DISPLAY_CTRL_REG_BASE + 0x700)
+#define DBIB_REG_BASE                       (DISPLAY_CTRL_REG_BASE + 0x800)
+#define LCDC_HANDLER_REG_BASE               (DISPLAY_CTRL_REG_BASE + 0x900)
 
 
 #define LCDC_DMA_Channel0                   ((LCDC_DMA_ChannelTypeDef *) LCDC_DMA_Channel0_BASE)

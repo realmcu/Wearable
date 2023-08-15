@@ -27,6 +27,7 @@ void LCDC_Init(LCDC_InitTypeDef *cfg)
     assert_param(IS_LCDC_TE_CMD(cfg->LCDC_TeEn));
     assert_param(IS_LCDC_TE_SIGNAL_VALID(cfg->LCDC_TePolarity));
 
+#if 0
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel0 = 0;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel1 = 1;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_mux_clk_cg_en = 1;
@@ -37,6 +38,7 @@ void LCDC_Init(LCDC_InitTypeDef *cfg)
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_mipi_rx_div_en = 1;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_mipi_rx_mux_clk_cg_en = 1;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_mipi_rx_clk_src_sel = 0;
+#endif
 
 
     /* Configure mask interrupt */
@@ -95,11 +97,13 @@ void LCDC_Init(LCDC_InitTypeDef *cfg)
 void LCDC_clk_src_sel(CLK_DISPLAY_SRC_MUX0 src_mux0, CLK_DISPLAY_SRC_MUX1 src_mux1,
                       CLK_DISPLAY_MUX_CG_EN mux_cg_en, LCDC_DIV_EN div_en, LCDC_DIV_SEL div_sel)
 {
+#if 0
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel0 = src_mux0;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_clk_src_sel1 = src_mux1;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_mux_clk_cg_en = mux_cg_en;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_div_en = div_en;
     PERIBLKCTRL_PERI_CLK->u_1E4.BITS_1E4.r_display_div_sel = div_sel;
+#endif
 }
 
 void LCDC_MaskINTConfig(uint32_t LCDC_INT_MSK, FunctionalState NewState)
@@ -163,7 +167,6 @@ void LCDC_DMA_Init(LCDC_DMA_ChannelTypeDef *LCDC_DMA_Channelx,
                    LCDC_DMA_InitTypeDef *LCDC_DMA_InitStruct)
 {
     uint32_t temp_bit = 0;
-    uint32_t llp_temp;
 
     /* Check the parameters */
     assert_param(IS_DMA_ALL_PERIPH(LCDC_DMA_Channelx));
