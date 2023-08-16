@@ -477,7 +477,7 @@ void app_data_capture_start_process(T_CAPTURE_HEADER *param, uint8_t app_idx)
 #if F_APP_WATCH_CUSTOMER_SPP_CAPTURE_DATA_V2_SUPPORT == 1
     pm_cpu_freq_set(100, &actual_mhz);
 #else
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     //pm_cpu_freq_req(&app_data_capture_freq_handle, 100, &actual_mhz);
 #endif
 

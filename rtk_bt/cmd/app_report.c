@@ -265,12 +265,12 @@ void app_report_raw_data(uint8_t cmd_path, uint8_t app_index, uint8_t *data,
 
 void app_report_rws_state(void)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
 }
 
 void app_report_rws_bud_side(void)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
 }
 
 #if F_APP_APT_SUPPORT
@@ -292,7 +292,7 @@ void app_report_apt_eq_idx(T_APT_EQ_DATA_UPDATE_EVENT apt_eq_data_update_event)
 
 void app_report_get_bud_info(uint8_t *data)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
 }
 
 void app_report_rws_bud_info(void)

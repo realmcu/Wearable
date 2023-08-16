@@ -163,7 +163,7 @@ void app_pop_data_transfer_queue(uint8_t cmd_path, bool next_flag)
         if (next_flag == true)
         {
             app_stop_timer(&timer_idx_data_transfer);
-            DBG_DIRECT("SPP CPATURE DATA V2 dt_queue active 0x%x",
+            DBG_DIRECT("SPP CAPTURE DATA V2 dt_queue active 0x%x",
                        dt_queue[dt_queue_ctrl.dt_queue_r_idx].active);
             if (dt_queue[dt_queue_ctrl.dt_queue_r_idx].active)
             {

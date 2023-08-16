@@ -226,7 +226,7 @@ static void app_cmd_handle_remote_cmd(uint16_t msg, void *buf, uint8_t len);
     */
 static uint32_t get_bank_size_by_img_id(IMG_ID image_id)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return 0;
 }
 
@@ -673,7 +673,7 @@ static void app_cmd_timeout_cb(uint8_t timer_evt, uint16_t param)
     case APP_TIMER_SWITCH_TO_HCI_DOWNLOAD_MODE:
         {
             app_stop_timer(&timer_idx_switch_to_hci_mode);
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //sys_hall_set_hci_download_mode(true);
             //set_hci_mode_flag(true);
             chip_reset(RESET_ALL_EXCEPT_AON);
@@ -683,7 +683,7 @@ static void app_cmd_timeout_cb(uint8_t timer_evt, uint16_t param)
     case APP_TIMER_ENTER_DUT_FROM_SPP_WAIT_ACK:
         {
             app_stop_timer(&timer_idx_enter_dut_from_spp_wait_ack);
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //app_mmi_handle_action(MMI_ENTER_DUT_FROM_SPP);
         }
         break;
@@ -769,7 +769,7 @@ static void app_cmd_timeout_cb(uint8_t timer_evt, uint16_t param)
             app_stop_timer(&timer_idx_io_pin_pull_high);
 
             uint8_t pin_num = (uint8_t)param;
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //Pad_Config(pin_num, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_HIGH);
         }
         break;
@@ -789,7 +789,7 @@ static void app_cmd_timeout_cb(uint8_t timer_evt, uint16_t param)
 
 uint16_t app_cmd_relay_cback(uint8_t *buf, uint8_t msg_type, bool total)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return 0;
 }
 
@@ -1029,7 +1029,7 @@ void app_flash_data_set_param(uint8_t flash_type, uint8_t cmd_path, uint8_t app_
     case DSP_SYSTEM_IMAGE:
         {
             flash_data.flash_data_start_addr = flash_cur_bank_img_header_addr_get(FLASH_IMG_DSPSYSTEM);
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //flash_data.flash_data_size = get_bank_size_by_img_id(IMG_DSPSYSTEM);
         }
         break;
@@ -1050,7 +1050,7 @@ void app_flash_data_set_param(uint8_t flash_type, uint8_t cmd_path, uint8_t app_
 
     case ANC_IMAGE:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //flash_data.flash_data_start_addr = flash_cur_bank_img_header_addr_get(FLASH_IMG_ANC);
             //flash_data.flash_data_size = get_bank_size_by_img_id(IMG_ANC);
         }
@@ -1064,7 +1064,7 @@ void app_flash_data_set_param(uint8_t flash_type, uint8_t cmd_path, uint8_t app_
 
     case CORE_DUMP_PARTITION:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //flash_data.flash_data_start_addr = flash_partition_addr_get(PARTITION_FLASH_HARDFAULT_RECORD);
             //flash_data.flash_data_size = flash_partition_size_get(PARTITION_FLASH_HARDFAULT_RECORD);
         }
@@ -1210,7 +1210,7 @@ T_SNK_CAPABILITY app_cmd_get_system_capability(void)
 
 static void app_cmd_get_fw_version(uint8_t *p_data)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     uint8_t temp_buff[13];
     T_IMG_HEADER_FORMAT *p_app_header = (T_IMG_HEADER_FORMAT *)flash_cur_bank_img_header_addr_get(
                                             FLASH_IMG_MCUAPP);
@@ -1333,7 +1333,7 @@ bool app_cmd_relay_command_set(uint16_t cmd_id, uint8_t *cmd_ptr, uint16_t cmd_l
     if (sync)
     {
         relay_cmd[4] = CMD_PATH_RWS_SYNC;
-        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         //if (app_relay_sync_single_with_raw_msg(module_type, relay_cmd_id, relay_cmd, total_len,
         //                                       REMOTE_TIMER_HIGH_PRECISION, 0, false) == false)
         {
@@ -1523,7 +1523,7 @@ bool app_cmd_get_tool_connect_status(void)
 
 void app_cmd_update_eq_ctrl(uint8_t value, bool is_need_relay)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
 }
 
 T_SRC_SUPPORT_VER_FORMAT *app_cmd_get_src_version(uint8_t cmd_path, uint8_t app_idx)
@@ -1734,7 +1734,7 @@ static void le_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
     case CMD_LE_GET_RAND_ADDR:
         {
             uint8_t rand_addr[6] = {0};
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //app_ble_rand_addr_get(rand_addr);
             if ((cmd_path == CMD_PATH_SPP) || (cmd_path == CMD_PATH_IAP))
             {
@@ -1829,7 +1829,7 @@ static void le_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
 
     case CMD_LE_GET_ALL_BONDED_DEV:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         }
         break;
 
@@ -1899,7 +1899,7 @@ static void le_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
                 uint8_t  app_link_id;
             } __attribute__((packed)) CMD_T;
             CMD_T *cmd = (CMD_T *)cmd_ptr;
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //client_send_exchange_mtu_req(le_db.le_link[cmd->app_link_id].conn_id);
 
             APP_PRINT_INFO1("app_cmd le_cmd_handle: CMD_LE_ATT_MTU_EXCHANGE conn_id %d",
@@ -1955,7 +1955,7 @@ void app_cmd_bt_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path,
 
     case CMD_BT_READ_PAIRED_RECORD:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         }
         break;
 
@@ -1968,7 +1968,7 @@ void app_cmd_bt_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path,
             memcpy(bd_addr, &cmd_ptr[3], 6);
             p_link = app_find_br_link(bd_addr);
             uint8_t prof = cmd_ptr[2];
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //a2dp_reconnect_check_flag = false;
             if ((prof & A2DP_PROFILE_MASK))//a2dp_connect_check_acl_flag
             {
@@ -2108,7 +2108,7 @@ void app_cmd_bt_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path,
 
     case CMD_BT_HFP_DIAL_WITH_NUMBER:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             uint8_t app_index = 0;
             //uint8_t app_index = app_hfp_get_active_idx();
             //char *number = (char *)&cmd_ptr[2];
@@ -2136,7 +2136,7 @@ void app_cmd_bt_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path,
                     }
                     else
                     {
-                        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                         //set_answer_by_watch(true);
                     }
                 }
@@ -2215,7 +2215,7 @@ void app_cmd_bt_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path,
 
     case CMD_GET_NUM_OF_CONNECTION:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //uint8_t event_data = app_multi_get_acl_connect_num();
 
             //app_cmd_set_event_ack(cmd_path, app_idx, ack_pkt);
@@ -2230,7 +2230,7 @@ void app_cmd_bt_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path,
             if (app_cfg_const.enable_multi_link == 0)
 #endif
             {
-                APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                 //app_cfg_const.enable_multi_link = 1;
                 app_cfg_const.max_legacy_multilink_devices = 2;
                 //app_bt_policy_set_b2s_connected_num_max(app_cfg_const.max_legacy_multilink_devices);
@@ -2708,7 +2708,7 @@ static void app_cmd_general_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8
 
                         if (cmd_ptr[2] == CFG_SET_LE_NAME)
                         {
-                            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                             //app_ble_common_adv_update_scan_rsp_data();
                         }
 
@@ -2910,14 +2910,14 @@ static void app_cmd_general_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8
 #endif
             case GET_STATUS_APP_STATE:
                 {
-                    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                     //buf[1] = app_bt_policy_get_state();
                 }
                 break;
 
             case GET_STATUS_BUD_ROLE:
                 {
-                    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                     //buf[1] = app_cfg_const.bud_role;
                 }
                 break;
@@ -3140,7 +3140,7 @@ static void app_cmd_general_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8
     case CMD_GET_PACKAGE_ID:
         {
             uint8_t temp_buff[2];
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //temp_buff[0] = sys_hall_read_chip_id();
             //temp_buff[1] = sys_hall_read_package_id();
 
@@ -3181,21 +3181,21 @@ static void app_cmd_general_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8
                 {
                 case REG_ACCESS_TYPE_AON:
                     {
-                        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                         //*report_value = btaon_fast_read_safe_8b(addr);
                     }
                     break;
 
                 case REG_ACCESS_TYPE_AON2B:
                     {
-                        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                         //*report_value = btaon_fast_read_safe(addr);
                     }
                     break;
 
                 case REG_ACCESS_TYPE_DIRECT:
                     {
-                        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                         //*report_value = HAL_READ32(addr, 0);
                     }
                     break;
@@ -3210,21 +3210,21 @@ static void app_cmd_general_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8
                 {
                 case REG_ACCESS_TYPE_AON:
                     {
-                        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                         //btaon_fast_write_safe_8b(addr, value);
                     }
                     break;
 
                 case REG_ACCESS_TYPE_AON2B:
                     {
-                        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                         //btaon_fast_write_safe(addr, value);
                     }
                     break;
 
                 case REG_ACCESS_TYPE_DIRECT:
                     {
-                        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                         HAL_WRITE32(addr, 0, value);
                     }
                     break;
@@ -3336,13 +3336,13 @@ static void app_cmd_other_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t
 
     case CMD_LED_TEST:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         }
         break;
 
     case CMD_SWITCH_TO_HCI_DOWNLOAD_MODE:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         }
         break;
 
@@ -3504,13 +3504,13 @@ static void app_cmd_customized_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, ui
     {
     case CMD_IO_PIN_PULL_HIGH:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         }
         break;
 
     case CMD_ENTER_BAT_OFF_MODE:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         }
         break;
 
@@ -3672,7 +3672,7 @@ static void app_cmd_customized_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, ui
 #endif
     case CMD_MIC_MP_VERIFY_BY_HFP:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         }
         break;
 
@@ -3786,12 +3786,12 @@ void app_handle_cmd_set(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, ui
                     {
                         if (status != CMD_SET_STATUS_COMPLETE)
                         {
-                            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                             //app_eq_report_terminate_param_report(cmd_path, app_idx);
                         }
                         else
                         {
-                            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                             //app_eq_report_eq_param(cmd_path, app_idx);
                         }
                     }
@@ -3905,7 +3905,7 @@ void app_handle_cmd_set(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, ui
     case CMD_GET_LOW_LATENCY_MODE_STATUS:
     case CMD_SET_LOW_LATENCY_LEVEL:
         {
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //app_audio_cmd_handle(cmd_ptr, cmd_len, cmd_path, app_idx, ack_pkt);
         }
         break;
@@ -3956,7 +3956,7 @@ void app_handle_cmd_set(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, ui
                 app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
                 return;
             }
-            APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             //app_eq_cmd_handle(cmd_ptr, cmd_len, cmd_path, app_idx, ack_pkt);
         }
         break;
@@ -4279,17 +4279,17 @@ void app_handle_cmd_set(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, ui
     case CMD_INQUIRY:
 #endif
     case CMD_BT_HFP_SCO_MAG:
-        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         //watch_customer_handle_cmd_set(cmd_ptr, cmd_len, cmd_path, rx_seqn, app_idx);
         break;
 
     case CMD_GCSS_ADD...CMD_GCSS_WRITE_RSP:
-        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         //gcss_handle_cmd(app_idx, (T_CMD_PATH)cmd_path, cmd_ptr, cmd_len, ack_pkt);
         break;
 
     case CMD_GCSC_SERV_DISCOVER_ALL...CMD_GCSC_DISCOVER_ALL:
-        APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+        APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
         //gcsc_cmd_handle(app_idx, (T_CMD_PATH)cmd_path, cmd_ptr, cmd_len, ack_pkt);
         break;
 

@@ -580,27 +580,27 @@ bool app_relay_init(void)
 uint16_t app_relay_msg_pack(uint8_t *buf, uint8_t msg_type, T_APP_MODULE_TYPE module_type,
                             uint16_t payload_len, uint8_t *msg_ptr, bool skip, bool total)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return 0;
 }
 
 bool app_relay_cback_register(P_APP_RELAY_CBACK relay_cb, P_APP_PARSE_CBACK parse_cb,
                               T_APP_MODULE_TYPE module_type, uint8_t msg_max)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return false;
 }
 
 bool app_relay_async_single_with_raw_msg(T_APP_MODULE_TYPE module_type, uint8_t msg_type,
                                          uint8_t *payload_buf, uint16_t payload_len)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return false;
 }
 
 bool app_relay_async_single(T_APP_MODULE_TYPE module_type, uint8_t msg_type)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return false;
 }
 
@@ -609,7 +609,7 @@ bool app_relay_sync_single_with_raw_msg(T_APP_MODULE_TYPE module_type, uint8_t m
                                         T_REMOTE_TIMER_TYPE timer_type,
                                         uint32_t timer_period, bool loopback)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return false;
 }
 
@@ -617,31 +617,31 @@ bool app_relay_sync_single(T_APP_MODULE_TYPE module_type, uint8_t msg_type,
                            T_REMOTE_TIMER_TYPE timer_type,
                            uint32_t timer_period, bool loopback)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return false;
 }
 
 
 T_APP_RELAY_MSG_LIST_HANDLE app_relay_async_build(void)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return NULL;
 }
 
 void app_relay_async_add(T_APP_RELAY_MSG_LIST_HANDLE msg_list_handle, T_APP_MODULE_TYPE module_type,
                          uint8_t msg_type)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
 }
 
 void app_relay_async_send(T_APP_RELAY_MSG_LIST_HANDLE msg_list_handle)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
 }
 
 bool app_relay_init(void)
 {
-    APP_PRINT_INFO2("SPP CPATURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
     return false;
 }
 #endif
