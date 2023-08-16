@@ -95,7 +95,6 @@ void DBIB_SendData(uint8_t *pBuf, uint32_t len)
 
 void DBIB_ReceiveData(uint8_t *pBuf, uint32_t len)
 {
-    uint32_t reg_value = 0;
     DBIB_RXDATA_t dbib_reg_0x08;
     while (len--)
     {

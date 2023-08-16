@@ -4,7 +4,11 @@
 #include "platform_utils.h"
 #include "trace.h"
 #include "os_sched.h"
+#if defined RTL8762G
+#include "rtl_pinmux.h"
+#elif defined RTL8763J
 #include "rtl876x_pinmux.h"
+#endif
 //#include "drv_gpio.h"
 
 #define LCDC_DMA_CHANNEL_NUM              0
@@ -400,7 +404,7 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
     LCDC_DmaCmd(ENABLE);
 #if (TE_VALID == 1)
-    TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
+    LCDC_HANDLER_TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
     handler_reg_0x10.b.bypass_t2w_delay = 0;
     handler_reg_0x10.b.t2w_delay = 0xfff;
     LCDC_HANDLER->TEAR_CTR = handler_reg_0x10.d32;
