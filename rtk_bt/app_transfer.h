@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "app_msg.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +55,6 @@ void app_pop_data_transfer_queue(uint8_t cmd_path, bool next_flag);
     */
 bool app_transfer_check_active(uint8_t cmd_path);
 
-
 /**
     * @brief  app transfer module init.
     *
@@ -80,6 +79,12 @@ void app_transfer_queue_reset(uint8_t cmd_path);
     */
 void app_transfer_queue_recv_ack_check(uint16_t event_id, uint8_t cmd_path);
 
+void app_transfer_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, uint8_t app_idx,
+                             uint8_t *ack_pkt);
+
+#if(F_APP_WATCH_CUSTOMER_CONSOLE_TX_BUF_EMPTY == 1)
+void app_transfer_pop_uart_queue_after_tx_buf_empty(void);
+#endif
 /** @} */ /* End of group APP_TRANSFER_Exported_Functions */
 
 /** End of APP_TRANSFER

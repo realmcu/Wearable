@@ -5,8 +5,6 @@
 #ifndef _APP_SPP_H_
 #define _APP_SPP_H_
 
-#include "btm.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -17,8 +15,6 @@ extern "C" {
   * @{
   */
 
-#define APP_SPP_DEFAULT_MTU_SIZE 1012
-#define APP_SPP_DEFAULT_CREDITS 7
 
 /**
     * @brief  spp module init
@@ -26,8 +22,6 @@ extern "C" {
     * @return void
     */
 void app_spp_init(void);
-bool spp_demo_role_get(void);
-void spp_demo_role_set(bool role);
 
 
 /** End of APP_SPP

@@ -4,18 +4,15 @@
 
 #include <string.h>
 #include "trace.h"
-#include "gap_timer.h"
 #include "gap_le.h"
 #include "btm.h"
 
 #include "engage.h"
 #include "app_cfg.h"
-#include "app_main.h"
 #include "app_bt_policy_api.h"
 #include "app_bt_policy_int.h"
 #include "app_linkback.h"
-#include "app_relay.h"
-
+#include "dp_br_info.h"
 extern T_LINKBACK_ACTIVE_NODE linkback_active_node;
 
 extern T_BP_STATE bp_state;
@@ -90,6 +87,7 @@ void app_bt_policy_exit_pairing_mode(void)
 
 void app_bt_policy_ota_mode(bool connectable)
 {
+#if 0
     T_BT_PARAM bt_param;
 
     memset(&bt_param, 0, sizeof(T_BT_PARAM));
@@ -97,6 +95,7 @@ void app_bt_policy_ota_mode(bool connectable)
     bt_param.is_connectable = connectable;
 
     state_machine(EVENT_OTA_MODE, &bt_param);
+#endif
 }
 
 #if (F_APP_OTA_TOOLING_SUPPORT == 1)
@@ -188,14 +187,16 @@ void app_bt_policy_set_b2s_connected_num_max(uint8_t num_max)
 
 void app_bt_policy_sync_b2s_connected(void)
 {
-    app_db.is_b2s_connected = app_bt_policy_get_b2s_connected_num();
+#if 0
+    br_db.is_b2s_connected = app_bt_policy_get_b2s_connected_num();
 
-    if ((app_db.remote_session_state == REMOTE_SESSION_STATE_CONNECTED) &&
+    if ((br_db.remote_session_state == REMOTE_SESSION_STATE_CONNECTED) &&
         (app_cfg_nv.bud_role == REMOTE_SESSION_ROLE_PRIMARY))
     {
-        remote_async_msg_relay(app_db.relay_handle, APP_REMOTE_MSG_PHONE_CONNECTED,
-                               &app_db.is_b2s_connected, 1, false);
+        remote_async_msg_relay(br_db.relay_handle, APP_REMOTE_MSG_PHONE_CONNECTED,
+                               &br_db.is_b2s_connected, 1, false);
     }
+#endif
 }
 
 bool app_bt_policy_get_first_connect_sync_default_vol_flag(void)

@@ -41,7 +41,9 @@
 #include "remote.h"
 #endif
 #include <watch_msg.h>
-
+#if F_APP_SPP_CAPTURE_DSP_DATA_2
+#include "app_data_capture.h"
+#endif
 #define ADD_DSP_JTAG_PINMUX   0
 
 /** @defgroup  PERIPH_APP_TASK Peripheral App Task
@@ -184,6 +186,8 @@ void bt_task_entry(void *p_param)
     watch_bt_gap_init();
     watch_app_gap_init();
     app_bt_policy_init();
+    app_transfer_init();
+    app_cmd_init();
 #endif
 #ifdef RTK_MODULE_LOCAL_PLAYBACK
     app_playback_init();
@@ -206,8 +210,13 @@ void bt_task_entry(void *p_param)
 #ifdef RTK_BR_PROFILE_A2DP
     app_a2dp_init();
     app_audio_init();
+
     /*20230607*/
     br_db.a2dp_info.audio_play_mode = MODE_APP_A2DP_SNK;
+#endif
+
+#if F_APP_SPP_CAPTURE_DSP_DATA_2
+    app_data_capture_init();
 #endif
 
     gap_start_bt_stack(evt_queue_handle, io_queue_handle, MAX_NUMBER_OF_GAP_MESSAGE);

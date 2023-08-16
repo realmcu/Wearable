@@ -82,6 +82,7 @@ typedef struct
     T_AUDIO_INFO                audio_info;
     T_SCO_INFO                  sco_info;
     T_ACL_INFO                  acl_info;
+    uint16_t                    external_mcu_mtu;
 } T_BR_DB;
 
 extern T_BR_DB br_db;

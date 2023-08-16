@@ -9,7 +9,8 @@
 #include <stdbool.h>
 
 #include "app_report.h"
-#include "dp_br_info.h"
+#include "app_relay.h"
+#include "app_br_link_util.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -229,7 +230,7 @@ typedef enum
 
     CMD_RESET_EQ_DATA                   = 0x0214,
 
-#if DATA_CAPTURE_V2_SUPPORT
+#if F_APP_SPP_CAPTURE_DSP_DATA_2
     CMD_DSP_CAPTURE_V2_START_STOP       = 0x0220,
     CMD_DSP_CAPTURE_SCENARIO_ENTER_EXIT = 0x0222,
 #endif
@@ -903,7 +904,10 @@ extern void spp_capture_ble_stop(void);
 */
 void app_cmd_init(void);
 void app_cmd_set_event_ack(uint8_t cmd_path, uint8_t app_idx, uint8_t *buf);
-
+bool app_cmd_relay_command_set(uint16_t cmd_id, uint8_t *cmd_ptr, uint16_t cmd_len,
+                               T_APP_MODULE_TYPE module_type, uint8_t relay_cmd_id, bool sync);
+bool app_cmd_relay_event(uint16_t event_id, uint8_t *event_ptr, uint16_t event_len,
+                         T_APP_MODULE_TYPE module_type, uint8_t relay_event_id);
 
 bool app_cmd_get_tool_connect_status(void);
 void app_cmd_update_eq_ctrl(uint8_t value, bool is_need_relay);

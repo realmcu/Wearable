@@ -180,7 +180,8 @@ typedef struct
     uint8_t             disconn_acl_flg: 1;
     uint8_t             acl_link_in_sniffmode_flg: 1;
     uint8_t             roleswitch_check_after_unsniff_flg: 1;
-    uint8_t             reserved: 5;
+    uint8_t             rtk_vendor_spp_active: 1;
+    uint8_t             reserved: 4;
 
     uint16_t            sniff_mode_disable_flag;
 } T_APP_BR_LINK;

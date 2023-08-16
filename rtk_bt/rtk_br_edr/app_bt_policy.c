@@ -653,6 +653,14 @@ static void app_bt_policy_cback(T_BT_EVENT event_type, void *event_buf, uint16_t
                         }
                     }
                 }
+#if 1//spp capture data v2
+                else if (((param->acl_conn_ind.cod & 0x1F00) >> 8) == 0x01)
+                {
+                    APP_PRINT_INFO1("connect to pc cod = 0x%x", param->acl_conn_ind.cod);
+                    // add policy
+                    bt_acl_conn_accept(param->acl_conn_ind.bd_addr, BT_LINK_ROLE_SLAVE);
+                }
+#endif
                 else
                 {
                     APP_PRINT_INFO1("unknown device cod = 0x%x", param->acl_conn_ind.cod);
@@ -1212,6 +1220,11 @@ static void reset_hfp_reconnect_callback(void *pxTimer)
     enter_state(STATE_LINKBACK);
 }
 
+void app_bt_policy_abandon_engage(void)
+{
+
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void app_bt_policy_init(void)
@@ -1233,3 +1246,23 @@ void app_bt_policy_disconnect(uint8_t *bd_addr, uint32_t plan_profs)
     linkback_profile_disconnect_start(bd_addr, plan_profs);
 }
 
+bool app_bt_policy_get_b2b_connected(void)
+{
+    APP_PRINT_INFO0("app_bt_policy_get_b2b_connected");
+    return true;
+    //return b2b_connected;
+}
+
+void app_bt_policy_default_connect(uint8_t *bd_addr, uint32_t plan_profs, bool check_bond_flag)
+{
+    T_BT_PARAM bt_param;
+
+    memset(&bt_param, 0, sizeof(T_BT_PARAM));
+
+    bt_param.bd_addr = bd_addr;
+    bt_param.prof = plan_profs;
+    bt_param.is_special = false;
+    bt_param.check_bond_flag = check_bond_flag;
+    APP_PRINT_INFO0("app_bt_policy_default_connect state_machine");
+    //state_machine(EVENT_DEDICATED_CONNECT, &bt_param);
+}

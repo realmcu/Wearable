@@ -28,6 +28,10 @@
 #include "app_eq.h"
 #include "app_br_link_util.h"
 
+#if F_APP_SPP_CAPTURE_DSP_DATA_2
+#include "app_data_capture.h"
+#endif
+
 //for CMD_AUDIO_DSP_CTRL_SEND
 #define CFG_H2D_DAC_GAIN                0x0C
 #define CFG_H2D_ADC_GAIN                0x0D
@@ -133,51 +137,55 @@ static void app_audio_policy_cback(T_AUDIO_EVENT event_type, void *event_buf, ui
 #if (F_APP_SPP_CAPTURE_DSP_DATA == 1)
             if ((app_cmd_dsp_capture_data_state() & DSP_CAPTURE_DATA_ENTER_SCO_MODE_MASK) == 0)
 #endif
-            {
-                T_APP_BR_LINK *p_link;
-                p_link = app_find_br_link(br_db.br_link[app_hfp_get_active_hf_index()].bd_addr);
-                if (p_link == NULL)
+#if F_APP_SPP_CAPTURE_DSP_DATA_2
+                if (((app_data_capture_get_state() & DATA_CAPTURE_DATA_START_SCO_MODE) == 0) &&
+                    ((app_data_capture_get_state() & DATA_CAPTURE_DATA_SAIYAN_EXECUTING) == 0))
+#endif
                 {
-                    break;
-                }
-
-                APP_PRINT_TRACE1("app_audio_policy_cback: data ind len %u", param->track_data_ind.len);
-                uint32_t timestamp;
-                uint16_t seq_num;
-                uint8_t frame_num;
-                uint16_t read_len;
-                uint8_t *buf;
-                T_AUDIO_STREAM_STATUS status;
-
-                buf = os_mem_alloc(RAM_TYPE_DATA_ON, param->track_data_ind.len);
-
-                if (buf == NULL)
-                {
-                    return;
-                }
-
-                if (audio_track_read(p_link->sco_track_handle,
-                                     &timestamp,
-                                     &seq_num,
-                                     &status,
-                                     &frame_num,
-                                     buf,
-                                     param->track_data_ind.len,
-                                     &read_len) == true)
-                {
-                    APP_PRINT_INFO5("audio_track_read timestamp: %d, seq num: %d, frame num: %d, read length = %d, duplicate = %d",
-                                    timestamp, seq_num, frame_num, read_len, p_link->duplicate_fst_sco_data);
-                    APP_PRINT_INFO1("read mic data = %b", TRACE_BINARY(read_len, buf));
-                    if (p_link->duplicate_fst_sco_data)
+                    T_APP_BR_LINK *p_link;
+                    p_link = app_find_br_link(br_db.br_link[app_hfp_get_active_hf_index()].bd_addr);
+                    if (p_link == NULL)
                     {
-                        p_link->duplicate_fst_sco_data = false;
-                        bt_sco_data_send(br_db.br_link[app_hfp_get_active_hf_index()].bd_addr, seq_num - 1, buf, read_len);
+                        break;
                     }
-                    bt_sco_data_send(br_db.br_link[app_hfp_get_active_hf_index()].bd_addr, seq_num, buf, read_len);
-                }
 
-                os_mem_free(buf);
-            }
+                    APP_PRINT_TRACE1("app_audio_policy_cback: data ind len %u", param->track_data_ind.len);
+                    uint32_t timestamp;
+                    uint16_t seq_num;
+                    uint8_t frame_num;
+                    uint16_t read_len;
+                    uint8_t *buf;
+                    T_AUDIO_STREAM_STATUS status;
+
+                    buf = os_mem_alloc(RAM_TYPE_DATA_ON, param->track_data_ind.len);
+
+                    if (buf == NULL)
+                    {
+                        return;
+                    }
+
+                    if (audio_track_read(p_link->sco_track_handle,
+                                         &timestamp,
+                                         &seq_num,
+                                         &status,
+                                         &frame_num,
+                                         buf,
+                                         param->track_data_ind.len,
+                                         &read_len) == true)
+                    {
+                        APP_PRINT_INFO5("audio_track_read timestamp: %d, seq num: %d, frame num: %d, read length = %d, duplicate = %d",
+                                        timestamp, seq_num, frame_num, read_len, p_link->duplicate_fst_sco_data);
+                        APP_PRINT_INFO1("read mic data = %b", TRACE_BINARY(read_len, buf));
+                        if (p_link->duplicate_fst_sco_data)
+                        {
+                            p_link->duplicate_fst_sco_data = false;
+                            bt_sco_data_send(br_db.br_link[app_hfp_get_active_hf_index()].bd_addr, seq_num - 1, buf, read_len);
+                        }
+                        bt_sco_data_send(br_db.br_link[app_hfp_get_active_hf_index()].bd_addr, seq_num, buf, read_len);
+                    }
+
+                    os_mem_free(buf);
+                }
         }
         break;
 

@@ -22,7 +22,7 @@ extern "C" {
 #define RFC_IAP_CHANN_NUM               3
 #define RFC_SPP_CHANN_NUM               3
 #define RFC_GFPS_CHANN_NUM              7
-#define RFC_SPECIFIC2_CHANN_NUM         8
+#define RFC_RTK_VENDOR_CHANN_NUM         8
 #define RFC_PBAP_CHANN_NUM              10
 #define RFC_SPP_XIAOAI_CHANN_NUM        11
 #define RFC_SPP_AMA_CHANN_NUM           12
