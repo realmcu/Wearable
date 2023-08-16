@@ -140,7 +140,7 @@ typedef struct
 
 #define DISPLAY_CTRL_REG_BASE              0x40023000UL
 
-#elif defined BB2PLUS
+#elif defined RTL8763J
 
 #define DISPLAY_CTRL_REG_BASE                0x40017000UL
 
