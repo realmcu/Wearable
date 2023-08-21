@@ -823,37 +823,37 @@ static void app_bt_policy_cback(T_BT_EVENT event_type, void *event_buf, uint16_t
         }
         break;
 
-    case BT_EVENT_HID_CONN_CMPL:
+    case BT_EVENT_HID_DEVICE_CONN_CMPL:
         {
             T_APP_BR_LINK *p_link;
             uint32_t prof;
-            p_link = app_find_br_link(param->hid_conn_cmpl.bd_addr);
+            p_link = app_find_br_link(param->hid_device_conn_cmpl.bd_addr);
 
             if (p_link)
             {
                 prof = HID_PROFILE_MASK;
-                b2s_connected_add_prof(param->hid_conn_cmpl.bd_addr, prof);
-                linkback_handle_profile_conn(param->hid_conn_cmpl.bd_addr, prof);
+                b2s_connected_add_prof(param->hid_device_conn_cmpl.bd_addr, prof);
+                linkback_handle_profile_conn(param->hid_device_conn_cmpl.bd_addr, prof);
             }
         }
         break;
 
-    case BT_EVENT_HID_SNIFFING_DISCONN_CMPL:
-    case BT_EVENT_HID_DISCONN_CMPL:
+    case BT_EVENT_HID_DEVICE_SNIFFING_DISCONN_CMPL:
+    case BT_EVENT_HID_DEVICE_DISCONN_CMPL:
         {
             uint32_t prof;
             prof = HID_PROFILE_MASK;
 
-            b2s_connected_del_prof(param->hid_disconn_cmpl.bd_addr, prof);
-            if (b2s_connected_no_profs(param->hid_disconn_cmpl.bd_addr))
+            b2s_connected_del_prof(param->hid_device_disconn_cmpl.bd_addr, prof);
+            if (b2s_connected_no_profs(param->hid_device_disconn_cmpl.bd_addr))
             {
-                p_link = app_find_br_link(param->hid_disconn_cmpl.bd_addr);
+                p_link = app_find_br_link(param->hid_device_disconn_cmpl.bd_addr);
                 if (p_link != NULL)
                 {
                     if (p_link->disconn_acl_flg)
                     {
                         p_link->disconn_acl_flg = false;
-                        gap_br_send_acl_disconn_req(param->hid_disconn_cmpl.bd_addr);
+                        gap_br_send_acl_disconn_req(param->hid_device_disconn_cmpl.bd_addr);
                     }
                 }
             }

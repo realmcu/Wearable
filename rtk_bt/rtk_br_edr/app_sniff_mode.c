@@ -10,6 +10,7 @@
 #include "app_bt_policy_api.h"
 #include "app_bt_sniffing.h"
 #include "dp_br_info.h"
+#include "remote.h"
 #if (F_APP_SPP_CAPTURE_DSP_DATA == 1)
 #include "app_cmd.h"
 #endif

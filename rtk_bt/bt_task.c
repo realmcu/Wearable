@@ -124,7 +124,7 @@ static void framework_init(void)
     }
 
     /* Bluetooth Manager */
-    if (bt_mgr_init() == true)
+    if (bt_mgr_init(MAX_BR_LINK_NUM) == true)
     {
         APP_PRINT_INFO0("Bluetooth manager was initialized successfully!\n");
     }

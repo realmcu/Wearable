@@ -813,7 +813,7 @@ static void app_data_capture_timeout_cb(uint8_t timer_evt, uint16_t param)
                                                                          format_info,
                                                                          8,//app_cfg_const.voice_out_volume_default
                                                                          8,//app_cfg_const.voice_volume_in_default
-                                                                         AUDIO_DEVICE_OUT_DEFAULT | AUDIO_DEVICE_IN_DEFAULT,
+                                                                         AUDIO_DEVICE_OUT_SPK | AUDIO_DEVICE_IN_MIC,
                                                                          NULL,
                                                                          NULL);
 

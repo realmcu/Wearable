@@ -369,7 +369,7 @@ static void app_audio_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16_t 
                                                           format_info,
                                                           app_cfg_nv.voice_gain_level[pair_idx],
                                                           8,
-                                                          AUDIO_DEVICE_OUT_DEFAULT | AUDIO_DEVICE_IN_DEFAULT,
+                                                          AUDIO_DEVICE_OUT_SPK | AUDIO_DEVICE_IN_MIC,
                                                           NULL,
                                                           NULL);
             if (p_link->sco_track_handle == NULL)
@@ -691,7 +691,7 @@ static void app_audio_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16_t 
                                                                format_info,
                                                                app_cfg_nv.audio_gain_level[pair_idx],
                                                                0,
-                                                               AUDIO_DEVICE_OUT_DEFAULT,
+                                                               AUDIO_DEVICE_OUT_SPK,
                                                                NULL,
                                                                NULL);
 
