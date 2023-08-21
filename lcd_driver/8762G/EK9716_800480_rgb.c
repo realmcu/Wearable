@@ -1,6 +1,6 @@
 #include "EK9716_800480_rgb.h"
 #include "rtl_lcdc_edpi.h"
-#include "rtl_nvic.h"
+//#include "rtl_nvic.h"
 #include "rtl_pinmux.h"
 #include "rtl_gpio.h"
 #include "rtl_rcc.h"

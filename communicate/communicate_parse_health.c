@@ -14,11 +14,8 @@
 #include "communicate_parse.h"
 #include "communicate_task.h"
 #include "communicate_parse_health.h"
-#include "string.h"
-#include "trace.h"
-
-
-
+//#include "string.h"
+//#include "trace.h"
 
 /**
 * @brief   resolve health data command received from remote APP

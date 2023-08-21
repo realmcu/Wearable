@@ -1,13 +1,13 @@
 #include "st7701s_480480_rgb.h"
 #include "rtl_lcdc_edpi.h"
-#include "rtl_nvic.h"
+//#include "rtl_nvic.h"
 #include "rtl_spi.h"
 #include "rtl_pinmux.h"
 #include "rtl_gpio.h"
 #include "rtl_rcc.h"
 #include "utils.h"
 #include "mem_config.h"
-#include "string.h"
+//#include "string.h"
 #include "rtl_gdma.h"
 
 /**************************************
@@ -99,7 +99,6 @@ static void st7701s_gpio_init(void)
 {
     Pad_Config(LCDC_RESET, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
 
-
     Pinmux_Config(LCDC_RESET, DWGPIO);
 
     RCC_PeriphClockCmd(APBPeriph_GPIOA, APBPeriph_GPIOA_CLOCK, ENABLE);
@@ -187,11 +186,9 @@ static void st7701s_dma_init(uint8_t *init_buffer)
     LCDC_SwitchMode(LCDC_AUTO_MODE);
     LCDC_SwitchDirect(LCDC_TX_MODE);
 
-
     LCDC_SetTxPixelLen(ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT);
 
     LCDC_Cmd(ENABLE);
-
 
     LCDC_DMA_SetSourceAddress(LCDC_DMA_CHANNEL_INDEX, (uint32_t)init_buffer);
 
@@ -202,7 +199,6 @@ static void st7701s_dma_init(uint8_t *init_buffer)
     LCDC_DmaCmd(ENABLE);
     LCDC_AutoWriteCmd(ENABLE);
 }
-
 
 static void lcd_pad_and_clk_init(void)
 {
@@ -303,7 +299,6 @@ void rtk_lcd_hal_init(void)
     lcdc_init.LCDC_InfiniteModeEn = 1;
     LCDC_Init(&lcdc_init);
 
-
     uint32_t HSA = 8, HFP = 10, HBP = 50, HACT = ST7701S_480480_LCD_WIDTH;
     uint32_t VSA = 8, VFP = 10, VBP = 20, VACT = ST7701S_480480_LCD_HEIGHT;
 
@@ -344,7 +339,7 @@ void rtk_lcd_hal_init(void)
     st7701s_reset_high();
     platform_delay_ms(120);
     //*******************************/
-#include "st7701s_rgb.txt"
+//#include "st7701s_rgb.txt"
     uint8_t *pixel = (uint8_t *)SPIC1_ADDR;
 
     for (uint32_t i = 0; i < ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT * 3; i = i + 3)
@@ -358,8 +353,6 @@ void rtk_lcd_hal_init(void)
                                    ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT);
 
 }
-
-
 
 static bool flush_first = true;
 
@@ -376,7 +369,6 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
                                      (uint32_t)buf + ST7701S_480480_LCD_WIDTH * ST7701S_DRV_PIXEL_BITS / 8);
     }
 }
-
 
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
 {
@@ -419,8 +411,3 @@ uint32_t rtk_lcd_hal_dlps_restore(void)
 {
     return 0;
 }
-
-
-
-
-

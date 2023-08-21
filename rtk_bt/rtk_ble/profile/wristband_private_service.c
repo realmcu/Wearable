@@ -13,13 +13,12 @@ enum { __FILE_NUM__ = 0 };
 * *********************************************************************************************************
 */
 
-
 #include "wristband_private_service.h"
 #include <string.h>
 #include <stdlib.h>
 #include <trace.h>
 #include <gap.h>
-#include "ftl.h"
+//#include "ftl.h"
 #include "gap_adv.h"
 #include "gap_conn_le.h"
 #include "os_msg.h"
@@ -146,7 +145,6 @@ const T_ATTRIB_APPL bwps_service_tbl[] =
 
 };
 
-
 /**
  * @brief read characteristic data from service.
  *
@@ -179,7 +177,6 @@ T_APP_RESULT   bwps_service_attr_read_cb(uint8_t conn_id, T_SERVER_ID service_id
 
     return (wCause);
 }
-
 
 /**
  * @brief write characteristic data from stack.
@@ -277,8 +274,6 @@ void bwps_service_cccd_update_cb(uint8_t conn_id, T_SERVER_ID service_id, uint16
     }
 }
 
-
-
 /**< @brief  BWPS Extended Service Callbacks, will be registered to stack.  */
 const T_FUN_GATT_SERVICE_CBS bwps_service_cbs =
 {
@@ -286,7 +281,6 @@ const T_FUN_GATT_SERVICE_CBS bwps_service_cbs =
     bwps_service_attr_write_cb, // Write callback function pointer
     bwps_service_cccd_update_cb  // CCCD update callback function pointer
 };
-
 
 /**
  * @brief Add BWPS extended service to stack/profile.

@@ -14,10 +14,7 @@
 #include "communicate_parse.h"
 #include "communicate_parse_control.h"
 #include "string.h"
-#include "trace.h"
-
-
-
+//#include "trace.h"
 
 /**
 * @brief   resolve Control data command received from remote APP

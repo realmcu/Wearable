@@ -22,7 +22,6 @@
 #include "trace.h"
 #include "utils.h"
 
-
 const uint8_t GT911_CFG_TBL[] =
 {
     0X60, 0XE0, 0X01, 0XE0, 0X01, 0X05, 0X35, 0X00, 0X02, 0X08,
@@ -46,7 +45,6 @@ const uint8_t GT911_CFG_TBL[] =
     0XFF, 0XFF, 0XFF, 0XFF,
 };
 
-
 uint8_t GT911_WR_Reg(uint16_t reg, uint8_t *buf, uint8_t len)
 {
     uint8_t send[198];
@@ -56,10 +54,11 @@ uint8_t GT911_WR_Reg(uint16_t reg, uint8_t *buf, uint8_t len)
     {
         return 0;
     }
-
-    memcpy(send + 2, buf, len);
-
-    drv_i2c0_write(TOUCH_GT911_ADDR, send, 2 + len);
+    else
+    {
+        memcpy(send + 2, buf, len);
+        drv_i2c0_write(TOUCH_GT911_ADDR, send, 2 + len);
+    }
 
     return 0;
 }
@@ -149,7 +148,6 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
         return true;
     }
 
-
 }
 void rtk_touch_hal_set_indicate(void (*indicate)(void *))
 {
@@ -195,7 +193,6 @@ void rtk_touch_hal_init(void)
     platform_delay_us(200);
     cmd_init[0] = 0;
     GT911_WR_Reg(GT_CTRL_REG, (uint8_t *)cmd_init, 1);
-
 
     uint8_t x_low = 0;
     uint8_t x_high = 0;

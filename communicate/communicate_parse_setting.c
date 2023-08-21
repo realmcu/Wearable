@@ -13,12 +13,9 @@
 #include "board.h"
 #include "communicate_parse.h"
 #include "communicate_parse_setting.h"
-#include "string.h"
+//#include "string.h"
 #include "trace.h"
-#include "gap_bond_le.h"
-
-
-
+//#include "gap_bond_le.h"
 
 void resolve_settings_config_command(uint8_t key, const uint8_t *pValue,
                                      uint16_t length)
