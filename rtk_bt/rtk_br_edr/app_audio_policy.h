@@ -50,6 +50,23 @@ typedef enum
     SCO_INTERRUPT_LOCAL                 = 2,
 } T_SCO_INTERRUPT_PLAY_MUSIC;
 
+/**  @brief  App define bud stream state */
+typedef enum
+{
+    BUD_STREAM_STATE_IDLE = 0x00,
+    BUD_STREAM_STATE_AUDIO = 0x01,
+    BUD_STREAM_STATE_VOICE = 0x02
+} T_APP_BUD_STREAM_STATE;
+
+typedef enum
+{
+    AUDIO_MP_DUAL_MIC_SETTING_INVALID,
+    AUDIO_MP_DUAL_MIC_SETTING_VALID,
+    AUDIO_MP_DUAL_MIC_SETTING_ROLE_SWAP,
+
+    AUDIO_MP_DUAL_MIC_SETTING_TOTAL
+} T_AUDIO_MP_DUAL_MIC_SETTING;
+
 /**
     * @brief  audio module init
     * @param  void

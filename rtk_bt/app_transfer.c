@@ -163,8 +163,8 @@ void app_pop_data_transfer_queue(uint8_t cmd_path, bool next_flag)
         if (next_flag == true)
         {
             app_stop_timer(&timer_idx_data_transfer);
-            DBG_DIRECT("SPP CAPTURE DATA V2 dt_queue active 0x%x",
-                       dt_queue[dt_queue_ctrl.dt_queue_r_idx].active);
+            APP_PRINT_INFO1("app_pop_data_transfer_queue dt_queue active 0x%x",
+                            dt_queue[dt_queue_ctrl.dt_queue_r_idx].active);
             if (dt_queue[dt_queue_ctrl.dt_queue_r_idx].active)
             {
                 dt_queue[dt_queue_ctrl.dt_queue_r_idx].active = 0;
@@ -180,6 +180,7 @@ void app_pop_data_transfer_queue(uint8_t cmd_path, bool next_flag)
 
                 if (dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr != NULL)
                 {
+                    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                     free(dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr);
                     dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr = NULL;
                 }
@@ -199,16 +200,20 @@ void app_pop_data_transfer_queue(uint8_t cmd_path, bool next_flag)
         }
 
         app_idx = dt_queue[dt_queue_ctrl.dt_queue_r_idx].link_idx;
+        pkt_ptr = dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr;
+        APP_PRINT_INFO3("SPP CAPTURE DATA V2 %s %d pkt_ptr 0x%x", TRACE_STRING(__FUNCTION__), __LINE__,
+                        dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr);
+        pkt_len = dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_len;
         if (dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr == NULL)
         {
-            APP_PRINT_INFO3("SPP CAPTURE DATA V2 %s %d pkt_ptr 0x%x", TRACE_STRING(__FUNCTION__), __LINE__,
-                            dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr);
-            return;
+            event_id = 0;
         }
-        pkt_ptr = dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr;
-        pkt_len = dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_len;
-        event_id = ((dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr[4]) |
-                    (dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr[5] << 8));
+        else
+        {
+            event_id = ((dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr[4]) |
+                        (dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr[5] << 8));
+        }
+
 
         APP_PRINT_INFO7("app_pop_data_transfer_queue: dt_status %d, active %d, connected_profile 0x%x, rfc_credit %d, pkt_len:%d, event_id:0x%x, r idx:%d",
                         dt_queue_ctrl.dt_status,

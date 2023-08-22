@@ -20,6 +20,7 @@
 #include "app_cfg.h"
 #include "app_hfp.h"
 #include "eq.h"
+#include "bt_types.h"
 #include "app_audio_if.h"
 #include "app_mmi.h"
 #include "bt_a2dp.h"
@@ -27,14 +28,20 @@
 #include "audio_probe.h"
 #include "app_eq.h"
 #include "app_br_link_util.h"
-
+#include "app_audio_route.h"
+#include "app_bt_sniffing.h"
 #if F_APP_SPP_CAPTURE_DSP_DATA_2
 #include "app_data_capture.h"
 #endif
 
 //for CMD_AUDIO_DSP_CTRL_SEND
+//#define CFG_H2D_DAC_GAIN                0x0C
+//#define CFG_H2D_ADC_GAIN                0x0D
+//#define CFG_H2D_APT_DAC_GAIN            0x4C
+
+//for CMD_AUDIO_DSP_CTRL_SEND
 #define CFG_H2D_DAC_GAIN                0x0C
-#define CFG_H2D_ADC_GAIN                0x0D
+#define CFG_H2D_VOICE_ADC_POST_GAIN     0x5D
 #define CFG_H2D_APT_DAC_GAIN            0x4C
 
 static uint8_t is_mic_mute;
@@ -1090,16 +1097,22 @@ void app_audio_mic_channel_set(uint8_t mic_channel)
     app_audio_speaker_channel(AUDIO_SPECIFIC_MIC_SET, app_cfg_nv.cur_spk_channel, mic_channel);
 }
 
-
-/*20230607
 void app_audio_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, uint8_t app_idx,
                           uint8_t *ack_pkt)
 {
-    APP_PRINT_INFO1("app_audio_cmd_handle: %s", TRACE_BINARY(cmd_len, cmd_ptr));
     uint16_t cmd_id = (uint16_t)(cmd_ptr[0] | (cmd_ptr[1] << 8));
+    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+    uint8_t active_a2dp_idx = 0;//app_a2dp_get_active_idx();
 
     switch (cmd_id)
     {
+    case CMD_SET_VP_VOLUME:
+        {
+            voice_prompt_volume_set(cmd_ptr[2]);
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+        }
+        break;
+
     case CMD_AUDIO_DSP_CTRL_SEND:
         {
             uint8_t *buf;
@@ -1117,13 +1130,16 @@ void app_audio_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
 
             gain_level_data = (T_DSP_TOOL_GAIN_LEVEL_DATA *)buf;
 
+#if F_APP_TEST_SUPPORT
+#if F_APP_SPP_CAPTURE_DSP_DATA
             send_cmd_flag = app_cmd_spp_capture_audio_dsp_ctrl_send_handler(&cmd_ptr[0], cmd_len, cmd_path,
                                                                             app_idx, &ack_pkt[0], send_cmd_flag);
-
-            app_cmd_set_event_ack(cmd_path, app_idx, ack_pkt);
+#endif
+#endif
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
 
             if (gain_level_data->cmd_id == CFG_H2D_DAC_GAIN ||
-                gain_level_data->cmd_id == CFG_H2D_ADC_GAIN ||
+                gain_level_data->cmd_id == CFG_H2D_VOICE_ADC_POST_GAIN ||
                 gain_level_data->cmd_id == CFG_H2D_APT_DAC_GAIN)
             {
                 switch (gain_level_data->category)
@@ -1139,14 +1155,16 @@ void app_audio_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
                 case AUDIO_CATEGORY_APT:
                 case AUDIO_CATEGORY_LLAPT:
                 case AUDIO_CATEGORY_ANC:
-                case AUDIO_CATEGORY_ANALOG:
+                case 0x03://AUDIO_CATEGORY_ANALOG
+                    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
                 case AUDIO_CATEGORY_VOICE:
                     {
                         stream_type = AUDIO_STREAM_TYPE_VOICE;
                     }
                     break;
-
+#if 0
                 case AUDIO_CATEGORY_VAD:
+#endif
                 case AUDIO_CATEGORY_RECORD:
                     {
                         stream_type = AUDIO_STREAM_TYPE_RECORD;
@@ -1166,13 +1184,16 @@ void app_audio_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
                                                  gain_level_data->gain);
                     audio_volume_out_set(stream_type, gain_level_data->level);
                 }
-//                else if (gain_level_data->cmd_id == CFG_H2D_APT_DAC_GAIN)
-//                {
-//                    app_audio_route_dac_gain_set((T_AUDIO_CATEGORY)gain_level_data->category, gain_level_data->level,
-//                                                 gain_level_data->gain);
-//                    app_cfg_nv.apt_volume_out_level = gain_level_data->level;
-//                    audio_passthrough_volume_out_set(gain_level_data->level);
-//                }
+                else if (gain_level_data->cmd_id == CFG_H2D_APT_DAC_GAIN)
+                {
+                    app_audio_route_dac_gain_set((T_AUDIO_CATEGORY)gain_level_data->category, gain_level_data->level,
+                                                 gain_level_data->gain);
+                    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                    //app_cfg_nv.apt_volume_out_level = gain_level_data->level;
+#if F_APP_APT_SUPPORT
+                    audio_passthrough_volume_out_set(gain_level_data->level);
+#endif
+                }
                 else
                 {
                     app_audio_route_adc_gain_set((T_AUDIO_CATEGORY)gain_level_data->category, gain_level_data->level,
@@ -1182,10 +1203,12 @@ void app_audio_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
                     {
                         audio_volume_in_set(stream_type, gain_level_data->level);
                     }
+#if F_APP_APT_SUPPORT
                     else
                     {
-                         audio_passthrough_volume_in_set(gain_level_data->level);
+                        audio_passthrough_volume_in_set(gain_level_data->level);
                     }
+#endif
                 }
             }
 
@@ -1197,21 +1220,295 @@ void app_audio_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
         }
         break;
 
-    case CMD_AUDIO_CODEC_CTRL_SEND:
+    case CMD_SET_VOLUME:
         {
-            uint8_t *buf;
+            uint8_t max_volume = 0;
+            uint8_t min_volume = 0;
+            uint8_t set_volume = cmd_ptr[2];
 
-            buf = malloc(cmd_len - 2);
-            if (buf == NULL)
+            T_AUDIO_STREAM_TYPE volume_type;
+
+            if (app_hfp_get_call_status() != APP_HFP_CALL_IDLE)
             {
-                return;
+                volume_type = AUDIO_STREAM_TYPE_VOICE;
+            }
+            else
+            {
+                volume_type = AUDIO_STREAM_TYPE_PLAYBACK;
             }
 
-            memcpy(buf, &cmd_ptr[2], (cmd_len - 2));
+            max_volume = audio_volume_out_max_get(volume_type);
+            min_volume = audio_volume_out_min_get(volume_type);
 
-            app_cmd_set_event_ack(cmd_path, app_idx, ack_pkt);
-            audio_probe_codec_send(buf, cmd_len - 2);
-            free(buf);
+            if ((set_volume <= max_volume) && (set_volume >= min_volume))
+            {
+                audio_volume_out_set(volume_type, set_volume);
+            }
+            else
+            {
+                ack_pkt[2] = CMD_SET_STATUS_PARAMETER_ERROR;
+            }
+
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+
+            if (ack_pkt[2] == CMD_SET_STATUS_COMPLETE)
+            {
+                uint8_t temp_buff[3];
+                temp_buff[0] = GET_STATUS_VOLUME;
+                temp_buff[1] = audio_volume_out_get(volume_type);
+                temp_buff[2] = max_volume;
+
+                app_report_event(cmd_path, EVENT_REPORT_STATUS, app_idx, temp_buff, sizeof(temp_buff));
+            }
+        }
+        break;
+
+#if F_APP_APT_SUPPORT
+    case CMD_SET_APT_VOLUME_OUT_LEVEL:
+        {
+            uint8_t event_data = cmd_ptr[2];
+
+            if ((event_data < app_cfg_const.apt_volume_out_min) ||
+                (event_data > app_cfg_const.apt_volume_out_max))
+            {
+                ack_pkt[2] = CMD_SET_STATUS_PARAMETER_ERROR;
+            }
+            else
+            {
+                app_cfg_nv.apt_volume_out_level = event_data;
+
+#if APT_SUB_VOLUME_LEVEL_SUPPORT
+                app_apt_main_volume_set(event_data);
+#else
+                audio_passthrough_volume_out_set(event_data);
+#endif
+                app_relay_async_single_with_raw_msg(APP_MODULE_TYPE_APT, APP_REMOTE_MSG_APT_VOLUME_OUT_LEVEL,
+                                                    &event_data, sizeof(uint8_t));
+            }
+
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+        }
+        break;
+
+    case CMD_GET_APT_VOLUME_OUT_LEVEL:
+        {
+            uint8_t event_data = 0;
+
+            event_data = app_cfg_nv.apt_volume_out_level;
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+            app_report_event(cmd_path, EVENT_APT_VOLUME_OUT_LEVEL, app_idx, &event_data, sizeof(uint8_t));
+        }
+        break;
+#endif
+
+#if F_APP_ADJUST_TONE_VOLUME_SUPPORT
+    case CMD_SET_TONE_VOLUME_LEVEL:
+    case CMD_GET_TONE_VOLUME_LEVEL:
+        {
+            uint16_t param_len = cmd_len - COMMAND_ID_LENGTH;
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+            app_audio_tone_volume_cmd_handle(cmd_id, &cmd_ptr[2], param_len, cmd_path, app_idx);
+        }
+        break;
+#endif
+
+    case CMD_DSP_TOOL_FUNCTION_ADJUSTMENT:
+        {
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+
+            uint8_t event_data[3];
+            uint16_t function_type;
+
+            LE_ARRAY_TO_UINT16(function_type, &cmd_ptr[2]);
+
+            memcpy(event_data, &cmd_ptr[2], 2);
+            event_data[2] = CMD_SET_STATUS_COMPLETE;
+
+            switch (function_type)
+            {
+            case DSP_TOOL_FUNCTION_BRIGHTNESS:
+                {
+#if F_APP_APT_SUPPORT
+                    uint16_t linear_vlaue;
+                    float alpha;
+
+                    LE_ARRAY_TO_UINT16(linear_vlaue, &cmd_ptr[4]);
+                    alpha = (float)linear_vlaue * 0.0025f;
+
+                    audio_passthrough_brightness_set(alpha);
+#endif
+                }
+                break;
+
+            default:
+                {
+                    event_data[2] = CMD_SET_STATUS_UNKNOW_CMD;
+                }
+                break;
+            }
+
+            app_report_event(cmd_path, EVENT_DSP_TOOL_FUNCTION_ADJUSTMENT, app_idx, event_data,
+                             sizeof(event_data));
+        }
+        break;
+
+    case CMD_MIC_SWITCH:
+        {
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            uint8_t param = 0;//app_audio_mic_switch(cmd_ptr[2]);
+
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+
+            if ((cmd_path == CMD_PATH_SPP) || (cmd_path == CMD_PATH_IAP))
+            {
+                app_report_event(cmd_path, EVENT_MIC_SWITCH, app_idx, &param, 1);
+            }
+        }
+        break;
+
+    case CMD_DSP_TEST_MODE:
+        {
+            uint8_t dsp_cmd_len;
+            uint8_t *dsp_cmd_buf;
+            uint8_t dsp_param_len;
+
+            dsp_cmd_len = cmd_len + 2;
+            dsp_cmd_len = ((dsp_cmd_len + 3) >> 2) << 2; //transfer to 4-byte align
+            dsp_cmd_buf = calloc(1, dsp_cmd_len);
+            dsp_param_len = cmd_len - 2;
+
+            if (dsp_cmd_buf == NULL)
+            {
+                ack_pkt[2] = CMD_SET_STATUS_PROCESS_FAIL;
+                app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+                return;
+            }
+            else
+            {
+                dsp_cmd_buf[0] = AUDIO_PROBE_TEST_MODE;
+                dsp_cmd_buf[2] = ((dsp_param_len + 3) >> 2); //word length
+                memcpy(&dsp_cmd_buf[4], &cmd_ptr[2], dsp_param_len);
+
+                audio_probe_dsp_send(dsp_cmd_buf, dsp_cmd_len);
+                free(dsp_cmd_buf);
+
+                app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+            }
+        }
+        break;
+
+    case CMD_DUAL_MIC_MP_VERIFY:
+        {
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+
+            uint8_t error_code;
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            if (true)//app_audio_get_bud_stream_state() == BUD_STREAM_STATE_VOICE
+            {
+                T_AUDIO_MP_DUAL_MIC_SETTING mp_dual_mic_setting;
+                APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                mp_dual_mic_setting = 0;//app_audio_mp_dual_mic_setting_check(&cmd_ptr[2]);
+
+                if (mp_dual_mic_setting == AUDIO_MP_DUAL_MIC_SETTING_VALID)
+                {
+                    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                    //app_audio_mp_dual_mic_switch_action();
+                    break;
+                }
+                else if (mp_dual_mic_setting == AUDIO_MP_DUAL_MIC_SETTING_ROLE_SWAP)
+                {
+                    app_mmi_handle_action(MMI_START_ROLESWAP);
+                    break;
+                }
+                else
+                {
+                    error_code = 1;  //invalid mic setting
+                }
+            }
+            else
+            {
+                error_code = 2;  //wrong dsp state
+            }
+
+            app_report_event(cmd_path, EVENT_DUAL_MIC_MP_VERIFY, app_idx, &error_code, 1);
+        }
+        break;
+
+    case CMD_SOUND_PRESS_CALIBRATION:
+        {
+            uint8_t event_param_val = 0x00;
+
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            //if (app_cfg_const.tone_sound_press_calibration == 0xFF)
+            {
+                event_param_val = 0x01;
+            }
+            app_report_event(cmd_path, EVENT_SOUND_PRESS_CALIBRATION, app_idx, &event_param_val,
+                             sizeof(uint8_t));
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            //app_audio_tone_type_play(TONE_SOUND_PRESS_CALIBRATION, false, false);
+        }
+        break;
+
+    case CMD_GET_LOW_LATENCY_MODE_STATUS:
+        {
+            uint16_t latency_value = A2DP_LATENCY_MS; // default value
+            T_APP_BR_LINK *p_link = NULL;
+
+            if (br_db.gaming_mode)
+            {
+                APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                if (app_check_b2s_link_by_id(active_a2dp_idx))
+                {
+                    p_link = &br_db.br_link[active_a2dp_idx];
+                }
+
+                app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+
+                if ((p_link != NULL) && (p_link->a2dp_track_handle != NULL))
+                {
+                    audio_track_latency_get(p_link->a2dp_track_handle, &latency_value);
+                }
+                else
+                {
+                    // audio track is null, use last used latency value
+                    APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+                    //app_audio_get_last_used_latency(&latency_value);
+                }
+            }
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            //app_audio_report_low_latency_status(latency_value);
+        }
+        break;
+
+    case CMD_SET_LOW_LATENCY_LEVEL:
+        {
+            uint8_t event_data[3];
+            uint8_t latency_level = cmd_ptr[2];
+            uint16_t latency_value = A2DP_LATENCY_MS; // default value
+            T_APP_BR_LINK *p_link = NULL;
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            if (app_check_b2s_link_by_id(active_a2dp_idx))
+            {
+                p_link = &br_db.br_link[active_a2dp_idx];
+            }
+
+            if ((!br_db.gaming_mode) || (latency_level >= LOW_LATENCY_LEVEL_MAX) || (p_link == NULL))
+            {
+                ack_pkt[2] = CMD_SET_STATUS_PROCESS_FAIL;
+                app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+                break;
+            }
+
+            latency_value = 0;//app_audio_update_audio_track_latency(p_link->a2dp_track_handle, latency_level);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
+            //event_data[0] = app_cfg_nv.rws_low_latency_level_record;
+            event_data[1] = (uint8_t)(latency_value);
+            event_data[2] = (uint8_t)(latency_value >> 8);
+
+            app_report_event(cmd_path, EVENT_ACK, app_idx, ack_pkt, 3);
+            app_report_event(cmd_path, EVENT_LOW_LATENCY_LEVEL_SET, app_idx, event_data, sizeof(event_data));
         }
         break;
 
@@ -1219,5 +1516,4 @@ void app_audio_cmd_handle(uint8_t *cmd_ptr, uint16_t cmd_len, uint8_t cmd_path, 
         break;
     }
 }
-*/
 

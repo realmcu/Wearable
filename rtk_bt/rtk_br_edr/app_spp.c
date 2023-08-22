@@ -46,8 +46,7 @@ static void app_spp_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16_t bu
             p_link = app_find_br_link(param->spp_conn_cmpl.bd_addr);
             if (p_link != NULL)
             {
-                APP_PRINT_INFO3("SPP CAPTURE DATA V2 %s %d local_server_chann %d", TRACE_STRING(__FUNCTION__),
-                                __LINE__, param->spp_conn_cmpl.local_server_chann);
+                APP_PRINT_INFO1("app_spp_bt_cback local_server_chann %d", param->spp_conn_cmpl.local_server_chann);
                 if (param->spp_conn_cmpl.local_server_chann == RFC_RTK_VENDOR_CHANN_NUM)
                 {
                     p_link->rtk_vendor_spp_active = 1;
@@ -92,13 +91,12 @@ static void app_spp_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16_t bu
 
     case BT_EVENT_SPP_DATA_IND:
         {
-            DBG_DIRECT("SPP CAPTURE DATA V2 %s %d", __FUNCTION__, __LINE__);
+            APP_PRINT_INFO2("SPP CAPTURE DATA V2 %s %d", TRACE_STRING(__FUNCTION__), __LINE__);
             if (param->spp_data_ind.local_server_chann != RFC_SPP_CHANN_NUM
                 && param->spp_credit_rcvd.local_server_chann != RFC_RTK_VENDOR_CHANN_NUM)
             {
                 return;
             }
-            DBG_DIRECT("SPP CAPTURE DATA V2 %s %d", __FUNCTION__, __LINE__);
             uint8_t     *p_data;
             uint16_t    len;
             uint8_t     app_idx;
@@ -115,24 +113,20 @@ static void app_spp_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16_t bu
             p_data = param->spp_data_ind.data;
             len = param->spp_data_ind.len;
             data_len = len;
-            DBG_DIRECT("SPP CAPTURE DATA V2 %s %d", __FUNCTION__, __LINE__);
             if (true) //app_cfg_const.enable_embedded_cmd
             {
                 bt_spp_credits_give(br_db.br_link[app_idx].bd_addr, param->spp_data_ind.local_server_chann, 1);
                 if (br_db.br_link[app_idx].p_embedded_cmd == NULL)
                 {
                     uint16_t cmd_len;
-                    DBG_DIRECT("SPP CAPTURE DATA V2 %s %d", __FUNCTION__, __LINE__);
                     //ios will auto combine two cmd into one pkt
                     while (data_len)
                     {
                         if (p_data[0] == CMD_SYNC_BYTE)
                         {
-                            DBG_DIRECT("SPP CAPTURE DATA V2 %s %d", __FUNCTION__, __LINE__);
                             cmd_len = (p_data[2] | (p_data[3] << 8)) + 4; //sync_byte, seqn, length
                             if (data_len >= cmd_len)
                             {
-                                DBG_DIRECT("SPP CAPTURE DATA V2 %s %d", __FUNCTION__, __LINE__);
                                 app_handle_cmd_set(&p_data[4], (cmd_len - 4), CMD_PATH_SPP, p_data[1], app_idx);
                                 data_len -= cmd_len;
                                 p_data += cmd_len;
