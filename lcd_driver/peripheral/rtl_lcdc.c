@@ -27,6 +27,30 @@ typedef struct
 LCDC_TypeDef LCDCdef = {LCDC_DMA_LINKLIST, LCDC_HANDLER, DBIB, EDPI};
 LCDC_TypeDef *LCDC = &LCDCdef;
 
+void LCDC_Clock_Cfg(FunctionalState state)
+{
+    if (state == ENABLE)
+    {
+#if defined RTL8762G
+//TODO
+#elif defined RTL8763EP
+        uint32_t reg_value = *(uint32_t *)0x40000214;
+        reg_value |= (BIT11 | BIT12);
+        *(uint32_t *)0x40000214 = reg_value;
+#endif
+    }
+    else if (state == DISABLE)
+    {
+#if defined RTL8762G
+//TODO
+#elif defined RTL8763EP
+        uint32_t reg_value = *(uint32_t *)0x40000214;
+        reg_value &= ~(BIT11 | BIT12);
+        *(uint32_t *)0x40000214 = reg_value;
+#endif
+    }
+}
+
 void LCDC_Init(LCDC_InitTypeDef *cfg)
 {
     /* Check the parameters */

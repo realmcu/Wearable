@@ -9,9 +9,13 @@ extern "C" {
 #define SH8601A_MAX_PARA_COUNT                          (300)
 
 #define DMA_LINKLIST                        1
+#if defined RTL8763EP
+#define TE_VALID                            0
+#else
 #define TE_VALID                            1
+#endif
 #define SH8601A_LCD_WIDTH                   454
-#define SH8601A_LCD_HIGHT                   454
+#define SH8601A_LCD_HEIGHT                  454
 #define INPUT_PIXEL_BYTES                   4
 #define OUTPUT_PIXEL_BYTES                  3
 #define RED                                 0xf800
@@ -31,6 +35,7 @@ typedef struct _SH8601A_CMD_DESC
 void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h);
 void rtk_lcd_hal_init(void);
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len);
+void rtk_lcd_hal_clear_screen(uint32_t ARGB_color);
 
 #ifdef __cplusplus
 }

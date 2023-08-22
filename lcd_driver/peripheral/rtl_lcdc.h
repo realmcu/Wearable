@@ -140,7 +140,7 @@ typedef struct
 
 #define DISPLAY_CTRL_REG_BASE              0x40023000UL
 
-#elif defined RTL8763J
+#elif defined RTL8763EP
 
 #define DISPLAY_CTRL_REG_BASE                0x40017000UL
 
@@ -763,7 +763,7 @@ void LCDC_WriteData(uint8_t data);
 
 void LCDC_DMA_LinkList_Init(LCDC_DMALLI_InitTypeDef *LCDC_DMA_LLIConfig, void *LCDC_DMA_Init);
 
-
+void LCDC_Clock_Cfg(FunctionalState state);
 
 #ifdef __cplusplus
 }
