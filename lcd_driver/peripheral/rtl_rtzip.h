@@ -20,7 +20,11 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "rtl876x.h"
 #include "stdbool.h"
+#if defined RTL8762G
 #include "rtl_gdma.h"
+#else
+#include "rtl876x_gdma.h"
+#endif
 #include "rtl_rtzip_reg.h"
 
 typedef enum
@@ -117,14 +121,15 @@ typedef struct
     RTZIP_ALGORITHM algorithm_type;
     RTZIP_THROW_AWAY_SIZE head_throw_away_byte_num;
     RTZIP_PIXEL_SIZE pic_pixel_size;
-    uint32_t pic_decompress_height;
-    uint32_t pic_raw_width;
-    uint32_t tx_column_start;
-    uint32_t tx_column_end;
     RTZIP_RLE_RUNLENGTH_SIZE pic_length2_size;
     RTZIP_RLE_RUNLENGTH_SIZE pic_length1_size;
     RTZIP_YUV_BLUR_BIT yuv_blur_bit;
     RTZIP_YUV_SAMPLE_TYPE yuv_sample_type;
+    uint8_t rsvd;
+    uint32_t pic_decompress_height;
+    uint32_t pic_raw_width;
+    uint32_t tx_column_start;
+    uint32_t tx_column_end;
     uint32_t compressed_data_size;
     uint32_t rx_fifo_dma_enable;
     uint32_t tx_fifo_dma_enable;
@@ -151,6 +156,10 @@ typedef union
     } b;
 } RTZIP_INT_CFG_t;
 
+#if defined RTL8763EP
+#undef RTZIP_REG_BASE
+#define RTZIP_REG_BASE                  0x40090000UL
+#endif
 #define RTZIP                           ((RTZIP_TypeDef *)RTZIP_REG_BASE)
 
 #define RTZIP_TX_FIFO_WIDTH             32
@@ -434,5 +443,5 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
 
 void RTZIP_Cmd(FunctionalState state);
 void RTZIP_Run(FunctionalState state);
-void RTZIP_Init(RTZIP_InitTypeDef *RTZIP_struct_init);
+void RTZIP_Init(RTZIP_InitTypeDef *RTZIP_init_struct);
 #endif

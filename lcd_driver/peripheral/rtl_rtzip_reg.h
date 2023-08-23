@@ -30,8 +30,8 @@ typedef struct
     DECOMPRESS_OUTPUT_PIXEL;                                                                      //0X18
     __IO uint32_t
     RLE_FASTLZ_CTL;                                                                               //0X1C
-    __IO uint32_t  YUV_SBF_CTL;
-    ;                                                                                  //0X20
+    __IO uint32_t
+    YUV_SBF_CTL;                                                                                  //0X20
     __IO uint32_t
     VERTICAL_COUNTER;                                                                             //0X24
     __IO uint32_t

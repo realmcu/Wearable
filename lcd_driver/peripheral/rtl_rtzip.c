@@ -14,22 +14,40 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stdio.h"
 #include "rtl_rtzip.h"
+#if defined RTL8762G
 #include "rtl_gdma.h"
 #include "rtl_rcc.h"
 #include "rtl_nvic.h"
+#else
+#include "rtl876x_gdma.h"
+#include "rtl876x_rcc.h"
+#include "rtl876x_nvic.h"
+#endif
 
 static void RTZIP_CLKConfig(FunctionalState state)
 {
-    IS_FUNCTIONAL_STATE(state);
+    assert_param(IS_FUNCTIONAL_STATE(state));
+#if defined RTL8762G
     uint32_t *reg = (uint32_t *)(0x40002000 + 0x324);
+#elif defined RTL8763EP
+    uint32_t *reg = (uint32_t *)(0x40000000 + 0x210);
+#endif
     uint32_t reg_value = *reg;
     if (state)
     {
+#if defined RTL8762G
         reg_value |= (BIT7 | BIT8);
+#elif defined RTL8763EP
+        reg_value |= BIT26;
+#endif
     }
     else
     {
+#if defined RTL8762G
         reg_value &= (~(BIT7 | BIT8));
+#elif defined RTL8763EP
+        reg_value &= (~BIT26);
+#endif
     }
     *reg = reg_value;
 }
@@ -46,34 +64,6 @@ void RTZIP_RxFifoClear(void)
     RTZIP_CTL1_t rtzip_reg_0x04 = {.d32 = RTZIP->RTZIP_CTL1};
     rtzip_reg_0x04.b.rx_fifo_clear = 1;
     RTZIP->RTZIP_CTL1 = rtzip_reg_0x04.d32;
-}
-
-static void RTZIP_TX_DMA_Cmd(uint8_t state)
-{
-    TX_FIFO_DMA_THRESHOLD_t rtzip_reg_0x4c = {.d32 = RTZIP->TX_FIFO_DMA_THRESHOLD};
-    if (state)
-    {
-        rtzip_reg_0x4c.b.tx_dma_enable = 1;
-    }
-    else
-    {
-        rtzip_reg_0x4c.b.tx_dma_enable = 0;
-    }
-    RTZIP->TX_FIFO_DMA_THRESHOLD = rtzip_reg_0x4c.d32;
-}
-
-static void RTZIP_RX_DMA_Cmd(uint8_t state)
-{
-    RX_FIFO_DMA_THRESHOLD_t rtzip_reg_0x48 = {.d32 = RTZIP->TX_FIFO_DMA_THRESHOLD};
-    if (state)
-    {
-        rtzip_reg_0x48.b.rx_dma_enable = 1;
-    }
-    else
-    {
-        rtzip_reg_0x48.b.rx_dma_enable = 0;
-    }
-    RTZIP->RX_FIFO_DMA_THRESHOLD = rtzip_reg_0x48.d32;
 }
 
 ITStatus RTZIP_GetINTStatus(uint32_t RTZIP_INT)
@@ -131,7 +121,7 @@ void RTZIP_ClearINTPendingBit(uint32_t RTZIP_INT)
 
 void RTZIP_Cmd(FunctionalState state)
 {
-    IS_FUNCTIONAL_STATE(state);
+    assert_param(IS_FUNCTIONAL_STATE(state));
     RTZIP_CTL0_t rtzip_reg_0x00 = {.d32 = RTZIP->RTZIP_CTL0};
     if (state)
     {
@@ -146,7 +136,7 @@ void RTZIP_Cmd(FunctionalState state)
 
 void RTZIP_Run(FunctionalState state)
 {
-    IS_FUNCTIONAL_STATE(state);
+    assert_param(IS_FUNCTIONAL_STATE(state));
     RTZIP_CTL0_t rtzip_reg_0x00 = {.d32 = RTZIP->RTZIP_CTL0};
     if (state)
     {
@@ -200,11 +190,6 @@ static uint32_t RTZIP_Get_Line_Start_Address(uint32_t compressed_start_address,
 //        DBG_DIRECT("[error]line number won't be equals to or bigger than pic height");
         return 0;
     }
-    else if (line_number < 0)
-    {
-//        DBG_DIRECT("[error]line number won't be less than 0");
-        return 0;
-    }
     else
     {
         uint32_t *line_address = (uint32_t *)(compressed_start_address + 12 + line_number * 4);
@@ -213,8 +198,9 @@ static uint32_t RTZIP_Get_Line_Start_Address(uint32_t compressed_start_address,
 }
 
 
-void RTZIP_Init(RTZIP_InitTypeDef *RTZIP_struct_init)
+void RTZIP_Init(RTZIP_InitTypeDef *RTZIP_init_struct)
 {
+    RTZIP_InitTypeDef *RTZIP_struct_init = RTZIP_init_struct;
     RTZIP_CTL0_t rtzip_reg_0x00 = {.d32 = RTZIP->RTZIP_CTL0};
     rtzip_reg_0x00.b.rt_zip_algorithm = RTZIP_struct_init->algorithm_type;
     RTZIP->RTZIP_CTL0 = rtzip_reg_0x00.d32;
@@ -321,19 +307,22 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
                                       (decompress_end_column - decompress_start_column + 1)\
                                       * (header->algorithm_type.pixel_bytes + 2);
 
-    RTZIP_InitTypeDef RTZIP_struct_init;
-    RTZIP_struct_init.algorithm_type            = header->algorithm_type.algorithm;
+    RTZIP_InitTypeDef RTZIP_struct_init = {0};
+    RTZIP_struct_init.algorithm_type            = (RTZIP_ALGORITHM)header->algorithm_type.algorithm;
     RTZIP_struct_init.head_throw_away_byte_num  = THROW_AWAY_0BYTE;
-    RTZIP_struct_init.pic_pixel_size            = header->algorithm_type.pixel_bytes;
+    RTZIP_struct_init.pic_pixel_size            = (RTZIP_PIXEL_SIZE)header->algorithm_type.pixel_bytes;
     RTZIP_struct_init.pic_decompress_height     = (decompress_end_line - decompress_start_line + 1);
     RTZIP_struct_init.pic_raw_width             = header->raw_pic_width;
     RTZIP_struct_init.tx_column_start           = decompress_start_column;
     RTZIP_struct_init.tx_column_end             = decompress_end_column ;
     RTZIP_struct_init.compressed_data_size      = compressed_data_size;
-    RTZIP_struct_init.pic_length2_size          = header->algorithm_type.feature_2;
-    RTZIP_struct_init.pic_length1_size          = header->algorithm_type.feature_1;
-    RTZIP_struct_init.yuv_blur_bit              = header->algorithm_type.feature_2;
-    RTZIP_struct_init.yuv_sample_type           = header->algorithm_type.feature_1;
+    RTZIP_struct_init.pic_length2_size          = (RTZIP_RLE_RUNLENGTH_SIZE)
+                                                  header->algorithm_type.feature_2;
+    RTZIP_struct_init.pic_length1_size          = (RTZIP_RLE_RUNLENGTH_SIZE)
+                                                  header->algorithm_type.feature_1;
+    RTZIP_struct_init.yuv_blur_bit              = (RTZIP_YUV_BLUR_BIT)header->algorithm_type.feature_2;
+    RTZIP_struct_init.yuv_sample_type           = (RTZIP_YUV_SAMPLE_TYPE)
+                                                  header->algorithm_type.feature_1;
     RTZIP_struct_init.rx_fifo_dma_enable        = (uint32_t)ENABLE;
     RTZIP_struct_init.tx_fifo_dma_enable        = (uint32_t)ENABLE;
     RTZIP_struct_init.rx_fifo_dma_threshold     = RTZIP_RX_FIFO_DEPTH / 2;
@@ -350,6 +339,7 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
     /* Configure DMA */
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_InitTypeDef RX_GDMA_InitStruct;
+
     /*--------------GDMA init-----------------------------*/
     GDMA_StructInit(&RX_GDMA_InitStruct);
     RX_GDMA_InitStruct.GDMA_ChannelNum          = dma_cfg->RX_DMA_channel_num;
@@ -367,11 +357,14 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     RX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)start_line_address;
     RX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(&RTZIP->RX_FIFO);
+#if defined RTL8762G
     RX_GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_RTZIP_RX;
     RX_GDMA_InitStruct.GDMA_Secure_En = 1;
+#elif defined RTL8763EP
+    RX_GDMA_InitStruct.GDMA_DestHandshake       = 43;
+#endif
     GDMA_Init(dma_cfg->RX_DMA_channel, &RX_GDMA_InitStruct);
 
-    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_InitTypeDef TX_GDMA_InitStruct;
     /*--------------GDMA init-----------------------------*/
     GDMA_StructInit(&TX_GDMA_InitStruct);
@@ -390,8 +383,12 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     TX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)(&RTZIP->TX_FIFO);
     TX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)dma_cfg->output_buf;
+#if defined RTL8762G
     TX_GDMA_InitStruct.GDMA_SourceHandshake     = GDMA_Handshake_RTZIP_TX;
     TX_GDMA_InitStruct.GDMA_Secure_En = 1;
+#elif defined RTL8763EP
+    TX_GDMA_InitStruct.GDMA_SourceHandshake     = 44;
+#endif
     GDMA_Init(dma_cfg->TX_DMA_channel, &TX_GDMA_InitStruct);
     GDMA_Cmd(dma_cfg->RX_DMA_channel_num, ENABLE);
     GDMA_Cmd(dma_cfg->TX_DMA_channel_num, ENABLE);
@@ -473,18 +470,21 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
                                       (header->algorithm_type.pixel_bytes + 2);
 
     RTZIP_InitTypeDef RTZIP_struct_init;
-    RTZIP_struct_init.algorithm_type            = header->algorithm_type.algorithm;
+    RTZIP_struct_init.algorithm_type            = (RTZIP_ALGORITHM)header->algorithm_type.algorithm;
     RTZIP_struct_init.head_throw_away_byte_num  = THROW_AWAY_0BYTE;
-    RTZIP_struct_init.pic_pixel_size            = header->algorithm_type.pixel_bytes;
+    RTZIP_struct_init.pic_pixel_size            = (RTZIP_PIXEL_SIZE)header->algorithm_type.pixel_bytes;
     RTZIP_struct_init.pic_decompress_height     = (decompress_end_line - decompress_start_line + 1);
     RTZIP_struct_init.pic_raw_width             = header->raw_pic_width;
     RTZIP_struct_init.tx_column_start           = decompress_start_column;
     RTZIP_struct_init.tx_column_end             = decompress_end_column ;
     RTZIP_struct_init.compressed_data_size      = compressed_data_size;
-    RTZIP_struct_init.pic_length2_size          = header->algorithm_type.feature_2;
-    RTZIP_struct_init.pic_length1_size          = header->algorithm_type.feature_1;
-    RTZIP_struct_init.yuv_blur_bit              = header->algorithm_type.feature_2;
-    RTZIP_struct_init.yuv_sample_type           = header->algorithm_type.feature_1;
+    RTZIP_struct_init.pic_length2_size          = (RTZIP_RLE_RUNLENGTH_SIZE)
+                                                  header->algorithm_type.feature_2;
+    RTZIP_struct_init.pic_length1_size          = (RTZIP_RLE_RUNLENGTH_SIZE)
+                                                  header->algorithm_type.feature_1;
+    RTZIP_struct_init.yuv_blur_bit              = (RTZIP_YUV_BLUR_BIT)header->algorithm_type.feature_2;
+    RTZIP_struct_init.yuv_sample_type           = (RTZIP_YUV_SAMPLE_TYPE)
+                                                  header->algorithm_type.feature_1;
     RTZIP_struct_init.rx_fifo_dma_enable        = (uint32_t)ENABLE;
     RTZIP_struct_init.tx_fifo_dma_enable        = (uint32_t)ENABLE;
     RTZIP_struct_init.rx_fifo_dma_threshold     = RTZIP_RX_FIFO_DEPTH / 2;
@@ -518,11 +518,14 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     RX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)start_line_address;
     RX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(&RTZIP->RX_FIFO);
+#if defined RTL8762G
     RX_GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_RTZIP_RX;
     RX_GDMA_InitStruct.GDMA_Secure_En = 1;
+#elif defined RTL8763EP
+    RX_GDMA_InitStruct.GDMA_DestHandshake       = 43;
+#endif
     GDMA_Init(dma_cfg->RX_DMA_channel, &RX_GDMA_InitStruct);
 
-    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_InitTypeDef TX_GDMA_InitStruct;
     /*--------------GDMA init-----------------------------*/
     GDMA_StructInit(&TX_GDMA_InitStruct);
@@ -541,8 +544,12 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     TX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)(&RTZIP->TX_FIFO);
     TX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)dma_cfg->output_buf;
+#if defined RTL8762G
     TX_GDMA_InitStruct.GDMA_SourceHandshake     = GDMA_Handshake_RTZIP_TX;
     TX_GDMA_InitStruct.GDMA_Secure_En = 1;
+#elif defined RTL8763EP
+    TX_GDMA_InitStruct.GDMA_SourceHandshake     = 44;
+#endif
     GDMA_Init(dma_cfg->TX_DMA_channel, &TX_GDMA_InitStruct);
 
     GDMA_Cmd(dma_cfg->RX_DMA_channel_num, ENABLE);
@@ -591,11 +598,14 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
         RTZIP_MaskINTConfig(RTZIP_TX_FIFO_UNDERFLOW_INT, DISABLE);
     }
 
+#if defined RTL8762G
+    //TODO: wait RTL8763G platform to add rtzip defines
     NVIC_InitTypeDef NVIC_InitStruct;
     NVIC_InitStruct.NVIC_IRQChannel = RTZIP_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStruct);
+#endif
 
     RTZIP_Cmd(ENABLE);
     RTZIP_Run(ENABLE);

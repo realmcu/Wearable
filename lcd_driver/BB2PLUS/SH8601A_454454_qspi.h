@@ -8,7 +8,6 @@ extern "C" {
 
 #define SH8601A_MAX_PARA_COUNT                          (300)
 
-#define DMA_LINKLIST                        1
 #if defined RTL8763EP
 #define TE_VALID                            0
 #else
