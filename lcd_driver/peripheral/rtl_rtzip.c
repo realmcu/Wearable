@@ -307,7 +307,7 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
                                       (decompress_end_column - decompress_start_column + 1)\
                                       * (header->algorithm_type.pixel_bytes + 2);
 
-    RTZIP_InitTypeDef RTZIP_struct_init = {0};
+    RTZIP_InitTypeDef RTZIP_struct_init;
     RTZIP_struct_init.algorithm_type            = (RTZIP_ALGORITHM)header->algorithm_type.algorithm;
     RTZIP_struct_init.head_throw_away_byte_num  = THROW_AWAY_0BYTE;
     RTZIP_struct_init.pic_pixel_size            = (RTZIP_PIXEL_SIZE)header->algorithm_type.pixel_bytes;
