@@ -178,7 +178,9 @@ void pwr_mgr_init(void)
     DLPS_IORegUserDlpsExitCb(app_exit_dlps_config);
     DLPS_IORegister();
 #ifdef RTL8762G
-    lps_mode_set(PLATFORM_DLPS_PFM);
+#if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+    //lps_mode_set(PLATFORM_DLPS_PFM);
+#endif
 #endif
 #ifdef RTL8772F
     lps_mode_set(PLATFORM_DLPS);

@@ -86,7 +86,7 @@ int realtek_flash_write(uint32_t addr, const uint8_t *buf, uint32_t size)
  * @return result
  */
 
-int realtek_flash_erase(uint32_t addr, size_t size)
+int realtek_flash_erase(uint32_t addr, uint32_t size)
 {
     uint32_t div_size;
     uint32_t yu_size;

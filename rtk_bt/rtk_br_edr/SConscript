@@ -43,19 +43,8 @@ if GetDepend(['BR_PROFILE_HFP']):
 
 
 CPPPATH = [cwd]
-CPPDEFINES += ['DEFINE_RTK_BT_TODO']
-libs = ['']
-libpath = [SDK_ROOT + '/bin/mdk']
-libs += ['gap_utils']
-libs += ['bt_mgr']
-libs += ['console']
-libs += ['audio']
-libs += ['sysm']
-libs += ['remote']
 
-libs += ['hal_utils']
-
-group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 for d in list:
     path = os.path.join(cwd, d)
