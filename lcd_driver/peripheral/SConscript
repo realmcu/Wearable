@@ -7,6 +7,10 @@ src = Split("""
 """)
 
 
+if GetDepend(['USING_8772F_DEVICE']):
+    group = []
+    Return('group')
+
 if GetDepend(['BSP_USING_DSI']):
     src += ['rtl_dsi.c']
 if GetDepend(['BSP_USING_LCDC']):

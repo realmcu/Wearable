@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_DISP_HOR_RES    464
+#define MY_DISP_HOR_RES    454
 #define MY_DISP_VER_RES    454
 #ifndef MY_DISP_HOR_RES
 #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen width, default value 320 is used for now.
@@ -88,7 +88,6 @@ void lv_port_disp_init(void)
      */
 #if 1
     /* Example for 1) */
-
     static lv_disp_draw_buf_t draw_buf_dsc_1;
     buffer0 = os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM,
                            drv_lcd_get_fb_width() * drv_lcd_get_fb_height() * drv_lcd_get_pixel_bits() / 8);

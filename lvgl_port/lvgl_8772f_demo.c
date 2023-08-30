@@ -1,23 +1,19 @@
 #include "lvgl.h"
 
 #include <string.h>
-
-/* FreeRTOS includes. */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "timers.h"
-#include "queue.h"
 #include "app_msg.h"
 #include "app_task.h"
 #include "board.h"
 #include "trace.h"
 #include "os_sync.h"
+#include "os_task.h"
 #include "rtl_gpio.h"
-
+#include "os_sched.h"
 #include "lv_port_disp.h"
 #include "lv_demo_benchmark.h"
 #include "lv_demo_widgets.h"
 #include "os_timer.h"
+#include "utils.h"
 #include "trace.h"
 
 #define APP_TASK_PRIORITY               1   /* Task priorities. */
@@ -98,7 +94,7 @@ static void lvgl_demo_run(void *p)
 void rt_lvgl_demo_init(void)
 {
     /* littleGL demo gui thread */
-    os_task_create(lvgl_task_handle, "lvgl", lvgl_demo_run, 0, APP_TASK_STACK_SIZE,
+    os_task_create(&lvgl_task_handle, "lvgl", lvgl_demo_run, 0, APP_TASK_STACK_SIZE,
                    APP_TASK_PRIORITY);
 
 }
