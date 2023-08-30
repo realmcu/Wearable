@@ -275,11 +275,10 @@ void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_
 
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
-#if (DMA_LINKLIST == 0)
     LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
     LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
     LCDC_DMA_InitStruct.LCDC_DMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
-    LCDC_DMA_InitStruct.LCDC_DMA_DIR                 = 4;
+    LCDC_DMA_InitStruct.LCDC_DMA_DIR                 = LCDC_DMA_DIR_PeripheralToMemory;
     LCDC_DMA_InitStruct.LCDC_DMA_SourceInc           = LCDC_DMA_SourceInc_Inc;
     LCDC_DMA_InitStruct.LCDC_DMA_DestinationInc      = LCDC_DMA_DestinationInc_Fix;
     LCDC_DMA_InitStruct.LCDC_DMA_SourceDataSize      = LCDC_DMA_DataSize_Word;
@@ -289,38 +288,6 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_DMA_InitStruct.LCDC_DMA_SourceAddr          = (uint32_t)buf;
     LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_En     = 0;
     LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
-#else
-    LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
-    LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
-    LCDC_DMA_InitStruct.LCDC_DMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
-    LCDC_DMA_InitStruct.LCDC_DMA_DIR                 = 4;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceInc           = DMA_SourceInc_Inc;
-    LCDC_DMA_InitStruct.LCDC_DMA_DestinationInc      = DMA_DestinationInc_Fix;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceDataSize      = DMA_DataSize_Word;
-    LCDC_DMA_InitStruct.LCDC_DMA_DestinationDataSize = DMA_DataSize_Word;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = DMA_Msize_8;
-    LCDC_DMA_InitStruct.LCDC_DMA_DestinationMsize    = DMA_Msize_8;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceAddr          = 0;
-
-    LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_Mode   =
-        LLI_TRANSFER;//LLI_TRANSFER or LLI_WITH_CONTIGUOUS_SAR
-    LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_En     = 1;
-    LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_Struct  = LCDC_DMA_LINKLIST_REG_BASE + 0x50;
-    LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
-
-    LCDC_SET_GROUP1_BLOCKSIZE(ICNA3311_LCD_WIDTH * INPUT_PIXEL_BYTES);
-    LCDC_SET_GROUP2_BLOCKSIZE(ICNA3311_LCD_WIDTH * INPUT_PIXEL_BYTES);
-
-    /*16 pixel aligned for GPU*/
-    LCDC_DMALLI_InitTypeDef LCDC_DMA_LLI_Init = {0};
-    LCDC_DMA_LLI_Init.g1_source_addr = (uint32_t)buf;
-    LCDC_DMA_LLI_Init.g1_sar_offset = ICNA3311_LCD_WIDTH * INPUT_PIXEL_BYTES * 2;
-
-    LCDC_DMA_LLI_Init.g2_source_addr = (uint32_t)(buf + ICNA3311_LCD_WIDTH * INPUT_PIXEL_BYTES);
-    LCDC_DMA_LLI_Init.g2_sar_offset = ICNA3311_LCD_WIDTH * INPUT_PIXEL_BYTES * 2;
-    LCDC_DMA_LinkList_Init(&LCDC_DMA_LLI_Init,
-                           &LCDC_DMA_InitStruct);//LLI_TRANSFER or LLI_WITH_CONTIGUOUS_SAR
-#endif
 
     LCDC_ClearDmaFifo();
     LCDC_ClearTxPixelCnt();
@@ -331,9 +298,7 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_SetTxPixelLen(len);
 
     LCDC_Cmd(ENABLE);
-#if DMA_LINKLIST
-    LCDC_DMA_MultiBlockCmd(ENABLE);
-#endif
+
     LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
     LCDC_DmaCmd(ENABLE);
 #if (TE_VALID == 1)

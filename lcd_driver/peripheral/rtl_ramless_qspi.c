@@ -49,14 +49,19 @@ void RLSPI_Init(LCDC_RLSPI_initTypeDef *init_struct)
 
 void RLSPI_Cmd(uint8_t state)
 {
+
     if (state)
     {
-        LCDC_HANDLER->TEAR_CTR |= LCDC_TEAR_START_EN_MSK;
-        LCDC_HANDLER->TEAR_CTR |= LCDC_TEAR_AUTO_TURN_ON_DMA_EN_MSK;
+        LCDC_HANDLER_TEAR_CTR_t lcdc_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
+        lcdc_reg_0x10.b.tear_auto_turn_on_dma_en = 1;
+        lcdc_reg_0x10.b.tear_auto_turn_on_autowritestart = 1;
+        LCDC_HANDLER->TEAR_CTR = lcdc_reg_0x10.d32;
     }
     else
     {
-        LCDC_HANDLER->TEAR_CTR &= LCDC_TEAR_START_EN_CLR;
-        LCDC_HANDLER->TEAR_CTR &= LCDC_TEAR_AUTO_TURN_ON_DMA_EN_CLR;
+        LCDC_HANDLER_TEAR_CTR_t lcdc_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
+        lcdc_reg_0x10.b.tear_auto_turn_on_dma_en = 0;
+        lcdc_reg_0x10.b.tear_auto_turn_on_autowritestart = 0;
+        LCDC_HANDLER->TEAR_CTR = lcdc_reg_0x10.d32;
     }
 }

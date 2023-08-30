@@ -47,14 +47,16 @@ extern "C" {
  * \{
  * \ingroup     GDMA_Exported_Constants
  */
-
+typedef enum
+{
+    LCDC_DMA_DIR_PeripheralToMemory = 0x4,
+    LCDC_DMA_DIR_PeripheralToPeripheral = 0x6,
+} LCDC_DMA_DIRECTION_T;
 
 /** \} */ /** End of Group GDMA_Data_Transfer_Direction */
 
-#define IS_GDMA_DIR(DIR) (((DIR) == GDMA_DIR_MemoryToMemory) || \
-                          ((DIR) == GDMA_DIR_MemoryToPeripheral) || \
-                          ((DIR) == GDMA_DIR_PeripheralToMemory) || \
-                          ((DIR) == GDMA_DIR_PeripheralToPeripheral))
+#define IS_LCDC_DMA_DIR(DIR)  ((DIR) == LCDC_DMA_DIR_PeripheralToMemory) || \
+    ((DIR) == LCDC_DMA_DIR_PeripheralToPeripheral))
 
 /**
  * \defgroup    GDMA_Source_Incremented_Mode GDMA Source Incremented Mode
@@ -69,9 +71,9 @@ typedef enum
 } LCDC_DMA_SRC_INC_T;
 /** \} */ /** End of Group GDMA_Source_Incremented_Mode */
 
-#define IS_GDMA_SourceInc(STATE) (((STATE) == DMA_SourceInc_Inc) || \
-                                  ((STATE) == DMA_SourceInc_Dec) || \
-                                  ((STATE) == DMA_SourceInc_Fix))
+#define IS_LCDC_DMA_SourceInc(STATE) (((STATE) == LCDC_DMA_SourceInc_Inc) || \
+                                      ((STATE) == LCDC_DMA_SourceInc_Dec) || \
+                                      ((STATE) == LCDC_DMA_SourceInc_Fix))
 
 /**
  * \defgroup    GDMA_Destination_Incremented_Mode GDMA Destination Incremented Mode
@@ -131,7 +133,7 @@ typedef enum
 typedef struct
 {
     uint8_t  LCDC_DMA_ChannelNum;               /*!< Specifies channel number for GDMA. */
-    uint8_t  LCDC_DMA_DIR;              /*!< Specifies transfer direction. */
+    LCDC_DMA_DIRECTION_T  LCDC_DMA_DIR;              /*!< Specifies transfer direction. */
     uint32_t LCDC_DMA_BufferSize;               /*!< Specifies the buffer size(<=65535).
                                                  The data unit is equal to the configuration set in DMA_PeripheralDataSize
                                                  or DMA_MemoryDataSize members depending in the transfer direction. */

@@ -30,6 +30,12 @@ typedef struct
     uint32_t SCPH;
 } LCDC_DBICCfgTypeDef;
 
+#define BIT_CK_MTIMES(x)        (((x) & 0x0000001F) << 23)
+#define BIT_FAST_RD(x)          (((x) & 0x00000001) << 22)
+#define BIT_CMD_CH(x)           (((x) & 0x00000003) << 20)
+#define BIT_DATA_CH(x)          (((x) & 0x00000003) << 18)
+#define BIT_ADDR_CH(x)          (((x) & 0x00000003) << 16)
+#define BIT_TMOD(x)             (((x) & 0x00000003) << 8)
 
 #define DBIC_AUTO_MODE              ((uint32_t)0x0)
 #define DBIC_USER_MODE              ((uint32_t)0x1)

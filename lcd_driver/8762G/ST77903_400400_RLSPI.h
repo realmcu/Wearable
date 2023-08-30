@@ -34,10 +34,6 @@ extern "C" {
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
 
-void st77903_screen_init(void);
-void init_cmds(void);
-void print_SPIC_reg(void);
-void st77903_framebuffer_init(uint8_t *buf, uint32_t len);
-void st77903_update_framebuffer(uint8_t *buf, uint32_t line_bytes);
-
+void rtk_lcd_hal_init(void);
+void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len);
 #endif

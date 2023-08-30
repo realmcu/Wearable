@@ -62,6 +62,7 @@ typedef enum
 typedef struct
 {
     uint32_t LCDC_Interface;
+    uint32_t LCDC_RamlessEn;
     uint32_t LCDC_GroupSel;
     uint32_t LCDC_PixelInputFarmat;
     uint32_t LCDC_PixelOutpuFarmat;
@@ -153,7 +154,7 @@ typedef struct
 #define EDPI_REG_BASE                       (DISPLAY_CTRL_REG_BASE + 0x700)
 #define DBIB_REG_BASE                       (DISPLAY_CTRL_REG_BASE + 0x800)
 #define LCDC_HANDLER_REG_BASE               (DISPLAY_CTRL_REG_BASE + 0x900)
-
+#define RAMLESS_QSPI_REG_BASE               (DISPLAY_CTRL_REG_BASE + 0xA00)//0x40023A00UL
 
 #define LCDC_DMA_Channel0                   ((LCDC_DMA_ChannelTypeDef *) LCDC_DMA_Channel0_BASE)
 #define LCDC_DMA_BASE                       ((LCDC_DMA_TypeDef *) LCDC_DMA_REG_BASE)
@@ -162,7 +163,7 @@ typedef struct
 #define EDPI                                ((LCDC_EDPI_TypeDef *)EDPI_REG_BASE)
 #define DBIB                                ((LCDC_DBIB_TypeDef *)DBIB_REG_BASE)
 #define LCDC_HANDLER                        ((LCDC_Handler_TypeDef *)LCDC_HANDLER_REG_BASE)
-
+#define RAMLESS_QSPI                        ((LCDC_Ramless_QSPI_TypeDef *)RAMLESS_QSPI_REG_BASE)
 
 /*============================================================================*
  *                         Constants
@@ -600,7 +601,7 @@ __STATIC_INLINE void LCDC_ClearDmaFifo(void)
 __STATIC_INLINE void LCDC_ClearINTPendingBit(uint32_t LCDC_CLEAR_INT)
 {
     /* Check the parameters */
-    assert_param(LCDC_INT_CLEAR(LCDC_CLEAR_INT));
+    assert_param(IS_LCDC_INT_CLEAR(LCDC_CLEAR_INT));
 
     //LCDC_HANDLER->DMA_FIFO_ICR &= LCDC_CLEAR_INT;
     LCDC_HANDLER->DMA_FIFO_ICR = LCDC_CLEAR_INT;

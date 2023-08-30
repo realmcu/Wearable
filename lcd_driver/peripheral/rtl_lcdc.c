@@ -78,6 +78,10 @@ void LCDC_Init(LCDC_InitTypeDef *cfg)
 
     LCDC_HANDLER_INTERFACE_SELECT_t handler_reg_0x00 = {.d32 = LCDC_HANDLER->INTERFACE_SELECT};
     handler_reg_0x00.b.interface_select = cfg->LCDC_Interface;
+    if ((cfg->LCDC_Interface == LCDC_IF_DBIC) && cfg->LCDC_RamlessEn)
+    {
+        handler_reg_0x00.b.ramless_qspi_enable = 1;
+    }
     handler_reg_0x00.b.group_sel = cfg->LCDC_GroupSel;
     LCDC_HANDLER->INTERFACE_SELECT = handler_reg_0x00.d32;
 
