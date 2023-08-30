@@ -23,7 +23,7 @@ static void port_log(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
-    char buf[256];
+    char buf[512];
     vsnprintf(buf, sizeof(buf), format, args);
 
     DBG_DIRECT("[GUI MODULE]%s", buf);
@@ -81,7 +81,7 @@ static void lvgl_demo_run(void *p)
     lv_demo_benchmark();
 #endif
 
-    lv_example_arc_1();
+    //lv_example_arc_1();
 
     while (1)
     {
