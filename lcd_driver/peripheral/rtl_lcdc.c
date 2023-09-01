@@ -298,7 +298,8 @@ void LCDC_DMA_StructInit(LCDC_DMA_InitTypeDef *LCDC_DMA_InitStruct)
 {
     /*-------------- Reset DMA init structure parameters values ------------------*/
     LCDC_DMA_InitStruct->LCDC_DMA_ChannelNum      = 0;
-    LCDC_DMA_InitStruct->LCDC_DMA_DIR             = 4;    //flow control display handler
+    LCDC_DMA_InitStruct->LCDC_DMA_DIR             =
+        LCDC_DMA_DIR_PeripheralToMemory;    //flow control display handler
     LCDC_DMA_InitStruct->LCDC_DMA_BufferSize      = 200;
     LCDC_DMA_InitStruct->LCDC_DMA_SourceInc       = LCDC_DMA_SourceInc_Fix;
     LCDC_DMA_InitStruct->LCDC_DMA_DestinationInc  = LCDC_DMA_DestinationInc_Inc;
