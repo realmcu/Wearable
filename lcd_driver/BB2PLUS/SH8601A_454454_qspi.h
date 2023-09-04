@@ -15,6 +15,7 @@ extern "C" {
 #endif
 #define SH8601A_LCD_WIDTH                   454
 #define SH8601A_LCD_HEIGHT                  454
+#define SH8601A_DRV_PIXEL_BITS             16
 #define INPUT_PIXEL_BYTES                   4
 #define OUTPUT_PIXEL_BYTES                  3
 #define RED                                 0xf800
@@ -35,6 +36,12 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
 void rtk_lcd_hal_init(void);
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len);
 void rtk_lcd_hal_clear_screen(uint32_t ARGB_color);
+
+void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len);
+void rtk_lcd_hal_transfer_done(void);
+uint32_t rtk_lcd_hal_get_width(void);
+uint32_t rtk_lcd_hal_get_height(void);
+uint32_t rtk_lcd_hal_get_pixel_bits(void);
 
 #ifdef __cplusplus
 }

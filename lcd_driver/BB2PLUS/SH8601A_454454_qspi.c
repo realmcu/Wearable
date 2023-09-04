@@ -317,6 +317,160 @@ static void rtl_SH8601A_qspi_enter_data_output_mode(uint32_t
 }
 
 
+static void sh8601a_pad_config(void)
+{
+//    Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P16_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+//    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+
+//    Pad_Dedicated_Config(P16_6, ENABLE);
+//    Pad_Dedicated_Config(P16_7, ENABLE);
+//    Pad_Dedicated_Config(P17_0, ENABLE);
+//    Pad_Dedicated_Config(P17_1, ENABLE);
+//    Pad_Dedicated_Config(P17_2, ENABLE);
+//    Pad_Dedicated_Config(P17_3, ENABLE);
+//    Pad_Dedicated_Config(P17_4, ENABLE);
+//    Pad_Dedicated_Config(P17_5, ENABLE);
+//    Pad_Dedicated_Config(P17_6, ENABLE);
+//    Pad_Dedicated_Config(P17_7, ENABLE);
+
+//    drv_pin_mode(P13_7, PIN_MODE_OUTPUT);
+//    drv_pin_write(P13_7, 0); //im0
+//    drv_pin_mode(P13_6, PIN_MODE_OUTPUT);
+//    drv_pin_write(P13_6, 1); //im1
+
+}
+
+void rtk_lcd_hal_init(void)
+{
+    //RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK_CLOCK, ENABLE);
+    //TODO
+    sh8601a_pad_config();
+    LCDC_InitTypeDef lcdc_init = {0};
+    lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
+#if INPUT_PIXEL_BYTES == 4
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_ARGB8888;
+#elif INPUT_PIXEL_BYTES == 3
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB888;
+#endif
+    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB888;
+    lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
+#if TE_VALID
+    lcdc_init.LCDC_TeEn = DISABLE;
+    lcdc_init.LCDC_TePolarity = LCDC_TE_EDGE_FALLING;
+    lcdc_init.LCDC_TeInputMux = LCDC_TE_LCD_INPUT;
+#endif
+    lcdc_init.LCDC_DmaThreshold =
+        8;    //only support threshold = 8 for DMA MSIZE = 8; the other threshold setting will be support later
+    LCDC_Init(&lcdc_init);
+
+//    LCDC_clk_src_sel(CKO1_PLL1_VCORE4, FROM_CLK_DISPLAY_SRC_MUX0, FRO_CLK_DISPLAY_SRC_MUX1,
+//                     LCDC_DIV_DISABLE, LCDC_DIV_1_DIV);
+
+    LCDC_DBICCfgTypeDef dbic_init = {0};
+    dbic_init.DBIC_SPEED_SEL         = 2;
+
+    dbic_init.DBIC_TxThr             = 0;//0 or 4
+    dbic_init.DBIC_RxThr             = 0;
+    dbic_init.SCPOL                  = DBIC_SCPOL_LOW;
+    dbic_init.SCPH                   = DBIC_SCPH_1Edge;
+    DBIC_Init(&dbic_init);
+
+    LCDC_SwitchMode(LCDC_MANUAL_MODE);
+    LCDC_SwitchDirect(LCDC_TX_MODE);
+    LCDC_Cmd(ENABLE);
+
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(100);
+    LCDC_LCD_SET_RST(true);
+    platform_delay_ms(50);
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(50);
+
+    LCDC_AXIMUXMode(LCDC_FW_MODE);
+    DBIC_SwitchMode(DBIC_USER_MODE);
+    DBIC_SwitchDirect(DBIC_TMODE_TX);
+
+    SH8601A_Init_Post_OTP();
+    //SH8601A_qspi_power_on();
+}
+
+uint32_t rtk_lcd_hal_get_width(void)
+{
+    return SH8601A_LCD_WIDTH;
+}
+uint32_t rtk_lcd_hal_get_height(void)
+{
+    return SH8601A_LCD_HEIGHT;
+}
+
+uint32_t rtk_lcd_hal_get_pixel_bits(void)
+{
+    return SH8601A_DRV_PIXEL_BITS;
+}
+void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
+{
+    LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
+    LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
+    LCDC_DMA_InitStruct.LCDC_DMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
+    LCDC_DMA_InitStruct.LCDC_DMA_DIR                 = LCDC_DMA_DIR_PeripheralToMemory;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceInc           = LCDC_DMA_SourceInc_Inc;
+    LCDC_DMA_InitStruct.LCDC_DMA_DestinationInc      = LCDC_DMA_DestinationInc_Fix;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceDataSize      = LCDC_DMA_DataSize_Word;
+    LCDC_DMA_InitStruct.LCDC_DMA_DestinationDataSize = LCDC_DMA_DataSize_Word;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = LCDC_DMA_Msize_8;
+    LCDC_DMA_InitStruct.LCDC_DMA_DestinationMsize    = LCDC_DMA_Msize_8;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceAddr          = (uint32_t)buf;
+    LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_En     = 0;
+    LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
+
+    LCDC_ClearDmaFifo();
+    LCDC_ClearTxPixelCnt();
+
+    LCDC_SwitchMode(LCDC_AUTO_MODE);
+    LCDC_SwitchDirect(LCDC_TX_MODE);
+
+    LCDC_SetTxPixelLen(len);
+
+    LCDC_Cmd(ENABLE);
+    LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
+    LCDC_DmaCmd(ENABLE);
+#if (TE_VALID == 1)
+    LCDC_TeCmd(ENABLE);
+#endif
+#if (TE_VALID == 0)
+    LCDC_AutoWriteCmd(ENABLE);
+#endif
+}
+
+void rtk_lcd_hal_transfer_done(void)
+{
+    LCDC_HANDLER_DMA_FIFO_CTRL_t handler_reg_0x18;
+    do
+    {
+        handler_reg_0x18.d32 = LCDC_HANDLER->DMA_FIFO_CTRL;
+    }
+    while (handler_reg_0x18.b.dma_enable != RESET);
+    LCDC_HANDLER_OPERATE_CTR_t handler_reg_0x14;
+    do
+    {
+        handler_reg_0x14.d32 = LCDC_HANDLER->OPERATE_CTR;
+    }
+    while (handler_reg_0x14.b.auto_write_start != RESET);
+
+    LCDC_ClearDmaFifo();
+    LCDC_ClearTxPixelCnt();
+    LCDC_AXIMUXMode(LCDC_FW_MODE);
+    LCDC_Cmd(DISABLE);
+}
+
 void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h)
 {
     uint8_t data[4];
@@ -448,89 +602,5 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_AXIMUXMode(LCDC_FW_MODE);
 }
 
-static void sh8601a_pad_config(void)
-{
-//    Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P16_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-//    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-
-//    Pad_Dedicated_Config(P16_6, ENABLE);
-//    Pad_Dedicated_Config(P16_7, ENABLE);
-//    Pad_Dedicated_Config(P17_0, ENABLE);
-//    Pad_Dedicated_Config(P17_1, ENABLE);
-//    Pad_Dedicated_Config(P17_2, ENABLE);
-//    Pad_Dedicated_Config(P17_3, ENABLE);
-//    Pad_Dedicated_Config(P17_4, ENABLE);
-//    Pad_Dedicated_Config(P17_5, ENABLE);
-//    Pad_Dedicated_Config(P17_6, ENABLE);
-//    Pad_Dedicated_Config(P17_7, ENABLE);
-
-//    drv_pin_mode(P13_7, PIN_MODE_OUTPUT);
-//    drv_pin_write(P13_7, 0); //im0
-//    drv_pin_mode(P13_6, PIN_MODE_OUTPUT);
-//    drv_pin_write(P13_6, 1); //im1
-
-}
-
-void rtk_lcd_hal_init(void)
-{
-    //RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK_CLOCK, ENABLE);
-    //TODO
-    sh8601a_pad_config();
-    LCDC_InitTypeDef lcdc_init = {0};
-    lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
-#if INPUT_PIXEL_BYTES == 4
-    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_ARGB8888;
-#elif INPUT_PIXEL_BYTES == 3
-    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB888;
-#endif
-    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB888;
-    lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
-#if TE_VALID
-    lcdc_init.LCDC_TeEn = DISABLE;
-    lcdc_init.LCDC_TePolarity = LCDC_TE_EDGE_FALLING;
-    lcdc_init.LCDC_TeInputMux = LCDC_TE_LCD_INPUT;
-#endif
-    lcdc_init.LCDC_DmaThreshold =
-        8;    //only support threshold = 8 for DMA MSIZE = 8; the other threshold setting will be support later
-    LCDC_Init(&lcdc_init);
-
-//    LCDC_clk_src_sel(CKO1_PLL1_VCORE4, FROM_CLK_DISPLAY_SRC_MUX0, FRO_CLK_DISPLAY_SRC_MUX1,
-//                     LCDC_DIV_DISABLE, LCDC_DIV_1_DIV);
-
-    LCDC_DBICCfgTypeDef dbic_init = {0};
-    dbic_init.DBIC_SPEED_SEL         = 2;
-
-    dbic_init.DBIC_TxThr             = 0;//0 or 4
-    dbic_init.DBIC_RxThr             = 0;
-    dbic_init.SCPOL                  = DBIC_SCPOL_LOW;
-    dbic_init.SCPH                   = DBIC_SCPH_1Edge;
-    DBIC_Init(&dbic_init);
-
-    LCDC_SwitchMode(LCDC_MANUAL_MODE);
-    LCDC_SwitchDirect(LCDC_TX_MODE);
-    LCDC_Cmd(ENABLE);
-
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(100);
-    LCDC_LCD_SET_RST(true);
-    platform_delay_ms(50);
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(50);
-
-    LCDC_AXIMUXMode(LCDC_FW_MODE);
-    DBIC_SwitchMode(DBIC_USER_MODE);
-    DBIC_SwitchDirect(DBIC_TMODE_TX);
-
-    SH8601A_Init_Post_OTP();
-    //SH8601A_qspi_power_on();
-}
 
 
