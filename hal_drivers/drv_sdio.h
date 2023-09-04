@@ -11,6 +11,8 @@
 
 #ifndef _DRV_SDIO_H
 #define _DRV_SDIO_H
+
+#ifdef OS_RTTHREAD
 #include <rtthread.h>
 #include "rtdevice.h"
 #include <rthw.h>
@@ -171,5 +173,233 @@ struct rtk_sdio_des
 };
 
 extern void stm32_mmcsd_change(void);
+#else
+#include <stdint.h>
+#include <stdbool.h>
+#include "rtl_sdio_reg.h"
 
+
+
+#define BYTES_PER_BLOCK  512
+
+
+typedef enum
+{
+    SDEMMCRES_OK = 0,
+
+    SDEMMCRES_ILLEGAL_PARM,
+
+    SDEMMCRES_CMD0_ERROR,
+    SDEMMCRES_CMD8_ERROR, // 3
+    SDEMMCRES_CMD55_ERROR,
+    SDEMMCRES_ACMD41_ERROR,
+    SDEMMCRES_ACMD41_TIMEOUT, // 6
+    SDEMMCRES_CMD2_ERROR,
+    SDEMMCRES_CMD3_ERROR,
+    SDEMMCRES_CMD7_ERROR, // 9
+    SDEMMCRES_CMD9_ERROR,
+    SDEMMCRES_CMD13_ERROR,
+    SDEMMCRES_ACMD6_ERROR, // 12
+    SDEMMCRES_CMD16_ERROR,
+    SDEMMCRES_ACMD42_ERROR,
+    SDEMMCRES_CMD18_ERROR, // 15
+    SDEMMCRES_CMD13_TIMEOUT,
+    SDEMMCRES_ACMD51_ERROR,
+    SDEMMCRES_CMD6_ERROR,  // 18
+    SDEMMCRES_CMD25_ERROR,
+    SDEMMCRES_CMD1_ERROR,
+    SDEMMCRES_CMD1_TIMEOUT, // 21
+    SDEMMCRES_CMD6_TIMEOUT,
+
+    SDEMMCRES_WRITE_TIMEOUT,
+    SDEMMCRES_MALLOC_FAILED, // 24
+} SdEmmcRes_t;
+
+typedef enum
+{
+    CARDTYPE_SD = 1,
+    CARDTYPE_EMMC,
+} CardType_t;
+
+typedef enum
+{
+    DATAWIDTH_1BIT,
+    DATAWIDTH_4BIT,
+    DATAWIDTH_8BIT,
+    DATAWIDTH_4BIT_DDR,
+    DATAWIDTH_8BIT_DDR,
+} DataWidth_t;
+
+typedef struct
+{
+    // Pin group.
+    // Power enable pin and active level.
+
+    // Enter DLPS callback;
+    // Power on/off callback;
+    // Auto power off;
+    // ...
+
+    CardType_t CardType;
+    DataWidth_t DataWidth;
+    uint32_t ClkOutFreq_kHz;
+} SdEmmcInitParm_t;
+
+
+//** All the following APIs must run in task environment.
+SdEmmcRes_t SdEmmc_Init(SDIO_TypeDef *Sdio, const SdEmmcInitParm_t *pParm);
+// A block is always set to 512 bytes.
+SdEmmcRes_t SdEmmc_Read(SDIO_TypeDef *Sdio, uint32_t StartBlock, uint32_t BlockCnt, void *pBuf);
+SdEmmcRes_t SdEmmc_Write(SDIO_TypeDef *Sdio, uint32_t StartBlock, uint32_t BlockCnt,
+                         const void *pBuf);
+uint32_t SdEmmc_GetBlockCnt(SDIO_TypeDef *Sdio);
+
+#include <string.h>
+#include "utils.h"
+#include "trace.h"
+
+
+#ifndef NDEBUG
+#define ASSERT(e) \
+    do { \
+        if(!(e)) { \
+            platform_delay_ms(1000); \
+            DBG_DIRECT("(" #e ") assert failed! Func: %s. Line: %d.", __func__, __LINE__); \
+            DBG_DIRECT("(" #e ") assert failed! Func: %s. Line: %d.", __func__, __LINE__); \
+            *(volatile int *)0x1 = 0; \
+        } \
+    } while(0)
+#else
+#define ASSERT(e) ((void)0)
+#endif // NDEBUG
+
+#define STATIC_ASSERT(e)  typedef char StaticAssertOn##__LINE__[(e) ? 1 : -1]
+
+#define IS_ADDR_ALIGNED(Addr)  ((uint32_t)(Addr) % 4 == 0)
+
+#define MIN2(a, b)  ((a) < (b) ? (a) : (b))
+
+
+static inline uint32_t BitsToU32(const void *pBits, uint32_t FirstBit, uint32_t LastBit)
+{
+    uint32_t FirstByte = FirstBit / 8;
+    uint32_t FirstOfs = FirstBit % 8;
+    uint32_t LastByte = LastBit / 8;
+
+    uint32_t ByteCnt = LastByte + 1 - FirstByte;
+    uint32_t BitsCnt = LastBit + 1 - FirstBit;
+    ASSERT(BitsCnt <= 32);
+
+    uint64_t u64;
+    const uint8_t *p = pBits;
+    memcpy(&u64, p + FirstByte, ByteCnt);
+
+    return (uint32_t)(u64 >> FirstOfs) & (~0UL >> (32 - BitsCnt));
+}
+
+
+typedef enum
+{
+    SDIORES_OK = 0,
+
+    SDIORES_HARDWARE_LOCKED_ERROR, // 1
+    SDIORES_RESPONSE_ERROR,
+    SDIORES_RESPONSE_CRC_ERROR,
+    SDIORES_RESPONSE_TIMEOUT,
+
+    SDIORES_DATA_CRC_ERROR, // 5
+    SDIORES_DATA_READ_TIMEOUT,
+    SDIORES_DATA_START_BIT_ERROR,
+    SDIORES_DATA_END_BIT_ERROR,
+    SDIORES_WRITE_NO_CRC, // 9
+
+    SDIORES_FATAL_BUS_ERROR,
+    SDIORES_DESCRIPTOR_UNAVAILABLE,
+    SDIORES_CARD_ERROR, // 12
+
+    SDIORES_WAIT_DATA0_IDLE_TIMEOUT,
+} SdioRes_t;
+
+
+typedef struct
+{
+    // 0 ~ 63
+    uint8_t CmdIdx;
+    uint32_t CmdArg;
+
+    // Such as CMD0.
+    bool IsResetCmd;
+    // Such as CMD12.
+    bool IsStopCmd;
+
+    // CMD0, CMD4, CMD15... have no response.
+    bool IsRspExpected;
+    // R2 is long response.
+    bool IsR2Rsp;
+    // Some CMD do not have CRC, such as ACMD41 for eMMC and CMD8 for SD.
+    bool CheckRspCrc;
+} CmdInfo_t;
+
+
+typedef struct
+{
+    // Bytes per block.
+    uint32_t BlockSize;
+    // Block counts you want to Tx/Rx.
+    uint32_t BlockCount;
+    // If set, stop cmd (CMD12) will be sent automatically after data transfer.
+    bool SendAutoStop;
+} DataInfo_t;
+
+
+
+
+// All the APIs must run in task environment.
+
+// pParm is shallow copied, and must keep valid during the whole SDIO session.
+void Sdio_InitPad(SDIO_TypeDef *Sdio, DataWidth_t DataWidth);
+void Sdio_DeInitPad(SDIO_TypeDef *Sdio, DataWidth_t DataWidth);
+
+void Sdio_Init(SDIO_TypeDef *Sdio);
+void Sdio_DeInit(SDIO_TypeDef *Sdio);
+
+uint32_t Sdio_SetClkOutFreq(SDIO_TypeDef *Sdio, uint32_t Freq_kHz);
+uint32_t Sdio_GetClkOutFreq_kHz(SDIO_TypeDef *Sdio);
+
+void Sdio_SetHostDataWidth(SDIO_TypeDef *Sdio, DataWidth_t Width);
+
+SdioRes_t Sdio_SendNoDataCmd(SDIO_TypeDef *Sdio, const CmdInfo_t *pCmdInfo, void *pRspBuf);
+
+// At most (DESC_CNT * MAX_BLOCK_PER_DESC * BYTES_PER_BLOCK) bytes can be send per transfer.
+SdioRes_t Sdio_SendCmdWithRxData(SDIO_TypeDef *Sdio,
+                                 const CmdInfo_t *pCmdInfo, void *pRspBuf,
+                                 const DataInfo_t *pDataInfo, void *pRxDataBuf);
+SdioRes_t Sdio_SendCmdWithTxData(SDIO_TypeDef *Sdio,
+                                 const CmdInfo_t *pCmdInfo, void *pRspBuf,
+                                 const DataInfo_t *pDataInfo, const void *pDataToTx);
+
+SdioRes_t Sdio_WaitData0Idle(SDIO_TypeDef *Sdio, uint32_t Timeout_ms);
+
+#define DESC_CNT  4
+// TODO: It seems that the maximum can only be set to 16. why?
+#define MAX_BLOCK_PER_DESC  16
+
+#define MAX_BYTES_PER_DESC  (MAX_BLOCK_PER_DESC * BYTES_PER_BLOCK)
+#define MAX_BLOCK_PER_XFER  (MAX_BLOCK_PER_DESC * DESC_CNT)
+#define MAX_BYTES_PER_XFER  (MAX_BYTES_PER_DESC * DESC_CNT)
+
+
+
+//// All the following APIs must run in task environment.
+SdEmmcRes_t Sd_Init(SDIO_TypeDef *Sdio, const SdEmmcInitParm_t *pParm);
+// A block is always set to 512 bytes.
+SdEmmcRes_t Sd_Read(SDIO_TypeDef *Sdio, uint32_t StartBlock, uint32_t BlockCnt, void *pBuf);
+SdEmmcRes_t Sd_Write(SDIO_TypeDef *Sdio, uint32_t StartBlock, uint32_t BlockCnt, const void *pBuf);
+uint32_t Sd_GetBlockCnt(SDIO_TypeDef *Sdio);
+
+
+
+
+
+#endif
 #endif
