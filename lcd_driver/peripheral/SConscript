@@ -15,14 +15,18 @@ if GetDepend(['BSP_USING_DSI']):
     src += ['rtl_dsi.c']
 if GetDepend(['BSP_USING_LCDC']):
     src += ['rtl_lcdc.c']
-    src += ['rtl_ppe.c']
-    src += ['rtl_rtzip.c']
 if GetDepend(['BSP_USING_DBIB']):
     src += ['rtl_lcdc_dbib.c']
 if GetDepend(['BSP_USING_DBIC']):
     src += ['rtl_lcdc_dbic.c']
 if GetDepend(['BSP_USING_EDPI']) or GetDepend(['BSP_USING_DSI']):
     src += ['rtl_lcdc_edpi.c']
+if GetDepend(['USING_8762G_DEVICE']):
+    src += ['rtl_ppe.c']
+    src += ['rtl_rtzip.c']
+if GetDepend(['USING_8763EP_DEVICE']):
+    #src += ['rtl_PPEV2.c']
+    src += ['rtl_rtzip.c']
 
 CPPPATH = [cwd]
 

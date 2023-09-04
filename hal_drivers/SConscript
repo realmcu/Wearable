@@ -7,10 +7,17 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-src += ['drv_dlps.c']
-src += ['drv_flash.c']
+
 
 CPPDEFINES = ['RTK_HAL_DRIVER']
+
+if GetDepend(['BSP_USING_FLASH']):
+    src += ['drv_flash.c']
+    CPPDEFINES += ['RTK_HAL_FLASH']
+
+if GetDepend(['BSP_USING_DLPS']):
+    src += ['drv_dlps.c']
+    CPPDEFINES += ['RTK_HAL_DLPS']
 
 if GetDepend(['BSP_USING_SPI']):
     src += ['drv_spi.c']
