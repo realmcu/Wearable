@@ -15,11 +15,12 @@
 #include "string.h"
 
 
-
+#define USE_INTERNAL_MAT     0
 #define ABS(x)               (((x) < 0)    ? -(x) :  (x))
 #define EPS                  2.2204460492503131e-14
 
 static void ppe_get_identity(ppe_matrix_t *matrix);
+#if USE_INTERNAL_MAT
 static void ppe_translate(float x, float y, ppe_matrix_t *matrix);
 static void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix);
 static void ppe_rotate(float degrees, ppe_matrix_t *matrix);
@@ -27,6 +28,7 @@ static void ppe_perspective(float px, float py, ppe_matrix_t *matrix);
 static int  ppe_get_transform_matrix(ppe_point4_t src, ppe_point4_t dst, ppe_matrix_t *mat);
 static void matrix_inverse(ppe_matrix_t *matrix);
 static void multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult);
+#endif
 static bool inv_matrix2complement(ppe_matrix_t *matrix, uint32_t *comp);
 
 void PPEV2_CLK_ENABLE(FunctionalState NewState)
@@ -684,7 +686,21 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
     return PPEV2_SUCCESS;
 }
 
+void ppe_get_identity(ppe_matrix_t *matrix)
+{
+    /* Set identify matrix. */
+    matrix->m[0][0] = 1.0f;
+    matrix->m[0][1] = 0.0f;
+    matrix->m[0][2] = 0.0f;
+    matrix->m[1][0] = 0.0f;
+    matrix->m[1][1] = 1.0f;
+    matrix->m[1][2] = 0.0f;
+    matrix->m[2][0] = 0.0f;
+    matrix->m[2][1] = 0.0f;
+    matrix->m[2][2] = 1.0f;
+}
 
+#if USE_INTERNAL_MAT
 static const int16_t sin_table[] =
 {
     0,     572,   1144,  1715,  2286,  2856,  3425,  3993,  4560,  5126,  5690,  6252,  6813,  7371,  7927,  8481,
@@ -730,19 +746,6 @@ static inline int16_t ppe_fix_cos(int16_t angle)
     return ppe_fix_sin(angle + 90);
 }
 
-void ppe_get_identity(ppe_matrix_t *matrix)
-{
-    /* Set identify matrix. */
-    matrix->m[0][0] = 1.0f;
-    matrix->m[0][1] = 0.0f;
-    matrix->m[0][2] = 0.0f;
-    matrix->m[1][0] = 0.0f;
-    matrix->m[1][1] = 1.0f;
-    matrix->m[1][2] = 0.0f;
-    matrix->m[2][0] = 0.0f;
-    matrix->m[2][1] = 0.0f;
-    matrix->m[2][2] = 1.0f;
-}
 
 static void multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult)
 {
@@ -975,6 +978,7 @@ void matrix_inverse(ppe_matrix_t *matrix)
     /* Copy temporary matrix into result. */
     memcpy(matrix, &temp, sizeof(temp));
 }
+#endif
 
 bool inv_matrix2complement(ppe_matrix_t *matrix, uint32_t *comp)
 {
