@@ -8,8 +8,14 @@ list = os.listdir(cwd)
 src = Split("""""")
 CPPPATH = [cwd]
 CPPDEFINES = ['DEFINE_RTK_BT_TODO']
-
-
+Import('SDK_ROOT')
+src += [SDK_ROOT + '/bin/mdk/gap_utils.lib']
+src += [SDK_ROOT + '/bin/mdk/bt_mgr.lib']
+src += [SDK_ROOT + '/bin/mdk/console.lib']
+src += [SDK_ROOT + '/bin/mdk/audio.lib']
+src += [SDK_ROOT + '/bin/mdk/sysm.lib']
+src += [SDK_ROOT + '/bin/mdk/remote.lib']
+src += [SDK_ROOT + '/bin/mdk/hal_utils.lib']
 if GetDepend(['USING_BR_TASK']) or GetDepend(['USING_BLE_TASK']):
     src += ['bt_task.c']
 if GetDepend(['USING_BR_TASK']):
