@@ -4,9 +4,10 @@
 #include "platform_utils.h"
 #include "trace.h"
 #include "os_sched.h"
+#include "rtl876x_rcc.h"
 #if defined RTL8762G
 #include "rtl_pinmux.h"
-#elif defined RTL8763J
+#elif defined RTL8763EP
 #include "rtl876x_pinmux.h"
 #endif
 //#include "drv_gpio.h"
@@ -223,7 +224,8 @@ void SH8601A_Init_Post_OTP(void)
     //delay 10ms
     SH8601A_Reg_Write(SH8601A_POST_OTP_POWERON_SEQ_CMD);
 }
-void SH8601A_qspi_power_on(void)
+
+uint32_t rtk_lcd_hal_power_on(void)
 {
     //pull low RESX
     //power on VBAT: VBAT = 3.7V
@@ -233,8 +235,9 @@ void SH8601A_qspi_power_on(void)
     //pull high RESX: IC reset
     //delay 10ms
     SH8601A_Reg_Write(SH8601A_OTP_WRITE_POWERON);
+    return 0;
 }
-void SH8601A_qspi_power_off(void)
+uint32_t rtk_lcd_hal_power_off(void)
 {
     SH8601A_Reg_Write(SH8601A_POWEROFF_SEQ_CMD);
     //delay 100ms
@@ -243,6 +246,7 @@ void SH8601A_qspi_power_off(void)
     //pull low VCI_EN: disable VCI
     //power off VDDI
     //power off VBAT
+    return 0;
 }
 
 void SH8601A_OTP_Write(void)
@@ -350,7 +354,8 @@ static void sh8601a_pad_config(void)
 
 void rtk_lcd_hal_init(void)
 {
-    //RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK_CLOCK, ENABLE);
+    LCDC_Clock_Cfg(ENABLE);
+    RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK, ENABLE);
     //TODO
     sh8601a_pad_config();
     LCDC_InitTypeDef lcdc_init = {0};
@@ -359,6 +364,8 @@ void rtk_lcd_hal_init(void)
     lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_ARGB8888;
 #elif INPUT_PIXEL_BYTES == 3
     lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB888;
+#elif INPUT_PIXEL_BYTES == 2
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB565;
 #endif
     lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB888;
     lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
@@ -496,20 +503,31 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
 void rtk_lcd_hal_clear_screen(uint32_t ARGB_color)
 {
     rtk_lcd_hal_set_window(0, 0, SH8601A_LCD_WIDTH, SH8601A_LCD_HEIGHT);
+    uint8_t *RGB_transfer = (uint8_t *)&ARGB_color;
     uint32_t clear_buf[64] = {0};
 #if INPUT_PIXEL_BYTES == 4
+    uint32_t rgba8888 = RGB_transfer[3] << 24 | RGB_transfer[0] << 16 | RGB_transfer[1] << 8 |
+                        RGB_transfer[2];
     for (int i = 0; i < 64; i++)
     {
-        clear_buf[i] = ARGB_color;
+        clear_buf[i] = rgba8888;
     }
 #elif INPUT_PIXEL_BYTES == 3
     uint8_t *rgb888_buf = (uint8_t *)clear_buf;
-    uint8_t *RGB_transfer = (uint8_t *)&ARGB_color;
     for (int i = 0; i < 64; i++)
     {
         rgb888_buf[i * 3] = RGB_transfer[0];
         rgb888_buf[i * 3 + 1] = RGB_transfer[1];
         rgb888_buf[i * 3 + 2] = RGB_transfer[2];
+    }
+#elif INPUT_PIXEL_BYTES == 2
+    uint16_t color = 0;
+    uint16_t *rgb565_buf = (uint16_t *)clear_buf;
+    color = (((RGB_transfer[0] & 0xF8) << 8) | ((RGB_transfer[1] & 0xFC) << 3) | ((
+            RGB_transfer[2] & 0xF8) >> 3));
+    for (int i = 0; i < 64 * 2; i++)
+    {
+        rgb565_buf[i] = color;
     }
 #endif
     LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};

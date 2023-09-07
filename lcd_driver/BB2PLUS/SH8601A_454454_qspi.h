@@ -15,10 +15,12 @@ extern "C" {
 #endif
 #define SH8601A_LCD_WIDTH                   454
 #define SH8601A_LCD_HEIGHT                  454
-#define SH8601A_DRV_PIXEL_BITS             16
+#define SH8601A_DRV_PIXEL_BITS              32
 #define INPUT_PIXEL_BYTES                   4
+#if INPUT_PIXEL_BYTES == 3
+#error "LCDC DMA doesn't allow 3 bytes input"
+#endif
 #define OUTPUT_PIXEL_BYTES                  3
-#define RED                                 0xf800
 
 
 
@@ -42,7 +44,8 @@ void rtk_lcd_hal_transfer_done(void);
 uint32_t rtk_lcd_hal_get_width(void);
 uint32_t rtk_lcd_hal_get_height(void);
 uint32_t rtk_lcd_hal_get_pixel_bits(void);
-
+uint32_t rtk_lcd_hal_power_off(void);
+uint32_t rtk_lcd_hal_power_on(void);
 #ifdef __cplusplus
 }
 #endif

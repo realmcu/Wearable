@@ -10,7 +10,6 @@
 #include "drv_lcd.h"
 #include "drv_dlps.h"
 #include "trace.h"
-#include "app_section.h"
 #include "os_mem.h"
 
 

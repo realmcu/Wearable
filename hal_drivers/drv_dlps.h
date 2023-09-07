@@ -14,7 +14,8 @@
 
 #include "string.h"
 #include "rtl_hal_peripheral.h"
-
+#include "stdint.h"
+#include "stdbool.h"
 
 /**
  * Single List structure for dlps
