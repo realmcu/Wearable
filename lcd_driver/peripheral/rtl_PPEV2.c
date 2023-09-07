@@ -20,6 +20,7 @@
 #define EPS                  2.2204460492503131e-14
 
 static void ppe_get_identity(ppe_matrix_t *matrix);
+bool check_inverse(ppe_matrix_t *matrix);
 #if USE_INTERNAL_MAT
 static void ppe_translate(float x, float y, ppe_matrix_t *matrix);
 static void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix);
@@ -269,7 +270,7 @@ void PPEV2_StructInit(PPEV2_Init_Typedef *PPEV2_Init_Struct)
     PPEV2_REG_SECURE_t             ppev2_reg_secure_0x18             = {.d32 = PPEV2->REG_SECURE};
 
     /*initialization*/
-    PPEV2_Init_Struct->SetValid_AutoClear = ppev2_reg_ld_cfg_0x08.b.auto_clr;
+    PPEV2_Init_Struct->SetValid_AutoClear = (FunctionalState)ppev2_reg_ld_cfg_0x08.b.auto_clr;
 
     PPEV2_Init_Struct->LLP                                 = (ppev2_reg_llp_0x10.b.llp) << 2;
 
@@ -551,11 +552,27 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
     {
         return PPEV2_ERR_NULL_TARGET;
     }
+    if (src->address == NULL)
+    {
+        return PPEV2_ERR_NULL_SOURCE;
+    }
+    if ((src->win_x_max <= src->win_x_min) || (src->win_y_max <= src->win_y_min))
+    {
+        return PPEV2_ERR_INVALID_RANGE;
+    }
+    if (!check_inverse(&src->inv_matrix))
+    {
+        return PPEV2_ERR_INVALID_MATRIX;
+    }
+    if (src->opacity == 0)
+    {
+        return PPEV2_SUCCESS;
+    }
     ppe_matrix_t matrix;
     ppe_get_identity(&matrix);
     memcpy(&matrix, &src->inv_matrix, sizeof(ppe_matrix_t));
 
-    uint32_t color = (src->opacity << 24);
+    uint32_t color = ((src->opacity << 24) | 0xFFFFFF);
 
     uint32_t comp[9];
     if (!inv_matrix2complement(&matrix, comp))
@@ -624,9 +641,9 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
     PPEV2_input_layer2_init.Transfer_Matrix_E31             = comp[ct++];
     PPEV2_input_layer2_init.Transfer_Matrix_E32             = comp[ct++];
     PPEV2_input_layer2_init.Transfer_Matrix_E33             = comp[ct++];
-    DBG_DIRECT("0x%x | 0x%x | 0x%x ", comp[0], comp[1], comp[2]);
-    DBG_DIRECT("0x%x | 0x%x | 0x%x ", comp[3], comp[4], comp[5]);
-    DBG_DIRECT("0x%x | 0x%x | 0x%x ", comp[6], comp[7], comp[8]);
+//    DBG_DIRECT("0x%x | 0x%x | 0x%x ", comp[0], comp[1], comp[2]);
+//    DBG_DIRECT("0x%x | 0x%x | 0x%x ", comp[3], comp[4], comp[5]);
+//    DBG_DIRECT("0x%x | 0x%x | 0x%x ", comp[6], comp[7], comp[8]);
     PPEV2_InputLayer_Init(PPEV2_INPUT_2, &PPEV2_input_layer2_init);
 
 
@@ -979,6 +996,25 @@ void matrix_inverse(ppe_matrix_t *matrix)
     memcpy(matrix, &temp, sizeof(temp));
 }
 #endif
+
+bool check_inverse(ppe_matrix_t *matrix)
+{
+    float det00, det01, det02, d;
+    det00 = (matrix->m[1][1] * matrix->m[2][2]) - (matrix->m[2][1] * matrix->m[1][2]);
+    det01 = (matrix->m[2][0] * matrix->m[1][2]) - (matrix->m[1][0] * matrix->m[2][2]);
+    det02 = (matrix->m[1][0] * matrix->m[2][1]) - (matrix->m[2][0] * matrix->m[1][1]);
+
+    /* Compute determinant. */
+    d = (matrix->m[0][0] * det00) + (matrix->m[0][1] * det01) + (matrix->m[0][2] * det02);
+    if (d != 0.0f)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 bool inv_matrix2complement(ppe_matrix_t *matrix, uint32_t *comp)
 {

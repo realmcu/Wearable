@@ -254,7 +254,9 @@ typedef enum
 {
     PPEV2_SUCCESS = 0x0,
     PPEV2_ERR_NULL_TARGET,
+    PPEV2_ERR_NULL_SOURCE,
     PPEV2_ERR_INVALID_MATRIX,
+    PPEV2_ERR_INVALID_RANGE,
 } PPEV2_err;
 
 typedef struct
