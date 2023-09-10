@@ -443,7 +443,14 @@ void PPEV2_Mask_All_Interrupt(FunctionalState NewState);
 
 PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src);
 
-
+void ppe_get_identity(ppe_matrix_t *matrix);
+void ppe_translate(float x, float y, ppe_matrix_t *matrix);
+void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix);
+void ppe_rotate(float degrees, ppe_matrix_t *matrix);
+void ppe_perspective(float px, float py, ppe_matrix_t *matrix);
+int  ppe_get_transform_matrix(ppe_point4_t src, ppe_point4_t dst, ppe_matrix_t *mat);
+void ppe_matrix_inverse(ppe_matrix_t *matrix);
+void ppe_mat_multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult);
 
 
 

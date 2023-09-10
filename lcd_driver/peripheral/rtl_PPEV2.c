@@ -15,20 +15,20 @@
 #include "string.h"
 
 
-#define USE_INTERNAL_MAT     0
+#define USE_PPE_MAT     1
 #define ABS(x)               (((x) < 0)    ? -(x) :  (x))
 #define EPS                  2.2204460492503131e-14
 
-static void ppe_get_identity(ppe_matrix_t *matrix);
+void ppe_get_identity(ppe_matrix_t *matrix);
 bool check_inverse(ppe_matrix_t *matrix);
-#if USE_INTERNAL_MAT
-static void ppe_translate(float x, float y, ppe_matrix_t *matrix);
-static void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix);
-static void ppe_rotate(float degrees, ppe_matrix_t *matrix);
-static void ppe_perspective(float px, float py, ppe_matrix_t *matrix);
-static int  ppe_get_transform_matrix(ppe_point4_t src, ppe_point4_t dst, ppe_matrix_t *mat);
-static void matrix_inverse(ppe_matrix_t *matrix);
-static void multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult);
+#if USE_PPE_MAT
+void ppe_translate(float x, float y, ppe_matrix_t *matrix);
+void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix);
+void ppe_rotate(float degrees, ppe_matrix_t *matrix);
+void ppe_perspective(float px, float py, ppe_matrix_t *matrix);
+int  ppe_get_transform_matrix(ppe_point4_t src, ppe_point4_t dst, ppe_matrix_t *mat);
+void ppe_matrix_inverse(ppe_matrix_t *matrix);
+void ppe_mat_multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult);
 #endif
 static bool inv_matrix2complement(ppe_matrix_t *matrix, uint32_t *comp);
 
@@ -717,7 +717,7 @@ void ppe_get_identity(ppe_matrix_t *matrix)
     matrix->m[2][2] = 1.0f;
 }
 
-#if USE_INTERNAL_MAT
+#if USE_PPE_MAT
 static const int16_t sin_table[] =
 {
     0,     572,   1144,  1715,  2286,  2856,  3425,  3993,  4560,  5126,  5690,  6252,  6813,  7371,  7927,  8481,
@@ -764,7 +764,7 @@ static inline int16_t ppe_fix_cos(int16_t angle)
 }
 
 
-static void multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult)
+void ppe_mat_multiply(ppe_matrix_t *matrix, ppe_matrix_t *mult)
 {
     ppe_matrix_t temp;
     int row, column;
@@ -796,7 +796,7 @@ void ppe_translate(float x, float y, ppe_matrix_t *matrix)
     };
 
     /* Multiply with current matrix. */
-    multiply(matrix, &t);
+    ppe_mat_multiply(matrix, &t);
 }
 
 void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix)
@@ -809,7 +809,7 @@ void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix)
     };
 
     /* Multiply with current matrix. */
-    multiply(matrix, &s);
+    ppe_mat_multiply(matrix, &s);
 }
 
 void ppe_rotate(float degrees, ppe_matrix_t *matrix)
@@ -832,7 +832,7 @@ void ppe_rotate(float degrees, ppe_matrix_t *matrix)
     };
 
     /* Multiply with current matrix. */
-    multiply(matrix, &r);
+    ppe_mat_multiply(matrix, &r);
 }
 
 void ppe_perspective(float px, float py, ppe_matrix_t *matrix)
@@ -844,7 +844,7 @@ void ppe_perspective(float px, float py, ppe_matrix_t *matrix)
         }
     };
     /* Multiply with current matrix. */
-    multiply(matrix, &p);
+    ppe_mat_multiply(matrix, &p);
 }
 
 static int swap(float *a, float *b)
@@ -955,7 +955,7 @@ int ppe_get_transform_matrix(ppe_point4_t src, ppe_point4_t dst,
     }
 }
 
-void matrix_inverse(ppe_matrix_t *matrix)
+void ppe_matrix_inverse(ppe_matrix_t *matrix)
 {
     ppe_matrix_t temp;
 
@@ -1031,7 +1031,6 @@ bool inv_matrix2complement(ppe_matrix_t *matrix, uint32_t *comp)
                 return false;
             }
             else
-
             {
                 comp[i] = ((0x7FFFFFFF - comp[i]) | 0x80000000) + 0x1 ;
             }
