@@ -7,7 +7,7 @@ src = Split("""
 """)
 
 
-if GetDepend(['USING_8772F_DEVICE']):
+if GetDepend(['USING_8772F_DEVICE']) or GetDepend(['SOC_RTL_8772F']):
     group = []
     Return('group')
 
