@@ -10,7 +10,7 @@ CPPPATH = [cwd]
 CPPDEFINES = ['DEFINE_RTK_BT_TODO']
     
 libs = ['']
-
+libpath = ['']
 if GetDepend(['USING_BR_TASK']) or GetDepend(['USING_BLE_TASK']):
     src += ['bt_task.c']
 if GetDepend(['USING_BR_TASK']):
