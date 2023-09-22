@@ -7,11 +7,14 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-if GetDepend(['BSP_TOUCH_ZT2717']):
-    src += ['touch_zt2717.c']
 
+if GetDepend(['BSP_USING_TOUCH']):
+    if GetDepend(['BSP_TOUCH_ZT2717']):
+        src += ['touch_zt2717.c']
+    if GetDepend(['BSP_TOUCH_GT911']):
+        src += ['touch_gt911.c']
 CPPPATH = [cwd]
 
-group = DefineGroup('touch_driver', src, depend = ['BSP_USING_TOUCH'], CPPPATH = CPPPATH)
+group = DefineGroup('touch_driver', src, depend = ['USING_8762G_DEVICE'], CPPPATH = CPPPATH)
 
 Return('group')
