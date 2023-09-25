@@ -277,7 +277,8 @@ typedef union
     struct
     {
         __IO uint32_t format:     8;
-        __I  uint32_t rsvd:     8;
+        __IO uint32_t background_blend: 1;
+        __I  uint32_t rsvd:     7;
         __IO uint32_t line_length:     16;
     } b;
 } PPEV2_REG_LYR0_PIC_CFG_t;

@@ -275,6 +275,7 @@ typedef struct
     PPEV2_PIXEL_FORMAT                  Color_Format;
     uint32_t                            BackGround;
     PPEV2_AWBURST                       LayerBus_Inc;
+    PPEV2_MAX_AXLEN                     Max_Axlen;
     FunctionalState                     MultiFrame_Reload_En;
     FunctionalState                     MultiFrame_LLP_En;
     PPEV2_HW_HS                         Layer_HW_Handshake_En;
@@ -299,6 +300,7 @@ typedef struct
     FunctionalState                     MultiFrame_Reload_En;
     FunctionalState                     MultiFrame_LLP_En;
     PPEV2_AWBURST                       LayerBus_Inc;
+    PPEV2_MAX_AXLEN                     Max_Axlen;
     PPEV2_HW_HS                         Layer_HW_Handshake_En;
     PPEV2_HW_HANDSHAKE_INDEX            Layer_HW_Handshake_Index;
     PPEV2_HW_HS_POL                     Layer_HW_Handshake_Polarity;
@@ -385,6 +387,14 @@ typedef struct
 {
     int x;
     int y;
+    uint32_t w;
+    uint32_t h;
+} ppe_rect_t;
+
+typedef struct
+{
+    int x;
+    int y;
 }
 ppe_point_t;
 
@@ -441,8 +451,8 @@ void PPEV2_Mask_Interrupt(PPEV2_INTERRUPT PPEV2_int, FunctionalState NewState);
 
 void PPEV2_Mask_All_Interrupt(FunctionalState NewState);
 
-PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src);
-
+PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src, ppe_rect_t *rect);
+uint8_t PPEV2_Get_Pixel_Size(PPEV2_PIXEL_FORMAT format);
 void ppe_get_identity(ppe_matrix_t *matrix);
 void ppe_translate(float x, float y, ppe_matrix_t *matrix);
 void ppe_scale(float scale_x, float scale_y, ppe_matrix_t *matrix);

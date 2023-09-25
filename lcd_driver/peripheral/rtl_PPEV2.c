@@ -109,6 +109,7 @@ void PPEV2_ResultLayer_Init(PPEV2_ResultLayer_Init_Typedef *PPEV2_ResultLyaer_In
     PPEV2_REG_LYR0_PIC_CFG_t  ppev2_reg_lyr0_pic_cfg_0x6C = {.d32 = PPEV2_ResultLayer->REG_LYR0_PIC_CFG};
     ppev2_reg_lyr0_pic_cfg_0x6C.b.format                  = PPEV2_ResultLyaer_Init_Struct->Color_Format;
     ppev2_reg_lyr0_pic_cfg_0x6C.b.line_length             = PPEV2_ResultLyaer_Init_Struct->Line_Length;
+    ppev2_reg_lyr0_pic_cfg_0x6C.b.background_blend        = ENABLE;
     PPEV2_ResultLayer->REG_LYR0_PIC_CFG                   = ppev2_reg_lyr0_pic_cfg_0x6C.d32;
 
     PPEV2_REG_BACKGROUND_t ppev2_reg_background_0x70 = {.d32 = PPEV2_ResultLayer->REG_BACKGROUND};
@@ -274,7 +275,7 @@ void PPEV2_StructInit(PPEV2_Init_Typedef *PPEV2_Init_Struct)
 
     PPEV2_Init_Struct->LLP                                 = (ppev2_reg_llp_0x10.b.llp) << 2;
 
-    PPEV2_Init_Struct->Secure_En                    = ppev2_reg_secure_0x18.b.secure;
+    PPEV2_Init_Struct->Secure_En                    = (PPEV2_SECURE)ppev2_reg_secure_0x18.b.secure;
 
 }
 void PPEV2_ResultLayer_StructInit(PPEV2_ResultLayer_Init_Typedef *PPEV2_ResultLyaer_Init_Struct)
@@ -295,23 +296,25 @@ void PPEV2_ResultLayer_StructInit(PPEV2_ResultLayer_Init_Typedef *PPEV2_ResultLy
     PPEV2_ResultLyaer_Init_Struct->Canvas_Height                    =
         ppev2_reg_canvas_size_0x68.b.canvas_height;
     PPEV2_ResultLyaer_Init_Struct->Color_Format                     =
-        ppev2_reg_lyr0_pic_cfg_0x6C.b.format;
+        (PPEV2_PIXEL_FORMAT)ppev2_reg_lyr0_pic_cfg_0x6C.b.format;
     PPEV2_ResultLyaer_Init_Struct->Line_Length                      =
         ppev2_reg_lyr0_pic_cfg_0x6C.b.line_length;
     PPEV2_ResultLyaer_Init_Struct->BackGround                       =
         ppev2_reg_background_0x70.b.background;
     PPEV2_ResultLyaer_Init_Struct->LayerBus_Inc                     =
-        ppev2_reg_lyr0_bus_cfg_0x74.b.incr;
-    PPEV2_ResultLyaer_Init_Struct->MultiFrame_Reload_En             = ppev2_reg_ld_cfg_0x08.b.reload_en;
-    PPEV2_ResultLyaer_Init_Struct->MultiFrame_LLP_En                = ppev2_reg_ll_cfg_0x0c.b.ll_en;
+        (PPEV2_AWBURST)ppev2_reg_lyr0_bus_cfg_0x74.b.incr;
+    PPEV2_ResultLyaer_Init_Struct->MultiFrame_Reload_En             = (FunctionalState)
+                                                                      ppev2_reg_ld_cfg_0x08.b.reload_en;
+    PPEV2_ResultLyaer_Init_Struct->MultiFrame_LLP_En                = (FunctionalState)
+                                                                      ppev2_reg_ll_cfg_0x0c.b.ll_en;
     PPEV2_ResultLyaer_Init_Struct->Layer_HW_Handshake_En            =
-        ppev2_reg_lyr0_hs_cfg_0x78.b.hs_en;
+        (PPEV2_HW_HS)ppev2_reg_lyr0_hs_cfg_0x78.b.hs_en;
     PPEV2_ResultLyaer_Init_Struct->Layer_HW_Handshake_Index         =
-        ppev2_reg_lyr0_hs_cfg_0x78.b.hw_index;
+        (PPEV2_HW_HANDSHAKE_INDEX)ppev2_reg_lyr0_hs_cfg_0x78.b.hw_index;
     PPEV2_ResultLyaer_Init_Struct->Layer_HW_Handshake_Polarity      =
-        ppev2_reg_lyr0_hs_cfg_0x78.b.polar;
+        (PPEV2_HW_HS_POL)ppev2_reg_lyr0_hs_cfg_0x78.b.polar;
     PPEV2_ResultLyaer_Init_Struct->Layer_HW_Handshake_MsizeLog      =
-        ppev2_reg_lyr0_hs_cfg_0x78.b.msize_log;
+        (PPEV2_MSIZE_LOG)ppev2_reg_lyr0_hs_cfg_0x78.b.msize_log;
 }
 
 void PPEV2_InputLayer_StructInit(PPEV2_INPUT_LAYER_INDEX intput_layer_index, \
@@ -372,21 +375,29 @@ void PPEV2_InputLayer_StructInit(PPEV2_INPUT_LAYER_INDEX intput_layer_index, \
     PPEV2_InputLayer_Init_Struct->Pic_Height            =    ppev2_reg_lyrx_pic_size_t.b.pic_height;
 
     PPEV2_InputLayer_Init_Struct->Line_Length           =    ppev2_reg_lyrx_pic_cfg_t.b.line_length;
-    PPEV2_InputLayer_Init_Struct->Color_Key_Mode        =    ppev2_reg_lyrx_pic_cfg_t.b.color_key_mode;
-    PPEV2_InputLayer_Init_Struct->Pixel_Source          =    ppev2_reg_lyrx_pic_cfg_t.b.pic_src;
-    PPEV2_InputLayer_Init_Struct->Pixel_Color_Format    =    ppev2_reg_lyrx_pic_cfg_t.b.format;
+    PPEV2_InputLayer_Init_Struct->Color_Key_Mode        = (PPEV2_COLOR_KEY_MODE)
+                                                          ppev2_reg_lyrx_pic_cfg_t.b.color_key_mode;
+    PPEV2_InputLayer_Init_Struct->Pixel_Source          = (PPEV2_PIXEL_SOURCE)
+                                                          ppev2_reg_lyrx_pic_cfg_t.b.pic_src;
+    PPEV2_InputLayer_Init_Struct->Pixel_Color_Format    = (PPEV2_PIXEL_FORMAT)
+                                                          ppev2_reg_lyrx_pic_cfg_t.b.format;
     PPEV2_InputLayer_Init_Struct->Read_Matrix_Size      =
-        ppev2_reg_lyrx_pic_cfg_t.b.input_lyr_read_matrix_size;
+        (PPEV2_READ_MATRIX_SIZE)ppev2_reg_lyrx_pic_cfg_t.b.input_lyr_read_matrix_size;
 
     PPEV2_InputLayer_Init_Struct->Const_Pixel           =    ppev2_reg_lyrx_fixed_color_t.b.const_pixel;
 
-    PPEV2_InputLayer_Init_Struct->LayerBus_Inc          =    ppev2_reg_lyrx_bus_cfg_t.b.incr;
+    PPEV2_InputLayer_Init_Struct->LayerBus_Inc          = (PPEV2_AWBURST)
+                                                          ppev2_reg_lyrx_bus_cfg_t.b.incr;
 
-    PPEV2_InputLayer_Init_Struct->Layer_HW_Handshake_En =    ppev2_reg_lyrx_hs_cfg_t.b.hs_en;
-    PPEV2_InputLayer_Init_Struct->Layer_HW_Handshake_Index      =    ppev2_reg_lyrx_hs_cfg_t.b.hw_index;
+    PPEV2_InputLayer_Init_Struct->Layer_HW_Handshake_En = (PPEV2_HW_HS)ppev2_reg_lyrx_hs_cfg_t.b.hs_en;
+    PPEV2_InputLayer_Init_Struct->Layer_HW_Handshake_Index      = (PPEV2_HW_HANDSHAKE_INDEX)
+                                                                  ppev2_reg_lyrx_hs_cfg_t.b.hw_index;
     PPEV2_InputLayer_Init_Struct->Layer_HW_Handshake_MsizeLog   =
-        ppev2_reg_lyrx_hs_cfg_t.b.msize_log;
-    PPEV2_InputLayer_Init_Struct->Layer_HW_Handshake_Polarity   =    ppev2_reg_lyrx_hs_cfg_t.b.polar;
+        (PPEV2_MSIZE_LOG)ppev2_reg_lyrx_hs_cfg_t.b.msize_log;
+    PPEV2_InputLayer_Init_Struct->Max_Axlen                     = (PPEV2_MAX_AXLEN)
+                                                                  ppev2_reg_lyrx_hs_cfg_t.b.msize_log;
+    PPEV2_InputLayer_Init_Struct->Layer_HW_Handshake_Polarity   = (PPEV2_HW_HS_POL)
+                                                                  ppev2_reg_lyrx_hs_cfg_t.b.polar;
 
     PPEV2_InputLayer_Init_Struct->Layer_Window_Xmin             =
         ppev2_reg_lyrx_win_min_t.b.win_x_min;
@@ -414,10 +425,12 @@ void PPEV2_InputLayer_StructInit(PPEV2_INPUT_LAYER_INDEX intput_layer_index, \
     PPEV2_InputLayer_Init_Struct->Transfer_Matrix_E32 = ppev2_reg_lyrx_trans_matrix_e32_t.b.matrix_e32;
     PPEV2_InputLayer_Init_Struct->Transfer_Matrix_E33 = ppev2_reg_lyrx_trans_matrix_e33_t.b.matrix_e33;
 
-    PPEV2_InputLayer_Init_Struct->MultiFrame_Reload_En = (ppev2_reg_ld_cfg_0x08.b.reload_en & BIT(
-                                                              intput_layer_index)) >> intput_layer_index;
-    PPEV2_InputLayer_Init_Struct->MultiFrame_LLP_En    = (ppev2_reg_ll_cfg_0x0c.b.ll_en & BIT(
-                                                              intput_layer_index)) >> intput_layer_index;
+    PPEV2_InputLayer_Init_Struct->MultiFrame_Reload_En = (FunctionalState)((
+                                                                               ppev2_reg_ld_cfg_0x08.b.reload_en & BIT(
+                                                                                   intput_layer_index)) >> intput_layer_index);
+    PPEV2_InputLayer_Init_Struct->MultiFrame_LLP_En    = (FunctionalState)((
+                                                                               ppev2_reg_ll_cfg_0x0c.b.ll_en & BIT(
+                                                                                   intput_layer_index)) >> intput_layer_index);
 }
 
 void PPEV2_InputLayer_enable(PPEV2_INPUT_LAYER_INDEX intput_layer_index, FunctionalState NewState)
@@ -546,7 +559,7 @@ uint8_t PPEV2_Get_Pixel_Size(PPEV2_PIXEL_FORMAT format)
 }
 
 #include "trace.h"
-PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
+PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src, ppe_rect_t *rect)
 {
     if (dst->address == NULL)
     {
@@ -572,7 +585,7 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
     ppe_get_identity(&matrix);
     memcpy(&matrix, &src->inv_matrix, sizeof(ppe_matrix_t));
 
-    uint32_t color = ((src->opacity << 24) | 0xFFFFFF);
+    uint32_t color = ((src->opacity << 24) | 0x000000);
 
     uint32_t comp[9];
     if (!inv_matrix2complement(&matrix, comp))
@@ -595,7 +608,7 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
     PPEV2_Global.Secure_En = PPEV2_NON_SECURE_MODE;
     PPEV2_Init(&PPEV2_Global);
 
-    /*input layer 1 initilization*/
+    /*input layer 2 initilization*/
     PPEV2_InputLayer_enable(PPEV2_INPUT_2, ENABLE);           // logic enable of layer
     PPEV2_InputLayer_Init_Typedef PPEV2_input_layer2_init;
     PPEV2_InputLayer_StructInit(PPEV2_INPUT_2, &PPEV2_input_layer2_init);
@@ -608,6 +621,7 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
     PPEV2_input_layer2_init.Pixel_Color_Format              = src->format;
     PPEV2_input_layer2_init.Const_Pixel                     = color;
     PPEV2_input_layer2_init.Color_Key_Mode                  = src->color_key_enable;
+    PPEV2_input_layer2_init.Read_Matrix_Size                = PPV2_READ_MATRIX_1X1;
     if (src->color_key_enable >= PPEV2_COLOR_KEY_INSIDE)
     {
         PPEV2_input_layer2_init.Color_Key_Min               = src->color_key_min;
@@ -651,16 +665,18 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
     PPEV2_InputLayer_enable(PPEV2_INPUT_1, ENABLE);           // logic enable of layer
     PPEV2_InputLayer_Init_Typedef PPEV2_input_layer1_init;
     PPEV2_InputLayer_StructInit(PPEV2_INPUT_1, &PPEV2_input_layer1_init);
-    PPEV2_input_layer1_init.Layer_Address                   = (uint32_t)dst->address;
-    PPEV2_input_layer1_init.Pic_Height                      = (uint32_t)dst->height;
-    PPEV2_input_layer1_init.Pic_Width                       = (uint32_t)dst->width;
-    PPEV2_input_layer1_init.Line_Length                     = PPEV2_input_layer1_init.Pic_Width *
-                                                              PPEV2_Get_Pixel_Size(src->format);
+    PPEV2_input_layer1_init.Layer_Address                   = dst->address +
+                                                              (rect->y * dst->width + rect->x) * PPEV2_Get_Pixel_Size(dst->format);
+    PPEV2_input_layer1_init.Pic_Height                      = (uint32_t)rect->h;
+    PPEV2_input_layer1_init.Pic_Width                       = (uint32_t)rect->w;
+    PPEV2_input_layer1_init.Line_Length                     = dst->width * PPEV2_Get_Pixel_Size(
+                                                                  dst->format);
     PPEV2_input_layer1_init.Pixel_Source                    = PPEV2_LAYER_SRC_FROM_DMA;
     PPEV2_input_layer1_init.Pixel_Color_Format              = dst->format;
     PPEV2_input_layer1_init.Const_Pixel                     = 0xFFFFFFFF;
     PPEV2_input_layer1_init.MultiFrame_Reload_En            = DISABLE;
     PPEV2_input_layer1_init.MultiFrame_LLP_En               = DISABLE;
+    PPEV2_input_layer1_init.Read_Matrix_Size                = PPV2_READ_MATRIX_1X1;
     PPEV2_input_layer1_init.LayerBus_Inc                    = PPEV2_AWBURST_INC;
     PPEV2_input_layer1_init.Layer_HW_Handshake_En           = PPEV2_HW_HS_DISABLE;
     PPEV2_input_layer1_init.Layer_HW_Handshake_Index        = PPEV2_HS_RTZIP_Tx;
@@ -686,16 +702,18 @@ PPEV2_err PPEV2_Blend(ppe_buffer_t *dst, ppe_buffer_t *src)
 
     PPEV2_ResultLayer_Init_Typedef PPEV2_ResultLayer0_Init;
     PPEV2_ResultLayer_StructInit(&PPEV2_ResultLayer0_Init);
-    PPEV2_ResultLayer0_Init.Layer_Address                   = (uint32_t)dst->address;
-    PPEV2_ResultLayer0_Init.Canvas_Height                   = dst->height;
-    PPEV2_ResultLayer0_Init.Canvas_Width                    = dst->width;
-    PPEV2_ResultLayer0_Init.Line_Length                     = PPEV2_ResultLayer0_Init.Canvas_Width *
-                                                              PPEV2_Get_Pixel_Size(dst->format);
+    PPEV2_ResultLayer0_Init.Layer_Address                   = dst->address +
+                                                              (rect->y * dst->width + rect->x) * PPEV2_Get_Pixel_Size(dst->format);
+    PPEV2_ResultLayer0_Init.Canvas_Height                   = rect->h;
+    PPEV2_ResultLayer0_Init.Canvas_Width                    = rect->w;
+    PPEV2_ResultLayer0_Init.Line_Length                     = dst->width * PPEV2_Get_Pixel_Size(
+                                                                  dst->format);
     PPEV2_ResultLayer0_Init.Color_Format                    = dst->format;
     PPEV2_ResultLayer0_Init.BackGround                      = dst->const_color;
     PPEV2_ResultLayer0_Init.LayerBus_Inc                    = PPEV2_AWBURST_INC;
     PPEV2_ResultLayer0_Init.MultiFrame_Reload_En            = DISABLE;
     PPEV2_ResultLayer0_Init.MultiFrame_LLP_En               = DISABLE;
+//    PPEV2_ResultLayer0_Init.Layer_HW_Handshake_MsizeLog     =
     PPEV2_ResultLayer_Init(&PPEV2_ResultLayer0_Init);
 
     PPEV2_Cmd(ENABLE);
@@ -953,6 +971,7 @@ int ppe_get_transform_matrix(ppe_point4_t src, ppe_point4_t dst,
             mat->m[i][j] = b[i * 3 + j];
         }
     }
+    return 0;
 }
 
 void ppe_matrix_inverse(ppe_matrix_t *matrix)
