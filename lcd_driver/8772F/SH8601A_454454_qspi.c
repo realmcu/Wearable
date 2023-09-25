@@ -338,7 +338,7 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
 #if (DMA_LINKLIST == 0)
-    LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
+    GDMA_InitTypeDef LCDC_DMA_InitStruct = {0};
     LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
     LCDC_DMA_InitStruct.GDMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
     LCDC_DMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
@@ -423,6 +423,23 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_AXIMUXMode(LCDC_FW_MODE);
 }
 
+uint32_t rtk_lcd_hal_power_on(void)
+{
+
+    return 0;
+}
+
+uint32_t rtk_lcd_hal_power_off(void)
+{
+
+    return 0;
+}
+
+uint32_t rtk_lcd_hal_dlps_restore(void)
+{
+    return 0;
+}
+
 static void sh8601a_pad_config(void)
 {
     Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
@@ -454,11 +471,30 @@ static void sh8601a_pad_config(void)
 
 }
 
+static void driver_ic_init(void)
+{
+    sh8601a_pad_config();
+
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(100);
+    LCDC_LCD_SET_RST(true);
+    platform_delay_ms(50);
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(50);
+
+    LCDC_AXIMUXMode(LCDC_FW_MODE);
+    DBIC_SwitchMode(DBIC_USER_MODE);
+    DBIC_SwitchDirect(DBIC_TMODE_TX);
+
+    SH8601A_Init_Post_OTP();
+    //SH8601A_qspi_power_on();
+}
+
 void rtk_lcd_hal_init(void)
 {
     RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK_CLOCK, ENABLE);
     RCC_PeriphClockCmd(APBPeriph_MIPI_HOST, APBPeriph_MIPI_HOST_CLOCK, ENABLE);
-    sh8601a_pad_config();
+    //sh8601a_pad_config();
     LCDC_InitTypeDef lcdc_init = {0};
     lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
     lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_ARGB8888;
@@ -489,19 +525,28 @@ void rtk_lcd_hal_init(void)
     LCDC_SwitchDirect(LCDC_TX_MODE);
     LCDC_Cmd(ENABLE);
 
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(100);
-    LCDC_LCD_SET_RST(true);
-    platform_delay_ms(50);
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(50);
-
-    LCDC_AXIMUXMode(LCDC_FW_MODE);
-    DBIC_SwitchMode(DBIC_USER_MODE);
-    DBIC_SwitchDirect(DBIC_TMODE_TX);
-
-    SH8601A_Init_Post_OTP();
-    //SH8601A_qspi_power_on();
+    driver_ic_init();
 }
 
+uint32_t rtk_lcd_hal_get_width(void)
+{
+    return SH8601A_LCD_WIDTH;
+}
+uint32_t rtk_lcd_hal_get_height(void)
+{
+    return SH8601A_LCD_HEIGHT;
+}
 
+uint32_t rtk_lcd_hal_get_pixel_bits(void)
+{
+    return SH8601A_LCD_BITS_PIXEL;
+}
+
+void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
+{
+    //todo
+}
+void rtk_lcd_hal_transfer_done(void)
+{
+    //todo
+}
