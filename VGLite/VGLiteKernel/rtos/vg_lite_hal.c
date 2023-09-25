@@ -257,8 +257,9 @@ void vg_lite_hal_initialize(void)
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStruct);
-
+#ifdef RTK_HAL_DLPS
     drv_dlps_check_cbacks_register("gpu", gpu_allowed_enter_dlps_check);
+#endif
 }
 
 void vg_lite_hal_deinitialize(void)
