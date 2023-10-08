@@ -356,6 +356,9 @@ static void SH8601Z_pad_config(void)
     drv_pin_mode(P13_6, PIN_MODE_OUTPUT);
     drv_pin_write(P13_6, 1); //im1
 
+    drv_pin_mode(P12_6, PIN_MODE_OUTPUT);
+    drv_pin_write(P12_6, 1); //bl enable
+
     drv_pin_mode(P10_7, PIN_MODE_OUTPUT);
     drv_pin_mode(P12_6, PIN_MODE_OUTPUT);
     drv_pin_write(P10_7, 1); //power enable
@@ -418,6 +421,7 @@ static void driver_ic_init(void)
     platform_delay_ms(25);
     SH8601Z_qspi_power_on();
 
+    lcd_clear_test(0, 0, SH8601Z_LCD_WIDTH, SH8601Z_LCD_HIGHT);
     //SH8601Z_qspi_set_backlight();
 }
 
