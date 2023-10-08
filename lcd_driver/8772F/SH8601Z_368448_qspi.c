@@ -329,16 +329,16 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 
 static void SH8601Z_pad_config(void)
 {
-    Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P16_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D3
+    Pad_Config(P16_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D2
+    Pad_Config(P17_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D1
+    Pad_Config(P17_1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D0
+    Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//TE
+    Pad_Config(P17_3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//
+    Pad_Config(P17_4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//CS
+    Pad_Config(P17_5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//CLK
     Pad_Config(P17_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//RST
 
     Pad_Dedicated_Config(P16_6, ENABLE);
     Pad_Dedicated_Config(P16_7, ENABLE);
@@ -357,7 +357,9 @@ static void SH8601Z_pad_config(void)
     drv_pin_write(P13_6, 1); //im1
 
     drv_pin_mode(P10_7, PIN_MODE_OUTPUT);
+    drv_pin_mode(P12_6, PIN_MODE_OUTPUT);
     drv_pin_write(P10_7, 1); //power enable
+    drv_pin_write(P12_6, 1); //power enable
 }
 
 uint32_t rtk_lcd_hal_get_width(void)
@@ -400,9 +402,9 @@ static void driver_ic_init(void)
     SH8601Z_pad_config();
 
     LCDC_LCD_SET_RST(false);
-    platform_delay_ms(100);
-    LCDC_LCD_SET_RST(true);
     platform_delay_ms(50);
+    LCDC_LCD_SET_RST(true);
+    platform_delay_ms(120);
     LCDC_LCD_SET_RST(false);
     platform_delay_ms(50);
 
