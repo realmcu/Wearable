@@ -1279,10 +1279,68 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
 {
-    //todo
+    GDMA_InitTypeDef LCDC_DMA_InitStruct = {0};
+    LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
+    LCDC_DMA_InitStruct.GDMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
+    LCDC_DMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
+    LCDC_DMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
+    LCDC_DMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Word;
+    LCDC_DMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Word;
+    LCDC_DMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_8;
+    LCDC_DMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_8;
+    LCDC_DMA_InitStruct.GDMA_SourceAddr          = (uint32_t)buf;
+    LCDC_DMA_InitStruct.GDMA_Multi_Block_En     = 0;
+    LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
+
+
+    LCDC_ClearDmaFifo();
+    LCDC_ClearTxPixelCnt();
+
+    LCDC_SwitchMode(LCDC_AUTO_MODE);
+    LCDC_SwitchDirect(LCDC_TX_MODE);
+
+    LCDC_SetTxPixelLen(len);
+
+    LCDC_Cmd(ENABLE);
+
+
+    LCDC_DMA_SetSourceAddress(LCDC_DMA_CHANNEL_INDEX, (uint32_t)buf);
+
+    LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
+    LCDC_DmaCmd(ENABLE);
+
+    TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
+    handler_reg_0x10.b.bypass_t2w_delay = 0;
+    handler_reg_0x10.b.t2w_delay = 0xfff;
+    LCDC_HANDLER->TEAR_CTR = handler_reg_0x10.d32;
+    LCDC_TeCmd(ENABLE);
 }
 void rtk_lcd_hal_transfer_done(void)
 {
-    //todo
+    uint32_t time_out_ms = 100;
+    while (((LCDC_HANDLER->DMA_FIFO_CTRL & LCDC_DMA_ENABLE) != RESET) && (time_out_ms != 0))
+    {
+        platform_delay_ms(1);
+        time_out_ms--;
+    }
+    if (time_out_ms != 0)
+    {
+        while (((LCDC_HANDLER->DMA_FIFO_OFFSET & LCDC_DMA_TX_FIFO_OFFSET) != RESET) &&
+               (LCDC_HANDLER->TX_CNT == LCDC_HANDLER->TX_LEN));
+
+        LCDC_TeCmd(DISABLE);                            // disable Tear trigger auto_write_start
+    }
+    else
+    {
+        LCDC_AutoWriteCmd(ENABLE);
+        while ((LCDC_HANDLER->DMA_FIFO_CTRL & LCDC_DMA_ENABLE) != RESET);
+        while (((LCDC_HANDLER->DMA_FIFO_OFFSET & LCDC_DMA_TX_FIFO_OFFSET) != RESET) &&
+               (LCDC_HANDLER->TX_CNT == LCDC_HANDLER->TX_LEN));
+    }
+
+    LCDC_ClearDmaFifo();
+    LCDC_ClearTxPixelCnt();
+
+    LCDC_Cmd(DISABLE);
 }
 

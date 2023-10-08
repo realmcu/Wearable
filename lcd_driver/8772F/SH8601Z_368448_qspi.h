@@ -8,7 +8,6 @@ extern "C" {
 
 #define SH8601Z_MAX_PARA_COUNT                          (300)
 
-#define DMA_LINKLIST                        1
 #define TE_VALID                            1
 #define SH8601Z_LCD_WIDTH                   368
 #define SH8601Z_LCD_HIGHT                   448
