@@ -1,14 +1,14 @@
 #include "st7701s_480480_rgb.h"
 #include "rtl_lcdc_edpi.h"
-//#include "rtl_nvic.h"
 #include "rtl_spi.h"
 #include "rtl_pinmux.h"
 #include "rtl_gpio.h"
 #include "rtl_rcc.h"
 #include "utils.h"
 #include "mem_config.h"
-//#include "string.h"
 #include "rtl_gdma.h"
+
+#define RTL8762G_TYPEB      0
 
 /**************************************
 NOTE:VCI=3.3V,IOVCC=1.8V,
@@ -33,14 +33,14 @@ params->RGB.PLL_CLOCK=(19.8)
 #define LCDC_DATA15         P3_3
 #define LCDC_DATA14         P3_2
 #define LCDC_DATA13         P9_2
+#define LCDC_DATA12         P4_7
 #define LCDC_DATA11         P4_6
 #define LCDC_DATA10         P4_5
 #define LCDC_DATA9          P4_4
 #define LCDC_DATA8          P1_2
-#define LCDC_DATA12         P4_7
+#define LCDC_DATA7          P4_3
 #define LCDC_DATA6          P4_2
 #define LCDC_DATA5          P4_1
-#define LCDC_DATA7          P4_3
 #define LCDC_DATA4          P4_0
 #define LCDC_DATA3          P0_7
 #define LCDC_DATA2          P0_6
@@ -52,16 +52,23 @@ params->RGB.PLL_CLOCK=(19.8)
 #define LCDC_VSYNC          P0_1
 #define LCDC_CSN_DE         P0_0
 
+#if RTL8762G_TYPEB
 #define GPD0                P2_5
 #define GPD1                P2_7
 #define GPD2                P9_0
 #define GPD3                P2_6
-
-#define LCDC_RESET          GPD2
-
 #define SPI0_SCK_PIN                               GPD0
 #define SPI0_MOSI_PIN                              P3_6
 #define SPI0_CS_PIN                                GPD3
+#define LCDC_RESET          GPD2
+#else
+#define SPI0_SCK_PIN                               P9_0
+#define SPI0_MOSI_PIN                              P1_3
+#define SPI0_MISO_PIN                              P1_6
+#define SPI0_CS_PIN                                P9_1
+#define LCDC_RESET                                 P3_6
+#endif
+
 
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
@@ -339,7 +346,7 @@ void rtk_lcd_hal_init(void)
     st7701s_reset_high();
     platform_delay_ms(120);
     //*******************************/
-//#include "st7701s_rgb.txt"
+#include "st7701s_rgb.txt"
     uint8_t *pixel = (uint8_t *)SPIC1_ADDR;
 
     for (uint32_t i = 0; i < ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT * 3; i = i + 3)
