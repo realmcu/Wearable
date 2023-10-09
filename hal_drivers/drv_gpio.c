@@ -245,6 +245,6 @@ uint8_t drv_pin_irq_enable(uint32_t pin, uint32_t enabled)
 
 void hw_pin_init(void)
 {
-
+    rtk_key_button_hal_init();
 }
 
