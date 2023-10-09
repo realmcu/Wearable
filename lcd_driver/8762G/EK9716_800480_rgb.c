@@ -293,14 +293,21 @@ void rtk_lcd_hal_init(void)
     //*******************************/
 
     uint8_t *pixel = (uint8_t *)SPIC1_ADDR;
-
+#if EK9716_DRV_PIXEL_BITS == 24
     for (uint32_t i = 0; i < EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_HEIGHT * 3; i = i + 3)
     {
         pixel[i] = 0xFF;
         pixel[i + 1] = 0;
         pixel[i + 2] = 0;
     }
-
+#endif
+#if EK9716_DRV_PIXEL_BITS == 16
+    for (uint32_t i = 0; i < EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_HEIGHT * 2; i = i + 2)
+    {
+        pixel[i] = 0x8F;
+        pixel[i + 1] = 0X00;
+    }
+#endif
     rtk_lcd_hal_update_framebuffer((uint8_t *)SPIC1_ADDR,
                                    EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_HEIGHT);
 }
