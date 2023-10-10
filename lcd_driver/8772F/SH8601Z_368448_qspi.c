@@ -241,7 +241,6 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
 
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
-#if (DMA_LINKLIST == 0)
     GDMA_InitTypeDef LCDC_DMA_InitStruct = {0};
     LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
     LCDC_DMA_InitStruct.GDMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
@@ -254,40 +253,7 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_DMA_InitStruct.GDMA_SourceAddr          = (uint32_t)buf;
     LCDC_DMA_InitStruct.GDMA_Multi_Block_En     = 0;
     LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
-#else
-    GDMA_InitTypeDef LCDC_DMA_InitStruct = {0};
-    LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
-    LCDC_DMA_InitStruct.GDMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
-    LCDC_DMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
-    LCDC_DMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
-    LCDC_DMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Word;
-    LCDC_DMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Word;
-    LCDC_DMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_8;
-    LCDC_DMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_8;
-    LCDC_DMA_InitStruct.GDMA_SourceAddr          = 0;
 
-    LCDC_DMA_InitStruct.GDMA_Multi_Block_Mode   =
-        LLI_TRANSFER;//LLI_TRANSFER or LLI_WITH_CONTIGUOUS_SAR
-    LCDC_DMA_InitStruct.GDMA_Multi_Block_En     = 1;
-    LCDC_DMA_InitStruct.GDMA_Multi_Block_Struct  = LCDC_DMA_LINKLIST_REG_BASE + 0x50;
-    LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
-
-    LCDC_SET_GROUP1_BLOCKSIZE(SH8601Z_LCD_WIDTH * INPUT_PIXEL_BYTES);
-    LCDC_SET_GROUP2_BLOCKSIZE(SH8601Z_LCD_WIDTH * INPUT_PIXEL_BYTES);
-
-    /*16 pixel aligned for GPU*/
-    //uint32_t gpu_width = SH8601Z_LCD_WIDTH;
-    uint32_t gpu_width = ((SH8601Z_LCD_WIDTH + 15) >> 4) << 4;
-    /*16 pixel aligned for GPU*/
-    LCDC_DMALLI_InitTypeDef LCDC_DMA_LLI_Init = {0};
-    LCDC_DMA_LLI_Init.g1_source_addr = (uint32_t)buf;
-    LCDC_DMA_LLI_Init.g1_sar_offset = gpu_width * INPUT_PIXEL_BYTES * 2;
-
-    LCDC_DMA_LLI_Init.g2_source_addr = (uint32_t)(buf + gpu_width * INPUT_PIXEL_BYTES);
-    LCDC_DMA_LLI_Init.g2_sar_offset = gpu_width * INPUT_PIXEL_BYTES * 2;
-    LCDC_DMA_LinkList_Init(&LCDC_DMA_LLI_Init,
-                           &LCDC_DMA_InitStruct);//LLI_TRANSFER or LLI_WITH_CONTIGUOUS_SAR
-#endif
 
     LCDC_ClearDmaFifo();
     LCDC_ClearTxPixelCnt();
@@ -298,9 +264,6 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_SetTxPixelLen(len);
 
     LCDC_Cmd(ENABLE);
-#if DMA_LINKLIST
-    LCDC_DMA_MultiBlockCmd(ENABLE);
-#endif
     LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
     LCDC_DmaCmd(ENABLE);
 #if (TE_VALID == 1)
@@ -327,18 +290,72 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_AXIMUXMode(LCDC_FW_MODE);
 }
 
+void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
+{
+    GDMA_InitTypeDef LCDC_DMA_InitStruct = {0};
+    LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
+    LCDC_DMA_InitStruct.GDMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
+    LCDC_DMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
+    LCDC_DMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
+    LCDC_DMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Word;
+    LCDC_DMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Word;
+    LCDC_DMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_8;
+    LCDC_DMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_8;
+    LCDC_DMA_InitStruct.GDMA_SourceAddr          = (uint32_t)buf;
+    LCDC_DMA_InitStruct.GDMA_Multi_Block_En     = 0;
+    LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
+
+
+    LCDC_ClearDmaFifo();
+    LCDC_ClearTxPixelCnt();
+
+    LCDC_SwitchMode(LCDC_AUTO_MODE);
+    LCDC_SwitchDirect(LCDC_TX_MODE);
+
+    LCDC_SetTxPixelLen(len);
+
+    LCDC_Cmd(ENABLE);
+    LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
+    LCDC_DmaCmd(ENABLE);
+#if (TE_VALID == 1)
+    TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
+    handler_reg_0x10.b.bypass_t2w_delay = 0;
+    handler_reg_0x10.b.t2w_delay = 0xfff;
+    LCDC_HANDLER->TEAR_CTR = handler_reg_0x10.d32;
+    LCDC_TeCmd(ENABLE);
+#else
+    LCDC_AutoWriteCmd(ENABLE);
+#endif
+}
+void rtk_lcd_hal_transfer_done(void)
+{
+    while ((LCDC_HANDLER->DMA_FIFO_CTRL & LCDC_DMA_ENABLE) != RESET)//wait dma finish
+    {
+        os_delay(1);
+    }
+    while (((LCDC_HANDLER->DMA_FIFO_OFFSET & LCDC_DMA_TX_FIFO_OFFSET) != RESET) &&
+           (LCDC_HANDLER->TX_CNT == LCDC_HANDLER->TX_LEN));//wait lcd tx cnt finish
+#if (TE_VALID == 1)
+    LCDC_TeCmd(DISABLE);                            // disable Tear trigger auto_write_start
+#endif
+    LCDC_Cmd(DISABLE);
+    LCDC_ClearDmaFifo();
+    LCDC_ClearTxPixelCnt();
+    LCDC_AXIMUXMode(LCDC_FW_MODE);
+}
+
 static void SH8601Z_pad_config(void)
 {
-    Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P16_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D3
+    Pad_Config(P16_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D2
+    Pad_Config(P17_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D1
+    Pad_Config(P17_1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//D0
+    Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//TE
+    Pad_Config(P17_3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//
+    Pad_Config(P17_4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//CS
+    Pad_Config(P17_5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//CLK
     Pad_Config(P17_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);//RST
 
     Pad_Dedicated_Config(P16_6, ENABLE);
     Pad_Dedicated_Config(P16_7, ENABLE);
@@ -356,11 +373,10 @@ static void SH8601Z_pad_config(void)
     drv_pin_mode(P13_6, PIN_MODE_OUTPUT);
     drv_pin_write(P13_6, 1); //im1
 
-    drv_pin_mode(P12_6, PIN_MODE_OUTPUT);
-    drv_pin_write(P12_6, 1); //bl enable
-
     drv_pin_mode(P10_7, PIN_MODE_OUTPUT);
+    drv_pin_mode(P12_6, PIN_MODE_OUTPUT);
     drv_pin_write(P10_7, 0); //power enable
+    drv_pin_write(P12_6, 1); //power enable
 }
 
 uint32_t rtk_lcd_hal_get_width(void)
@@ -403,9 +419,9 @@ static void driver_ic_init(void)
     SH8601Z_pad_config();
 
     LCDC_LCD_SET_RST(false);
-    platform_delay_ms(100);
-    LCDC_LCD_SET_RST(true);
     platform_delay_ms(50);
+    LCDC_LCD_SET_RST(true);
+    platform_delay_ms(120);
     LCDC_LCD_SET_RST(false);
     platform_delay_ms(50);
 
@@ -448,9 +464,6 @@ void rtk_lcd_hal_init(void)
         8;    //only support threshold = 8 for DMA MSIZE = 8; the other threshold setting will be support later
     LCDC_Init(&lcdc_init);
 
-//    LCDC_clk_src_sel(CKO1_PLL1_VCORE4, FROM_CLK_DISPLAY_SRC_MUX0, FRO_CLK_DISPLAY_SRC_MUX1,
-//                     LCDC_DIV_DISABLE, LCDC_DIV_1_DIV);
-
     LCDC_DBICCfgTypeDef dbic_init = {0};
     dbic_init.DBIC_SPEED_SEL         = 2;
 
@@ -467,11 +480,4 @@ void rtk_lcd_hal_init(void)
     driver_ic_init();
 }
 
-void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
-{
-    //todo
-}
-void rtk_lcd_hal_transfer_done(void)
-{
-    //todo
-}
+
