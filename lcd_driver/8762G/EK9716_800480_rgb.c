@@ -75,7 +75,7 @@ static void ek9716_gpio_init(void)
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_StructInit(&GPIO_InitStruct);
     GPIO_InitStruct.GPIO_Pin    = GPIO_GetPin(LCDC_RESET);
-    GPIO_InitStruct.GPIO_Mode   = 0x01;
+    GPIO_InitStruct.GPIO_Mode   = GPIO_Mode_OUT;
     GPIO_InitStruct.GPIO_ITCmd  = DISABLE;
     GPIO_Init(GPIO_GetPort(LCDC_RESET), &GPIO_InitStruct);
     ek9716_reset_high();

@@ -80,7 +80,7 @@ static void nv3047_gpio_init(void)
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_StructInit(&GPIO_InitStruct);
     GPIO_InitStruct.GPIO_Pin    = GPIO_GetPin(LCDC_RESET);
-    GPIO_InitStruct.GPIO_Mode   = GPIO_MODE_OUT;
+    GPIO_InitStruct.GPIO_Mode   = GPIO_Mode_OUT;
     GPIO_InitStruct.GPIO_ITCmd  = DISABLE;
     GPIO_Init(GPIO_GetPort(LCDC_RESET), &GPIO_InitStruct);
     nv3047_reset_high();

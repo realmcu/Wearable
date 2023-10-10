@@ -114,7 +114,7 @@ static void st7701s_gpio_init(void)
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_StructInit(&GPIO_InitStruct);
     GPIO_InitStruct.GPIO_Pin    = GPIO_GetPin(LCDC_RESET);
-    GPIO_InitStruct.GPIO_Mode   = GPIO_MODE_OUT;
+    GPIO_InitStruct.GPIO_Mode   = GPIO_Mode_OUT;
     GPIO_InitStruct.GPIO_ITCmd  = DISABLE;
     GPIO_Init(GPIO_GetPort(LCDC_RESET), &GPIO_InitStruct);
     st7701s_reset_high();
