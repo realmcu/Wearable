@@ -54,9 +54,11 @@ const SH8601Z_CMD_DESC SH8601Z_POST_OTP_POWERON_SEQ_CMD[] =
     {SH8601Z_QSPI_INST_CMD_WRITE, 0x2B, 1,  4,  {0x00, 0x00, 0x01, 0xBF}},
     //{SH8601Z_QSPI_INST_CMD_WRITE, 0x44, 1,  2,  {0x00, 0x40}},
     {SH8601Z_QSPI_INST_CMD_WRITE, 0x44, 1,  2,  {0x01, 0xBF}},
-    {SH8601Z_QSPI_INST_CMD_WRITE, 0x3A, 1,  1,  {0x77}},////0x55 -->565, 0x77 -->888
+    {SH8601Z_QSPI_INST_CMD_WRITE, 0x3A, 1,  1,  {0x55}},////0x55 -->565, 0x77 -->888
     //{SH8601Z_QSPI_INST_CMD_WRITE, 0x36, 1,  1,  {0x02}},//memory data access control
     {SH8601Z_QSPI_INST_CMD_WRITE, 0x35, 1,  1,  {0x00}},
+
+    //{SH8601Z_QSPI_INST_CMD_WRITE, 0xB1, 1,  9,  {0x01, 0x05, 0x00, 0xA2, 0x00, 0xA7, 0x00, 0xA7, 0x01}},   // 0x01=45Hz, 0x00=60Hz
     {SH8601Z_QSPI_INST_CMD_WRITE, 0x53, 1,  1,  {0x20}},
     {SH8601Z_QSPI_SEQ_FINISH_CODE,  0,  0,  0,  {0}},
 };
@@ -268,7 +270,7 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_DmaCmd(ENABLE);
 #if (TE_VALID == 1)
     TEAR_CTR_t handler_reg_0x10 = {.d32 = LCDC_HANDLER->TEAR_CTR};
-    handler_reg_0x10.b.bypass_t2w_delay = 0;
+    handler_reg_0x10.b.bypass_t2w_delay = 1;
     handler_reg_0x10.b.t2w_delay = 0xfff;
     LCDC_HANDLER->TEAR_CTR = handler_reg_0x10.d32;
     LCDC_TeCmd(ENABLE);
@@ -453,11 +455,11 @@ void rtk_lcd_hal_init(void)
     LCDC_InitTypeDef lcdc_init = {0};
     lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
     lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_ARGB8888;
-    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB888;
+    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB565;
     lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
 #if TE_VALID
     lcdc_init.LCDC_TeEn = DISABLE;
-    lcdc_init.LCDC_TePolarity = LCDC_TE_EDGE_FALLING;
+    lcdc_init.LCDC_TePolarity = LCDC_TE_EDGE_RISING;
     lcdc_init.LCDC_TeInputMux = LCDC_TE_LCD_INPUT;
 #endif
     lcdc_init.LCDC_DmaThreshold =
