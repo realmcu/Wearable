@@ -113,10 +113,12 @@ static bool touch_system_wakeup_dlps_check(void)
 void drv_touch_dlps_init(void)
 {
     System_WakeUpPinEnable(TOUCH_FT3169_INT, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+#ifdef RTK_HAL_DLPS
     drv_dlps_exit_cbacks_register("touch", touch_exit_dlps);
     drv_dlps_enter_cbacks_register("touch", touch_enter_dlps);
     drv_dlps_wakeup_cbacks_register("touch", touch_system_wakeup_dlps_check);
     drv_dlps_check_cbacks_register("touch", touch_allowed_enter_dlps_check);
+#endif
 }
 
 void drv_touch_set_wakeup_indicate(void (*wakeup_ind))
