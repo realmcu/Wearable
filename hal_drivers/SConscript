@@ -23,7 +23,7 @@ if GetDepend(['BSP_USING_SPI']):
     src += ['drv_spi.c']
     CPPDEFINES += ['RTK_HAL_SPI']
 
-if GetDepend(['BSP_USING_UART']):
+if GetDepend(['BSP_USING_UART']) and GetDepend(['BSP_USING_DRIVE_UART']):
     src += ['drv_uart.c']
     CPPDEFINES += ['RTK_HAL_UART']
 
