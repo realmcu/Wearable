@@ -10,7 +10,7 @@ objs = []
 src = Split("""
 """)
 
-if GetDepend(['PRIVATE_SERVICE']):
+if GetDepend(['PRIVATE_SERVICE']) or GetDepend(['CONFIG_RTK_PRIVATE_SERVICE']):
     src += ['communicate_task.c']
     src += ['communicate_protocol.c']
     src += ['communicate_parse.c']
@@ -25,5 +25,6 @@ CPPPATH = [cwd, cwd + './../Sensor_Algorithm_3.8.14']
 CPPDEFINES = ['RTK_PRIVATE_SERVICE']
 
 group = DefineGroup('communication', src, depend = ['PRIVATE_SERVICE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+group = DefineGroup('communication', src, depend = ['CONFIG_RTK_PRIVATE_SERVICE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

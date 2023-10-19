@@ -1,6 +1,5 @@
 Import('TOOL_ROOT')
 
-Import('SDK_ROOT')
 from building import *
 
 cwd = GetCurrentDir()

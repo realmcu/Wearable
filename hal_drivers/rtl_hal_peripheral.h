@@ -35,8 +35,11 @@
 #include "rtl_lcdc_edpi.h"
 
 
-
+#ifdef RTL8772G
+#define RTL_HAL_RAM_CODE    RAM_FUNCTION
+#else
 #define RTL_HAL_RAM_CODE    RAM_TEXT_SECTION
+#endif // DEBUG
 
 
 

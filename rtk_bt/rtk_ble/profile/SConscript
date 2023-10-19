@@ -21,6 +21,8 @@ if GetDepend(['USING_BR_TASK']):
     src += [SDK_ROOT + '/src/ble/profile/server/transmit_service.c']
 if GetDepend(['PRIVATE_SERVICE']):
     src += ['wristband_private_service.c']
+if GetDepend(['CONFIG_RTK_PRIVATE_SERVICE']):
+    src = ['wristband_private_service.c']
 if GetDepend(['RTK_BLE_THROUGHPUT']):
     src += ['wristband_private_service.c']
 

@@ -39,7 +39,7 @@ if GetDepend(['RT_USING_DAC']):
     src += Glob('drv_dac.c')
     CPPDEFINES += ['RTK_HAL_DAC']
 
-if GetDepend('BSP_USING_LCD'):
+if GetDepend('BSP_USING_LCD') or GetDepend(['CONFIG_RTK_USING_LCD']):
     src += ['drv_lcd.c']
     CPPDEFINES += ['RTK_HAL_LCD']
 
