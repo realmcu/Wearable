@@ -19,31 +19,13 @@
 #include "rtl_nvic.h"
 #include "rtl_pinmux.h"
 #include "rtl_rcc.h"
-#include "rtl_io_dlps.h"
-#include "rtl_uart.h"
-#include "rtl_tim.h"
-#include "flash_nor_device.h"
 
-#include "rtl_gpio.h"
-#include "rtl_i2c.h"
-#include "rtl_spi.h"
-#include "rtl_gdma.h"
-#include "rtl_rtc.h"
-#include "rtl_lcdc.h"
-#include "rtl_lcdc_dbib.h"
-#include "rtl_lcdc_dbic.h"
-#include "rtl_lcdc_edpi.h"
-
-#define RTL_HAL_RAM_CODE    RAM_TEXT_SECTION
-
-#elif defined RTL8772G
-
-#include "app_section.h"
-#include "utils.h"
-#include "rtl_nvic.h"
-#include "rtl_pinmux.h"
-#include "rtl_rcc.h"
+#if defined RTL8772G
 #include "io_dlps.h"
+#else
+#include "rtl_io_dlps.h"
+#endif
+
 #include "rtl_uart.h"
 #include "rtl_tim.h"
 #include "flash_nor_device.h"
@@ -58,7 +40,11 @@
 #include "rtl_lcdc_dbic.h"
 #include "rtl_lcdc_edpi.h"
 
+#if defined RTL8772G
 #define RTL_HAL_RAM_CODE    RAM_FUNCTION
+#else
+#define RTL_HAL_RAM_CODE    RAM_TEXT_SECTION
+#endif
 
 #elif defined RTL8762D
 
