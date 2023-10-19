@@ -19,7 +19,7 @@
 #include "rtl_nvic.h"
 #include "rtl_pinmux.h"
 #include "rtl_rcc.h"
-#include "rtl_io_dlps.h"
+#include "io_dlps.h"
 #include "rtl_uart.h"
 #include "rtl_tim.h"
 #include "flash_nor_device.h"
