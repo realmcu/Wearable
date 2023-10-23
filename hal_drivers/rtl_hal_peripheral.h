@@ -20,7 +20,7 @@
 #include "rtl_pinmux.h"
 #include "rtl_rcc.h"
 
-#if defined RTL8772G
+#if defined RTL8772G || defined RTL8762G
 #include "io_dlps.h"
 #else
 #include "rtl_io_dlps.h"
