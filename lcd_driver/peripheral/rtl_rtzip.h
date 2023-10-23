@@ -83,6 +83,12 @@ typedef enum
     RTZIP_ERROR_INVALID_PARAM,
 } RTZIP_ERROR;
 
+typedef enum
+{
+    RTZIP_HW_HANDSHAKE_DMA = 0x0,
+    RTZIP_HW_HANDSHAKE_PPE = 0x1,
+} RTZIP_HW_HANDSHAKE;
+
 typedef struct
 {
     struct
@@ -125,7 +131,7 @@ typedef struct
     RTZIP_RLE_RUNLENGTH_SIZE pic_length1_size;
     RTZIP_YUV_BLUR_BIT yuv_blur_bit;
     RTZIP_YUV_SAMPLE_TYPE yuv_sample_type;
-    uint8_t rsvd;
+    RTZIP_HW_HANDSHAKE hw_handshake;
     uint32_t pic_decompress_height;
     uint32_t pic_raw_width;
     uint32_t tx_column_start;
@@ -444,4 +450,8 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
 void RTZIP_Cmd(FunctionalState state);
 void RTZIP_Run(FunctionalState state);
 void RTZIP_Init(RTZIP_InitTypeDef *RTZIP_init_struct);
+#if defined(RTL8763EP)
+RTZIP_ERROR RTZIP_Decode_Direct(uint8_t *file, RTZIP_decode_range *range,
+                                RTZIP_DMA_config *dma_cfg);
+#endif
 #endif

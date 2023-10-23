@@ -114,7 +114,11 @@ typedef union
         __IO uint32_t rx_fifo_clear: 1;
         __I uint32_t reserved_1: 23;
         __IO uint32_t pic_pixel_size: 2;
-        __I uint32_t reserved_0: 1;
+#if defined(RTL8763EP)
+        __IO uint32_t hw_handshake_mux: 1;
+#else
+        __I uint32_t reserved: 1;
+#endif
         __I uint32_t rtzip_internal_buffer_empty: 1;
         __IO uint32_t head_throw_away_byte_num: 2;
     } b;
