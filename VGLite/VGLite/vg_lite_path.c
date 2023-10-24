@@ -275,7 +275,6 @@ vg_lite_error_t vg_lite_set_path_type(vg_lite_path_t *path, vg_lite_path_type_t 
     return VG_LITE_SUCCESS;
 }
 
-#include "trace.h"
 vg_lite_error_t vg_lite_clear_path(vg_lite_path_t *path)
 {
     vg_lite_error_t error;
