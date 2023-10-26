@@ -12,7 +12,7 @@
 #define __RTL_HAL_PERIPHERAL_H__
 
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
 
 #include "app_section.h"
 #include "utils.h"
@@ -20,10 +20,10 @@
 #include "rtl_pinmux.h"
 #include "rtl_rcc.h"
 
-#if defined RTL8772G || defined RTL8762G
-#include "io_dlps.h"
-#else
+#if defined RTL8762G
 #include "rtl_io_dlps.h"
+#else
+#include "io_dlps.h"
 #endif
 
 #include "rtl_uart.h"
@@ -40,10 +40,10 @@
 #include "rtl_lcdc_dbic.h"
 #include "rtl_lcdc_edpi.h"
 
-#if defined RTL8772G
-#define RTL_HAL_RAM_CODE    RAM_FUNCTION
-#else
+#if defined RTL8762G
 #define RTL_HAL_RAM_CODE    RAM_TEXT_SECTION
+#else
+#define RTL_HAL_RAM_CODE    RAM_FUNCTION
 #endif
 
 #elif defined RTL8762D

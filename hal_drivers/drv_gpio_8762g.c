@@ -68,7 +68,7 @@ void DRV_GPIO_A31_Handler(void) {DRV_GPIO_HANDLER(P3_6);}
 #endif
 
 
-#if defined RTL8762G
+#if defined RTL87x2G
 void drv_pin_clk_set(uint32_t pin)
 {
     if (GPIO_GetPort(pin) == GPIOA)

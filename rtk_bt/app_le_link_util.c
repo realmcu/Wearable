@@ -136,7 +136,7 @@ bool app_reg_le_link_disc_cb(uint8_t conn_id, P_FUN_LE_LINK_DISC_CB p_fun_cb)
     if (p_link != NULL)
     {
         T_LE_DISC_CB_ENTRY *p_entry;
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
         for (uint8_t i = 0; i < p_link->disc_cb_list.count; i++)
         {
             p_entry = os_queue_peek(&p_link->disc_cb_list, i);

@@ -5,7 +5,7 @@
 #include "trace.h"
 #include "os_sched.h"
 #include "rtl876x_rcc.h"
-#if defined RTL8762G
+#if defined RTL87x2G
 #include "rtl_pinmux.h"
 #elif defined RTL8763EP
 #include "rtl876x_pinmux.h"

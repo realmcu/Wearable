@@ -137,7 +137,7 @@ typedef struct
 *===============================================================*/
 #undef  DISPLAY_CTRL_REG_BASE
 
-#if defined RTL8762G
+#if defined RTL87x2G
 
 #define DISPLAY_CTRL_REG_BASE              0x40023000UL
 

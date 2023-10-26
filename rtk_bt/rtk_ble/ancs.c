@@ -758,7 +758,7 @@ void ancs_init(uint8_t link_num)
     }
     for (i = 0; i < ancs_link_number; i++)
     {
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
         if (os_msg_queue_create(&(ancs_link_table[i].ancs_queue_handle), "ancsQ", ANCS_MSG_QUEUE_NUM,
                                 sizeof(T_ANCS_MSG)) == false)
         {

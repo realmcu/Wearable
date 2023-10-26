@@ -85,7 +85,7 @@ void drv_rtc_second_attach_irq(void (*hdr)(void *args), void *args)
     uint32_t CompareValue;
     CompareValue = RTC_GetCounter() + RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1);
     RTC_SetCompValue(RTC_COMP0, CompareValue & 0xFFFFFFFF);
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     RTC_WKConfig(RTC_WK_COMP0, ENABLE);
 #endif
     RTC_INTConfig(RTC_INT_COMP0, ENABLE);
@@ -103,7 +103,7 @@ void drv_rtc_minute_attach_irq(void (*hdr)(void *args), void *args)
     uint32_t CompareValue;
     CompareValue = RTC_GetCounter() + RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1) * 60; //todo
     RTC_SetCompValue(RTC_COMP1, CompareValue & 0xFFFFFFFF);
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     RTC_WKConfig(RTC_WK_COMP1, ENABLE);
 #endif
     RTC_INTConfig(RTC_INT_COMP1, ENABLE);
@@ -134,7 +134,7 @@ void drv_rtc_set_comp(bool start, time_t time_stamp)
 void RTC_Handler()
 {
     //uint32_t CompareValue = 0;
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     DBG_DIRECT("RTC->CR0 = 0x%x, RTC->INT_CLR = 0x%x, RTC->INT_SR = 0x%x, RTC->CNT = 0x%x, RTC->COMP0 = 0x%x",
                RTC->RTC_CR0, RTC->RTC_INT_CLEAR, RTC->RTC_INT_SR, RTC->RTC_CNT0, RTC->RTC_COMP_0);
     DBG_DIRECT("refuse_reason 0x%x error_code 0x%x", platform_pm_get_refuse_reason(),
@@ -145,7 +145,7 @@ void RTC_Handler()
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP0);
         RTC_ClearCompINT(RTC_COMP0);
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
         RTC_ClearWakeupStatusBit(RTC_WK_COMP0);
 #endif
         uint32_t CompareValue;
@@ -160,7 +160,7 @@ void RTC_Handler()
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP1);
         RTC_ClearCompINT(RTC_COMP1);
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
         RTC_ClearWakeupStatusBit(RTC_WK_COMP1);
 #endif
         if (comp1_irq.rtc_cb != NULL)
@@ -172,7 +172,7 @@ void RTC_Handler()
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP2);
         RTC_ClearCompINT(RTC_COMP2);
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
         RTC_ClearWakeupStatusBit(RTC_WK_COMP2);
 #endif
     }
@@ -180,7 +180,7 @@ void RTC_Handler()
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP3);
         RTC_ClearCompINT(RTC_COMP3);
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
         RTC_ClearWakeupStatusBit(RTC_WK_COMP2);
 #endif
     }

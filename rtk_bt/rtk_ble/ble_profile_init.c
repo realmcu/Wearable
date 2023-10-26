@@ -74,7 +74,7 @@ void app_le_profile_init(void)
 
     server_register_app_cb(app_profile_callback);
 
-#ifdef RTL8762G
+#if defined RTL87x2G
 #else
     client_init(2);
     ancs_init(1);

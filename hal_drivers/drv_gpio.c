@@ -11,7 +11,7 @@
 #include <board.h>
 #include "drv_gpio.h"
 #include "trace.h"
-#if defined RTL8762G
+#if defined RTL87x2G
 #include "vector_table.h"
 #endif
 #if defined RTL8772F
@@ -38,7 +38,7 @@ static drv_gpio_irq gpio_cb[GPIO_NUM_MAX] = {{NULL, NULL}};
 static void DRV_GPIO_HANDLER(uint32_t pin)
 {
     uint8_t num = GPIO_GetNum(pin);
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     GPIO_ClearINTPendingBit(GPIO_GetPort(pin), GPIO_GetPin(pin));
 #elif defined RTL8762D
     GPIO_ClearINTPendingBit(GPIO_GetPin(pin));
@@ -54,7 +54,7 @@ static void DRV_GPIO_HANDLER(uint32_t pin)
 #include "drv_gpio_8772f.c"
 #elif defined RTL8762D
 #include "drv_gpio_8762d.c"
-#elif defined RTL8762G
+#elif defined RTL87x2G
 #include "drv_gpio_8762g.c"
 #endif
 
@@ -90,7 +90,7 @@ void drv_pin_mode(uint32_t pin, uint32_t mode)
     }
     GPIO_InitStruct.GPIO_ITCmd  = DISABLE;
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     GPIO_Init(GPIO_GetPort(pin), &GPIO_InitStruct);
 #elif defined RTL8762D
     GPIO_Init(&GPIO_InitStruct);
@@ -99,7 +99,7 @@ void drv_pin_mode(uint32_t pin, uint32_t mode)
 
 void drv_pin_write(uint32_t pin, uint32_t value)
 {
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     GPIO_WriteBit(GPIO_GetPort(pin), GPIO_GetPin(pin), (BitAction)(value));
 #elif defined RTL8762D
     GPIO_WriteBit(GPIO_GetPin(pin), (BitAction)(value));
@@ -112,7 +112,7 @@ uint8_t drv_pin_read(uint32_t pin)
 
     value = PIN_LOW;
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     value = GPIO_ReadInputDataBit(GPIO_GetPort(pin), GPIO_GetPin(pin));
 #elif defined RTL8762D
     value = GPIO_ReadInputDataBit(GPIO_GetPin(pin));
@@ -162,7 +162,7 @@ uint8_t drv_pin_attach_irq(uint32_t pin, uint32_t mode, void (*hdr)(void *args),
         GPIO_InitStruct.GPIO_ITPolarity = GPIO_INT_POLARITY_ACTIVE_LOW;
     }
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     GPIO_Init(GPIO_GetPort(pin), &GPIO_InitStruct);
 #elif defined RTL8762D
     GPIO_Init(&GPIO_InitStruct);
@@ -170,7 +170,7 @@ uint8_t drv_pin_attach_irq(uint32_t pin, uint32_t mode, void (*hdr)(void *args),
 
     gpio_cb[GPIO_GetNum(pin)].gpio_cb = hdr;
     gpio_cb[GPIO_GetNum(pin)].args = args;
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     RamVectorTableUpdate_ns_ext(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
 #elif defined RTL8762D
     //extern bool RamVectorTableUpdate(VECTORn_Type v_num, IRQ_Fun isr_handler);
@@ -178,7 +178,7 @@ uint8_t drv_pin_attach_irq(uint32_t pin, uint32_t mode, void (*hdr)(void *args),
 #endif
 
     NVIC_InitTypeDef NVIC_InitStruct;
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     NVIC_InitStruct.NVIC_IRQChannel = table_irq[GPIO_GetNum(pin)];
 #elif defined RTL8762D
     NVIC_InitStruct.NVIC_IRQChannel = pin2irq(pin);
@@ -194,7 +194,7 @@ uint8_t drv_pin_dettach_irq(uint32_t pin)
     gpio_cb[GPIO_GetNum(pin)].gpio_cb = NULL;
     gpio_cb[GPIO_GetNum(pin)].args = NULL;
     NVIC_InitTypeDef NVIC_InitStruct;
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     NVIC_InitStruct.NVIC_IRQChannel = table_irq[GPIO_GetNum(pin)];
 #elif defined RTL8762D
     NVIC_InitStruct.NVIC_IRQChannel = pin2irq(pin);
@@ -208,7 +208,7 @@ uint8_t drv_pin_dettach_irq(uint32_t pin)
 uint8_t drv_pin_irq_enable(uint32_t pin, uint32_t enabled)
 {
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     if (PIN_IRQ_ENABLE == enabled)
     {
         GPIO_MaskINTConfig(GPIO_GetPort(pin), GPIO_GetPin(pin), ENABLE);

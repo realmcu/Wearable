@@ -8,7 +8,7 @@
 #include "mem_config.h"
 #include "rtl_gdma.h"
 
-#define RTL8762G_TYPEB      0
+#define RTL87x2G_TYPEB      0
 
 /**************************************
 NOTE:VCI=3.3V,IOVCC=1.8V,
@@ -52,7 +52,7 @@ params->RGB.PLL_CLOCK=(19.8)
 #define LCDC_VSYNC          P0_1
 #define LCDC_CSN_DE         P0_0
 
-#if RTL8762G_TYPEB
+#if RTL87x2G_TYPEB
 #define GPD0                P2_5
 #define GPD1                P2_7
 #define GPD2                P9_0

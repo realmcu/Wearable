@@ -24,7 +24,7 @@
 #include "tuya_ble_service_rtl8762c.h"
 #include "watch_msg.h"
 
-#if defined RTL8762G
+#if defined RTL87x2G
 #include "rtl_wdg.h"
 #elif defined RTL8762D || defined RTL8772F
 #include "rtl876x_wdg.h"

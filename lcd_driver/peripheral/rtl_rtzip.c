@@ -14,7 +14,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stdio.h"
 #include "rtl_rtzip.h"
-#if defined RTL8762G
+#if defined RTL87x2G
 #include "rtl_gdma.h"
 #include "rtl_rcc.h"
 #include "rtl_nvic.h"
@@ -28,7 +28,7 @@ GDMA_LLIDef TX_GDMA_LLIStruct[20];
 static void RTZIP_CLKConfig(FunctionalState state)
 {
     assert_param(IS_FUNCTIONAL_STATE(state));
-#if defined RTL8762G
+#if defined RTL87x2G
     uint32_t *reg = (uint32_t *)(0x40002000 + 0x324);
 #elif defined RTL8763EP
     uint32_t *reg = (uint32_t *)(0x40000000 + 0x210);
@@ -36,7 +36,7 @@ static void RTZIP_CLKConfig(FunctionalState state)
     uint32_t reg_value = *reg;
     if (state)
     {
-#if defined RTL8762G
+#if defined RTL87x2G
         reg_value |= (BIT7 | BIT8);
 #elif defined RTL8763EP
         reg_value |= BIT26;
@@ -44,7 +44,7 @@ static void RTZIP_CLKConfig(FunctionalState state)
     }
     else
     {
-#if defined RTL8762G
+#if defined RTL87x2G
         reg_value &= (~(BIT7 | BIT8));
 #elif defined RTL8763EP
         reg_value &= (~BIT26);
@@ -373,7 +373,7 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     RX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)start_line_address;
     RX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(&RTZIP->RX_FIFO);
-#if defined RTL8762G
+#if defined RTL87x2G
     RX_GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_RTZIP_RX;
     RX_GDMA_InitStruct.GDMA_Secure_En = 1;
 #elif defined RTL8763EP
@@ -453,7 +453,7 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     TX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)(&RTZIP->TX_FIFO);
     TX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)dma_cfg->output_buf;
-#if defined RTL8762G
+#if defined RTL87x2G
     TX_GDMA_InitStruct.GDMA_SourceHandshake     = GDMA_Handshake_RTZIP_TX;
     TX_GDMA_InitStruct.GDMA_Secure_En = 1;
 #elif defined RTL8763EP
@@ -665,7 +665,7 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     RX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)start_line_address;
     RX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(&RTZIP->RX_FIFO);
-#if defined RTL8762G
+#if defined RTL87x2G
     RX_GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_RTZIP_RX;
     RX_GDMA_InitStruct.GDMA_Secure_En = 1;
 #elif defined RTL8763EP
@@ -745,7 +745,7 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     TX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)(&RTZIP->TX_FIFO);
     TX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)dma_cfg->output_buf;
-#if defined RTL8762G
+#if defined RTL87x2G
     TX_GDMA_InitStruct.GDMA_SourceHandshake     = GDMA_Handshake_RTZIP_TX;
     TX_GDMA_InitStruct.GDMA_Secure_En = 1;
 #elif defined RTL8763EP
@@ -845,7 +845,7 @@ RTZIP_ERROR RTZIP_Decode_Ex(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_
         RTZIP_MaskINTConfig(RTZIP_TX_FIFO_UNDERFLOW_INT, DISABLE);
     }
 
-#if defined RTL8762G
+#if defined RTL87x2G
     //TODO: wait RTL8763G platform to add rtzip defines
     NVIC_InitTypeDef NVIC_InitStruct;
     NVIC_InitStruct.NVIC_IRQChannel = RTZIP_IRQn;
@@ -971,7 +971,7 @@ RTZIP_ERROR RTZIP_Decode_Direct(uint8_t *file, RTZIP_decode_range *range, RTZIP_
         GDMA_DataSize_Word;                   // 32 bit width for source transaction
     RX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)start_line_address;
     RX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(&RTZIP->RX_FIFO);
-#if defined RTL8762G
+#if defined RTL87x2G
     RX_GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_RTZIP_RX;
     RX_GDMA_InitStruct.GDMA_Secure_En = 1;
 #elif defined RTL8763EP

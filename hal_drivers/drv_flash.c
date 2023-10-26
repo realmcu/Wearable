@@ -34,7 +34,7 @@ int realtek_flash_read(uint32_t addr, uint8_t *buf, uint32_t size)
         return -1;
     }
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     flash_nor_read_locked(addr, buf, size);
 #elif defined RTL8762D
     flash_read_locked(addr, size, buf);
@@ -57,7 +57,7 @@ int realtek_flash_read(uint32_t addr, uint8_t *buf, uint32_t size)
 int realtek_flash_write(uint32_t addr, const uint8_t *buf, uint32_t size)
 {
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     FLASH_NOR_RET_TYPE ret = flash_nor_write_locked(addr, (uint8_t *)buf, size);
     if (ret != FLASH_NOR_RET_SUCCESS)
     {
@@ -140,7 +140,7 @@ int realtek_flash_erase(uint32_t addr, uint32_t size)
     for (uint32_t i = 0; i < count_sector; i++)
     {
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
         FLASH_NOR_RET_TYPE ret = flash_nor_erase_locked(REALTK_FLASH_START_ADDRESS + start_sector *
                                                         FLASH_SECTOR_SIZE +
                                                         FLASH_SECTOR_SIZE * i, FLASH_NOR_ERASE_SECTOR);

@@ -23,7 +23,7 @@
 #include <app_msg.h>
 #include <ble_gap_cb.h>
 #include "trace.h"
-#ifdef RTL8762G_DASHBOARD
+#ifdef RTL87x2G_DASHBOARD
 #include "gatt.h"
 #include <simple_ble_service.h>
 #endif
@@ -39,7 +39,7 @@
 #define GATT_UUID128_BWPS_ADV   0x12, 0xA2, 0x4D, 0x2E, 0xFE, 0x14, 0x48, 0x8e, 0x93, 0xD2, 0x17, 0x3C, 0xFF, 0x01, 0x00, 0x00
 #define GATT_UUID128_BEACON_SERVICE_ADV           0x12, 0xA2, 0x4D, 0x2E, 0xFE, 0x14, 0x48, 0x8e, 0x93, 0xD2, 0x17, 0x3C, 0xFF, 0x02, 0x00, 0x00
 
-#ifdef RTL8762G_DASHBOARD
+#ifdef RTL87x2G_DASHBOARD
 static const uint8_t scan_rsp_data[] =
 {
     0x03,                             /* length */
@@ -122,7 +122,7 @@ uint8_t adv_data[] =
 void app_le_gap_init(void)
 {
     /* Device name and device appearance */
-#ifdef RTL8762G_DASHBOARD
+#ifdef RTL87x2G_DASHBOARD
     uint8_t  device_name[GAP_DEVICE_NAME_LEN] = "BLE_PERIPHERAL";
     uint16_t appearance = GAP_GATT_APPEARANCE_UNKNOWN;
     uint8_t  slave_init_mtu_req = true;

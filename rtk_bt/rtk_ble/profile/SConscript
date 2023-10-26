@@ -25,7 +25,8 @@ if GetDepend(['CONFIG_RTK_PRIVATE_SERVICE']):
     src = ['wristband_private_service.c']
 if GetDepend(['RTK_BLE_THROUGHPUT']):
     src += ['wristband_private_service.c']
-
+if GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
+    src = []
 
 CPPPATH = [cwd]
 

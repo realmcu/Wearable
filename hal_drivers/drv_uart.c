@@ -97,7 +97,7 @@ void UART2_Handler(void)
 {
     uart_isr(uart2_rx_indicate, UART2);
 }
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
 void UART3_Handler(void)
 {
     uart_isr(uart3_rx_indicate, UART3);
@@ -156,7 +156,7 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
         periph = APBPeriph_UART2;
         periph_clock = APBPeriph_UART2_CLOCK;
     }
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     else if (UARTx == UART3)
     {
         irq_type = UART3_IRQn;
@@ -211,7 +211,7 @@ void drv_uart2_init(uint8_t tx_pin, uint8_t rx_pin)
 {
     drv_uart_init(UART2, tx_pin, rx_pin);
 }
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
 void drv_uart3_init(uint8_t tx_pin, uint8_t rx_pin)
 {
     drv_uart_init(UART3, tx_pin, rx_pin);
@@ -230,7 +230,7 @@ uint32_t drv_uart2_write(const void *buffer, uint32_t size)
 {
     return drv_uart_write(UART2, buffer, size);
 }
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
 uint32_t drv_uart3_write(const void *buffer, uint32_t size)
 {
     return drv_uart_write(UART3, buffer, size);

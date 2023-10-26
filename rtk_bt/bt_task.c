@@ -155,12 +155,12 @@ static void framework_init(void)
 void bt_task_entry(void *p_param)
 {
     uint8_t event;
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     os_alloc_secure_ctx(1024);
 #endif
 
 
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
     os_msg_queue_create(&io_queue_handle, "ioQ", MAX_NUMBER_OF_IO_MESSAGE, sizeof(T_IO_MSG));
     os_msg_queue_create(&evt_queue_handle, "evtQ", MAX_NUMBER_OF_EVENT_MESSAGE, sizeof(uint8_t));
 #elif defined RTL8762D
@@ -233,7 +233,7 @@ void bt_task_entry(void *p_param)
                     app_handle_io_msg(io_msg);
                 }
             }
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
             else if (EVENT_GROUP(event) == EVENT_GROUP_STACK)
 #elif defined RTL8762D
             else

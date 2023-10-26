@@ -20,7 +20,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "rtl876x.h"
 #include "stdbool.h"
-#if defined RTL8762G
+#if defined RTL87x2G
 #include "rtl_gdma.h"
 #else
 #include "rtl876x_gdma.h"

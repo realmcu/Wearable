@@ -31,7 +31,7 @@ void LCDC_Clock_Cfg(FunctionalState state)
 {
     if (state == ENABLE)
     {
-#if defined RTL8762G
+#if defined RTL87x2G
 //TODO
 #elif defined RTL8763EP
         uint32_t reg_value = *(uint32_t *)0x40000214;
@@ -41,7 +41,7 @@ void LCDC_Clock_Cfg(FunctionalState state)
     }
     else if (state == DISABLE)
     {
-#if defined RTL8762G
+#if defined RTL87x2G
 //TODO
 #elif defined RTL8763EP
         uint32_t reg_value = *(uint32_t *)0x40000214;

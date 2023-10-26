@@ -125,7 +125,7 @@ static void app_exit_dlps_config(void)
 * @return true : allow enter dlps
  * @retval void
 */
-#if defined RTL8772F || defined RTL8762G
+#if defined RTL8772F || defined RTL87x2G
 RTL_HAL_RAM_CODE
 static PMCheckResult app_dlps_check_cb(void)
 {
@@ -177,7 +177,7 @@ void pwr_mgr_init(void)
     DLPS_IORegUserDlpsEnterCb(app_enter_dlps_config);
     DLPS_IORegUserDlpsExitCb(app_exit_dlps_config);
     DLPS_IORegister();
-#ifdef RTL8762G
+#ifdef RTL87x2G
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
     //lps_mode_set(PLATFORM_DLPS_PFM);
 #endif
