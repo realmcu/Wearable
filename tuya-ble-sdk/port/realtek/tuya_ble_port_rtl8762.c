@@ -26,6 +26,7 @@
 
 #if defined RTL87x2G
 #include "rtl_wdg.h"
+#include "wdg.h"
 #elif defined RTL8762D || defined RTL8772F
 #include "rtl876x_wdg.h"
 #endif

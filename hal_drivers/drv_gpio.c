@@ -170,11 +170,11 @@ uint8_t drv_pin_attach_irq(uint32_t pin, uint32_t mode, void (*hdr)(void *args),
 
     gpio_cb[GPIO_GetNum(pin)].gpio_cb = hdr;
     gpio_cb[GPIO_GetNum(pin)].args = args;
-#if defined RTL8772F || defined RTL87x2G
+#if defined RTL8772F
     RamVectorTableUpdate_ns_ext(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
-#elif defined RTL8762D
+#elif defined RTL8762D || defined RTL87x2G
     //extern bool RamVectorTableUpdate(VECTORn_Type v_num, IRQ_Fun isr_handler);
-    //RamVectorTableUpdate(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
+    RamVectorTableUpdate(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
 #endif
 
     NVIC_InitTypeDef NVIC_InitStruct;

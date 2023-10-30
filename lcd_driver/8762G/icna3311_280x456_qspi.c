@@ -380,7 +380,7 @@ void rtk_lcd_hal_init(void)
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_func_en = 1;
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_mux_clk_cg_en = 1;
 
-    //From PLL1, SOURCE = 125M
+    //From PLL1, SOURCE = 100M
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_en = 1;
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 0; //pll1_peri(0) or pll2(1, pll2 = 160M)
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel1 = 1; //pll(1) or xtal(0)

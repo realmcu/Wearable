@@ -9,7 +9,11 @@
  */
 
 #include "drv_dlps.h"
+#if defined RTL87x2G
+#include "pm.h"
+#else
 #include "dlps.h"
+#endif
 #include "trace.h"
 #include "app_section.h"
 #include "stdlib.h"
@@ -125,7 +129,7 @@ static void app_exit_dlps_config(void)
 * @return true : allow enter dlps
  * @retval void
 */
-#if defined RTL8772F || defined RTL87x2G
+#if defined RTL8772F
 RTL_HAL_RAM_CODE
 static PMCheckResult app_dlps_check_cb(void)
 {
@@ -141,6 +145,23 @@ static PMCheckResult app_dlps_check_cb(void)
     }
 
     return PM_CHECK_PASS;
+}
+#elif defined RTL87x2G
+RTL_HAL_RAM_CODE
+static POWER_CheckResult app_dlps_check_cb(void)
+{
+    dlps_slist_t *node;
+    for (node = dlps_slist_first(&(drv_dlps_check_slist)); node; node = dlps_slist_next(node))
+    {
+        drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
+        //DBG_DIRECT("%s check fail! Module[%s]", __func__, p_item->name);
+        if (p_item->dlps_cb() == false)
+        {
+            return POWER_CHECK_FAIL;
+        }
+    }
+
+    return POWER_CHECK_PASS;
 }
 #elif defined RTL8762D
 RTL_HAL_RAM_CODE
@@ -170,7 +191,7 @@ static bool app_dlps_check_cb(void)
  */
 void pwr_mgr_init(void)
 {
-    if (false == dlps_check_cb_reg(app_dlps_check_cb))
+    if (false == power_check_cb_register(app_dlps_check_cb))
     {
         APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
     }
@@ -181,6 +202,7 @@ void pwr_mgr_init(void)
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
     //lps_mode_set(PLATFORM_DLPS_PFM);
 #endif
+    power_mode_set(POWER_DLPS_MODE);
 #endif
 #ifdef RTL8772F
     lps_mode_set(PLATFORM_DLPS);
