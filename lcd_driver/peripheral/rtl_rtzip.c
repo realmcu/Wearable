@@ -519,6 +519,7 @@ RTZIP_ERROR RTZIP_Decode(uint8_t *file, RTZIP_decode_range *range, RTZIP_DMA_con
 
     RTZIP_Cmd(ENABLE);
     RTZIP_Run(ENABLE);
+    while (RTZIP->RTZIP_CTL0 & BIT0);
     if (RTZIP_GetINTStatus(RTZIP_DECOMPRESS_ERROR_INT))
     {
         err =  RTZIP_ERROR_DECODE_FAIL;
