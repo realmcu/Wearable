@@ -20,10 +20,11 @@
 #include "rtl_pinmux.h"
 #include "rtl_rcc.h"
 
-#if defined RTL8762G
-#include "rtl_io_dlps.h"
-#else
+#if defined RTL87x2G
 #include "io_dlps.h"
+#endif
+#if defined RTL8772F
+#include "rtl_io_dlps.h"
 #endif
 
 #include "rtl_uart.h"
