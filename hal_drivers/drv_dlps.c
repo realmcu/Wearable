@@ -47,7 +47,7 @@ static dlps_slist_t drv_dlps_wakeup_slist =
  * @note     system handle to judge which pin is wake source
  * @return   void
  */
-RTL_HAL_RAM_CODE
+APP_RAM_TEXT_SECTION
 void System_Handler(void)
 {
 #ifdef RTL8772F
@@ -75,7 +75,7 @@ void System_Handler(void)
  * @return none
  * @retval void
 */
-RTL_HAL_RAM_CODE
+APP_RAM_TEXT_SECTION
 static void app_enter_dlps_config(void)
 {
     DBG_DIRECT("DLPS ENTER");
@@ -100,7 +100,7 @@ static void app_enter_dlps_config(void)
  * @return none
  * @retval void
 */
-RTL_HAL_RAM_CODE
+APP_RAM_TEXT_SECTION
 static void app_exit_dlps_config(void)
 {
     DBG_DIRECT("DLPS EXIT");
@@ -130,7 +130,7 @@ static void app_exit_dlps_config(void)
  * @retval void
 */
 #if defined RTL8772F
-RTL_HAL_RAM_CODE
+APP_RAM_TEXT_SECTION
 static PMCheckResult app_dlps_check_cb(void)
 {
     dlps_slist_t *node;
@@ -147,7 +147,7 @@ static PMCheckResult app_dlps_check_cb(void)
     return PM_CHECK_PASS;
 }
 #elif defined RTL87x2G
-RTL_HAL_RAM_CODE
+APP_RAM_TEXT_SECTION
 static POWER_CheckResult app_dlps_check_cb(void)
 {
     dlps_slist_t *node;
@@ -164,7 +164,7 @@ static POWER_CheckResult app_dlps_check_cb(void)
     return POWER_CHECK_PASS;
 }
 #elif defined RTL8762D
-RTL_HAL_RAM_CODE
+APP_RAM_TEXT_SECTION
 static bool app_dlps_check_cb(void)
 {
     dlps_slist_t *node;
