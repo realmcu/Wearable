@@ -16,7 +16,6 @@ if GetDepend(['USING_BLE_TASK']):
     src += ['ble_gap_init.c']
     src += ['ble_gap_cb.c']
     src += ['app_ble_bas.c']
-    src += ['app_ble_hid.c']
     src += ['app_gatts_client.c']
     src += ['ancs.c']
 if GetDepend(['PRIVATE_SERVICE']) or GetDepend(['CONFIG_RTK_PRIVATE_SERVICE']):
