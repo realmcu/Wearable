@@ -8,7 +8,7 @@
 #include "mem_config.h"
 #include "rtl_gdma.h"
 
-#define RTL87x2G_TYPEB      0
+#define RTL87x2G_TYPEB      1
 
 /**************************************
 NOTE:VCI=3.3V,IOVCC=1.8V,

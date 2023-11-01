@@ -75,10 +75,10 @@ void app_le_profile_init(void)
     server_register_app_cb(app_profile_callback);
 
 #if defined RTL87x2G
-    extern void app_ble_ota_init(void);
-    app_ble_ota_init();
-    extern void app_ble_dfu_init(void);
-    app_ble_dfu_init();
+//    extern void app_ble_ota_init(void);
+//    app_ble_ota_init();
+//    extern void app_ble_dfu_init(void);
+//    app_ble_dfu_init();
 #else
     client_init(2);
     ancs_init(1);

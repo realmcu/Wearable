@@ -9,9 +9,9 @@ src = Split("""
 
 
 if GetDepend(['BSP_USING_TOUCH']):
-    if GetDepend(['BSP_TOUCH_ZT2717']):
+    if GetDepend(['BSP_TOUCH_ZT2717_8762G']):
         src += ['touch_zt2717.c']
-    if GetDepend(['BSP_TOUCH_GT911']):
+    if GetDepend(['BSP_TOUCH_GT911_8762G']):
         src += ['touch_gt911.c']
 CPPPATH = [cwd]
 
