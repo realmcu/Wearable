@@ -21,6 +21,10 @@ if GetDepend(['USING_BLE_TASK']):
     src += ['ancs.c']
 if GetDepend(['PRIVATE_SERVICE']) or GetDepend(['CONFIG_RTK_PRIVATE_SERVICE']):
     src += ['app_ble_bwps.c']
+if GetDepend(['CONFIG_RTK_OTA_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
+    src += ['app_ble_ota.c']
+if GetDepend(['CONFIG_RTK_DFU_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
+    src += ['app_ble_dfu.c']
 CPPPATH = [cwd]
 
 CPPDEFINES = ['DEFINE_RTK_BT_TODO']

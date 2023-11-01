@@ -104,16 +104,30 @@ extern "C" {
 
 #define TOUCH_ZT2717_ADDR                                      0x20
 #define TOUCH_ZT2717_CHIP_ID                                   0x15
-#if 1 // 1 QFN68 -  0 QFN88
-#define TOUCH_ZT2717_RST                                          P2_3
-#define TOUCH_ZT2717_INT                                          P2_4
-#define TOUCH_ZT2717_SCL                                          P5_7
-#define TOUCH_ZT2717_SDA                                          P1_3
-#else
+
+#define A_CUT_QFN68       0
+#define A_CUT_QFN88       1
+#define B_CUT_QFN88       2
+
+#define TP_HW             B_CUT_QFN88
+
+#if TP_HW == B_CUT_QFN88
+#define TOUCH_ZT2717_RST                                          P2_2
+#define TOUCH_ZT2717_INT                                          P2_3
+#define TOUCH_ZT2717_SCL                                          P2_4
+#define TOUCH_ZT2717_SDA                                          P2_5
+#endif
+#if TP_HW == A_CUT_QFN88
 #define TOUCH_ZT2717_RST                                          P5_0
 #define TOUCH_ZT2717_INT                                          P2_2
 #define TOUCH_ZT2717_SCL                                          P2_3
 #define TOUCH_ZT2717_SDA                                          P2_4
+#endif
+#if TP_HW == A_CUT_QFN68
+#define TOUCH_ZT2717_RST                                          P2_3
+#define TOUCH_ZT2717_INT                                          P2_4
+#define TOUCH_ZT2717_SCL                                          P5_7
+#define TOUCH_ZT2717_SDA                                          P1_3
 #endif
 struct _ts_zinitix_coord
 {
