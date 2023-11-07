@@ -4,9 +4,7 @@
 #include "watch_msg.h"
 #include "gap_msg.h"
 #include "wristband_private_service.h"
-#ifdef RTL87x2G_DASHBOARD
-#include "app_cluster_data.h"
-#endif
+
 static T_SERVER_ID bwps_srv_id;
 
 
