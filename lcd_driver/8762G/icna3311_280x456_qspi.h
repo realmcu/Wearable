@@ -8,7 +8,7 @@ extern "C" {
 
 
 #define DMA_LINKLIST                        0
-//#define TE_VALID                            1
+#define TE_VALID                            0
 #define ICNA3311_LCD_WIDTH                  280
 #define ICNA3311_LCD_HIGHT                  456
 #define INPUT_PIXEL_BYTES                   2
