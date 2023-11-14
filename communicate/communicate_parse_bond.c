@@ -40,7 +40,6 @@ static void bond_success(void)
 
 static void login_request(void)
 {
-    //rt_kprintf("current thread name = %s \n",rt_thread_self()->name);
     struct protocol_pack p = {0};
     p.l2_cmd_id = BOND_COMMAND_ID;
     p.l2_key = 0x04;

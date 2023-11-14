@@ -121,7 +121,6 @@ void l1receive_task(void *pvParameters)
     {
         if (os_msg_recv(raw_data_receive_queue_handle, &buf, 0xFFFFFFFF) == true)
         {
-            //rt_kprintf("buf2 = 0x%x \n", buf);
             resolve_remote_data(buf + 1, buf[0]);
             free(buf);
         }

@@ -99,10 +99,6 @@ bool L2_frame_resolve(uint8_t *pData, uint16_t length)
                                 gsensor_axis[0], \
                                 gsensor_axis[1], \
                                 gsensor_axis[2]);
-                //rt_kprintf("Gsensor data X = 0x%x, y = 0x%x, z = 0x%x\n", \
-                //          gsensor_axis[0], \
-                //          gsensor_axis[1], \
-                //          gsensor_axis[2]);
             }
             APP_PRINT_INFO2("hrs act data is %d, hrs reliability is %d\n", *(pData + L2_FIRST_VALUE_POS),
                             *(pData + L2_FIRST_VALUE_POS + 1));
