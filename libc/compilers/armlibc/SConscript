@@ -1,10 +1,11 @@
 from building import *
-
+import menu_config
 
 src   = Glob('*.c')
 group = []
 
 
-group = DefineGroup('Compiler', src, depend = ['BUILD_USING_ARMCC_LIBC'])
+if menu_config.PLATFORM == 'armcc' or menu_config.PLATFORM == 'armclang':
+    group = DefineGroup('Compiler', src, depend = [''])
 
 Return('group')

@@ -214,6 +214,7 @@ T_APP_RESULT bwps_service_attr_write_cb(uint8_t conn_id, T_SERVER_ID service_id,
     case GATT_SRV_BWPS_TX_INDEX:
         APP_PRINT_INFO0("bwps_service_attr_write_cb, GATT_SRV_BWPS_TX_INDEX");
         /* copy gatt write value in tx_buffer, the first byte is value length*/
+#if 0
         buf = malloc((length + 1) * sizeof(uint8_t));
         buf[0] = length;
         memcpy(buf + 1, p_value, length);
@@ -223,6 +224,7 @@ T_APP_RESULT bwps_service_attr_write_cb(uint8_t conn_id, T_SERVER_ID service_id,
             APP_PRINT_ERROR0("send_msg_to_l1send_task_fail");
             free(buf);
         }
+#endif
         break;
     case GATT_SRV_BWPS_DEVNAME_INDEX:
         APP_PRINT_INFO0("BWPS: update device name\n");

@@ -23,31 +23,31 @@
 
 
 
-void *_malloc_r(struct _reent *ptr, size_t size)
-{
-    void *result = NULL;
+// void *_malloc_r(struct _reent *ptr, size_t size)
+// {
+//     void *result = NULL;
 
-    return result;
-}
+//     return result;
+// }
 
-void *_realloc_r(struct _reent *ptr, void *old, size_t newlen)
-{
-    void *result = NULL;
+// void *_realloc_r(struct _reent *ptr, void *old, size_t newlen)
+// {
+//     void *result = NULL;
 
-    return result;
-}
+//     return result;
+// }
 
-void *_calloc_r(struct _reent *ptr, size_t size, size_t len)
-{
-    void *result = NULL;
+// void *_calloc_r(struct _reent *ptr, size_t size, size_t len)
+// {
+//     void *result = NULL;
 
-    return result;
-}
+//     return result;
+// }
 
-void _free_r(struct _reent *ptr, void *addr)
-{
-    return;
-}
+// void _free_r(struct _reent *ptr, void *addr)
+// {
+//     return;
+// }
 
 
 
