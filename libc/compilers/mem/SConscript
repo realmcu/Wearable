@@ -1,0 +1,13 @@
+from building import *
+
+
+src   = Glob('*.c')
+group = []
+
+
+
+group = DefineGroup('Compiler', src, depend = [''])
+
+
+
+Return('group')
