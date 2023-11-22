@@ -3,6 +3,7 @@
 #include "rtl_pinmux.h"
 #include "rtl_hal_peripheral.h"
 #include "trace.h"
+#include "drv_dlps.h"
 
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
@@ -358,16 +359,55 @@ static void incna3311_chip_reset(void)
 
 uint32_t rtk_lcd_hal_power_off(void)
 {
+    DBG_DIRECT("func = %s, line = %d", __func__, __LINE__);
+    incna3311_cmd(0x28);             /*sleep in*/
+    platform_delay_ms(25);
+    incna3311_cmd(0x10);             /*power off*/
     return 0;
 }
 uint32_t rtk_lcd_hal_power_on(void)
 {
+    DBG_DIRECT("func = %s, line = %d", __func__, __LINE__);
+    incna3311_cmd(0x11);             /*sleep out*/
+    platform_delay_ms(25);
+    incna3311_cmd(0x29);             /*power on*/
     return 0;
+}
+
+static bool lcd_hal_power_on(void)
+{
+    rtk_lcd_hal_power_on();
+    return true;
+}
+
+static bool lcd_hal_power_off(void)
+{
+    rtk_lcd_hal_power_off();
+    return true;
+}
+static bool lcd_allowed_enter_dlps_check(void)
+{
+    return true;
+}
+
+static bool lcd_allowed_wakeup_dlps_check(void)
+{
+    return true;
 }
 
 uint32_t rtk_lcd_hal_dlps_restore(void)
 {
     return 0;
+}
+
+static void drv_lcd_dlps_init(void)
+{
+#ifdef RTK_HAL_DLPS
+    drv_dlps_exit_cbacks_register("lcd", lcd_hal_power_on);
+    drv_dlps_enter_cbacks_register("lcd", lcd_hal_power_off);
+    drv_dlps_wakeup_cbacks_register("lcd", lcd_allowed_enter_dlps_check);
+    drv_dlps_check_cbacks_register("lcd", lcd_allowed_enter_dlps_check);
+#endif
 }
 
 void rtk_lcd_hal_init(void)
@@ -444,7 +484,7 @@ void rtk_lcd_hal_init(void)
     incna3311_cmd_param1(0xFE, 0x00);
     incna3311_cmd_param1(0xC4, 0x80);           /*set dual SPI mode*/
     incna3311_cmd_param1(0x35, 0x00);           /*set tear on*/
-    incna3311_cmd_param1(0x51, 0xFF);           /*write display brightness*/
+    incna3311_cmd_param1(0x51, 0xff);           /*write display brightness*/
     incna3311_cmd_param1(0x53, 0x20);           /*write displya ctrl ,dimming*/
     incna3311_cmd_param1(0x63, 0xFF);           /*write HBM display brightness*/
 
@@ -464,6 +504,7 @@ void rtk_lcd_hal_init(void)
 
     rtk_lcd_hal_set_window(0, 0, 280, 456);
     rtk_lcd_hal_rect_fill(0, 0, 280, 456, 0x0000ff00);
+    drv_lcd_dlps_init();
     DBG_DIRECT("[LCD Init Done]func = %s, line = %d", __func__, __LINE__);
 }
 

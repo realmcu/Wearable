@@ -200,7 +200,7 @@ void pwr_mgr_init(void)
     DLPS_IORegister();
 #ifdef RTL87x2G
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-    //lps_mode_set(PLATFORM_DLPS_PFM);
+    bt_power_mode_set(BTPOWER_DEEP_SLEEP);
 #endif
     power_mode_set(POWER_DLPS_MODE);
 #endif
