@@ -41,11 +41,9 @@
 #include "rtl_lcdc_dbic.h"
 #include "rtl_lcdc_edpi.h"
 
-#if defined RTL8762G
-#define RTL_HAL_RAM_CODE    RAM_TEXT_SECTION
-#else
+
 #define RTL_HAL_RAM_CODE    RAM_FUNCTION
-#endif
+
 
 #elif defined RTL8762D
 
