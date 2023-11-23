@@ -4,6 +4,7 @@
 #include "rtl_hal_peripheral.h"
 #include "trace.h"
 #include "drv_dlps.h"
+#include "os_sync.h"
 
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
@@ -17,13 +18,13 @@
 #define BIT_SEQ_EN              (0x00000001 << 3)
 
 
-
 static void qspi_write(uint8_t *buf, uint32_t len)
 {
+    uint32_t flag = os_lock();
     DBIC_Cmd(DISABLE);//disable DBIC
+    DBIC->CTRLR0 |= BIT31;
     DBIC->CTRLR0 &= ~(BIT_CMD_CH(3) | BIT_ADDR_CH(3) | BIT_DATA_CH(3));//SET CHANNEL NUM
     DBIC->CTRLR0 &= ~(BIT_TMOD(3)); //tx mode
-
     DBIC_CmdLength(1);
     DBIC_AddrLength(3);
     DBIC_TX_NDF(len - 4);
@@ -33,7 +34,9 @@ static void qspi_write(uint8_t *buf, uint32_t len)
         DBIC->DR[0].byte = buf[i];
     }
     while (DBIC->SR & BIT0); // wait bus busy
-    DBIC_Cmd(DISABLE);//disable DBIC
+    DBIC->CTRLR0 &= ~BIT31;
+//    DBIC_Cmd(DISABLE);//disable DBIC
+    os_unlock(flag);
 }
 
 static void incna3311_cmd(uint8_t cmd) //total 5 byte, first byte is 0x02
