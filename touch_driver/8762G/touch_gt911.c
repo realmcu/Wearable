@@ -176,7 +176,7 @@ void rtk_touch_hal_init(void)
 
     uint8_t iic_write_buf[2] = {0x81, 0x40};
     uint8_t iic_read_buf[5] = {0};
-
+    platform_delay_ms(255);
     drv_i2c0_write(TOUCH_GT911_ADDR, iic_write_buf, 2);
 
     drv_i2c0_read(TOUCH_GT911_ADDR, iic_read_buf, 4);
