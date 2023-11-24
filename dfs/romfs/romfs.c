@@ -3,7 +3,7 @@
 #include "trace.h"
 #include "stdarg.h"
 
-#define ROMFS_ADDR    0x4400000
+#define ROMFS_ADDR    0x4600000
 
 
 int check_dirent(struct romfs_dirent *dirent)
