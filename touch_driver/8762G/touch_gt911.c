@@ -24,7 +24,7 @@
 
 const uint8_t GT911_CFG_TBL[] =
 {
-    0x48, 0xE0, 0x01, 0xE0, 0x01, 0x03, 0x35, 0x00,
+    0x62, 0xE0, 0x01, 0xE0, 0x01, 0x03, 0x35, 0x00,
     0x01, 0x18, 0x1E, 0x0F, 0x60, 0x3C, 0x03, 0x0E,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18,
     0x1A, 0x1D, 0x14, 0x87, 0x07, 0x0E, 0x52, 0x56,
@@ -95,6 +95,7 @@ uint8_t GT911_Send_Cfg(uint8_t mode)
     GT911_WR_Reg(GT_CFGS_REG, (uint8_t *)GT911_CFG_TBL, sizeof(GT911_CFG_TBL));
 
     GT911_WR_Reg(GT_CHECK_REG, buf, 2);
+    GT911_WR_Reg(0x8100, &mode, 1);
     return 0;
 }
 
@@ -147,7 +148,6 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
         *y = (buf[4] | (buf[5] << 8));
         x_old = *x;
         y_old = *y;
-        DBG_DIRECT("x = %d, y = %d", *x, *y);
         return true;
     }
     else
@@ -176,7 +176,7 @@ void rtk_touch_hal_init(void)
     drv_pin_write(TOUCH_GT911_INT, 0);
     drv_pin_mode(TOUCH_GT911_RST, PIN_MODE_OUTPUT);
     drv_pin_write(TOUCH_GT911_RST, 0);
-    platform_delay_ms(100);
+    platform_delay_ms(10);
     drv_pin_write(TOUCH_GT911_INT, 1);
     platform_delay_ms(10);
     drv_pin_write(TOUCH_GT911_RST, 1);
@@ -185,6 +185,7 @@ void rtk_touch_hal_init(void)
 
     uint8_t iic_write_buf[2] = {0x81, 0x40};
     uint8_t iic_read_buf[5] = {0};
+    platform_delay_ms(255);
 
     drv_i2c0_write(TOUCH_GT911_ADDR, iic_write_buf, 2);
 
@@ -197,10 +198,12 @@ void rtk_touch_hal_init(void)
     GT911_RD_Reg(GT_CFGS_REG, (uint8_t *)cmd_init, 1);
 
     DBG_DIRECT("[GT_CFGS_REG]:%x\r\n", cmd_init[0]);
-    //if (cmd_init[0] < 0x60)
+    if (cmd_init[0] == 0x60)
     {
-        //GT911_Send_Cfg(1);
+        GT911_Send_Cfg(1);
     }
+    GT911_RD_Reg(GT_CFGS_REG, (uint8_t *)cmd_init, 1);
+    DBG_DIRECT("[GT_CFGS_REG]:%x\r\n", cmd_init[0]);
 
     uint8_t touch_read[200] = {0};
 
