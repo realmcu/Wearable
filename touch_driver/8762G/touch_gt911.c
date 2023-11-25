@@ -24,25 +24,29 @@
 
 const uint8_t GT911_CFG_TBL[] =
 {
-    0X60, 0XE0, 0X01, 0XE0, 0X01, 0X05, 0X35, 0X00, 0X02, 0X08,
-    0X1E, 0X08, 0X05, 0X3C, 0X0F, 0X05, 0X00, 0X00, 0XFF, 0X67,
-    0X50, 0X00, 0X00, 0X18, 0X1A, 0X1E, 0X14, 0X89, 0X28, 0X0A,
-    0X30, 0X2E, 0XBB, 0X0A, 0X03, 0X00, 0X00, 0X02, 0X33, 0X1D,
-    0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X32, 0X00, 0X00,
-    0X2A, 0X1C, 0X5A, 0X94, 0XC5, 0X02, 0X07, 0X00, 0X00, 0X00,
-    0XB5, 0X1F, 0X00, 0X90, 0X28, 0X00, 0X77, 0X32, 0X00, 0X62,
-    0X3F, 0X00, 0X52, 0X50, 0X00, 0X52, 0X00, 0X00, 0X00, 0X00,
-    0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00,
-    0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X0F,
-    0X0F, 0X03, 0X06, 0X10, 0X42, 0XF8, 0X0F, 0X14, 0X00, 0X00,
-    0X00, 0X00, 0X1A, 0X18, 0X16, 0X14, 0X12, 0X10, 0X0E, 0X0C,
-    0X0A, 0X08, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00,
-    0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00,
-    0X00, 0X00, 0X29, 0X28, 0X24, 0X22, 0X20, 0X1F, 0X1E, 0X1D,
-    0X0E, 0X0C, 0X0A, 0X08, 0X06, 0X05, 0X04, 0X02, 0X00, 0XFF,
-    0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00,
-    0X00, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF,
-    0XFF, 0XFF, 0XFF, 0XFF,
+    0x48, 0xE0, 0x01, 0xE0, 0x01, 0x03, 0x35, 0x00,
+    0x01, 0x18, 0x1E, 0x0F, 0x60, 0x3C, 0x03, 0x0E,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18,
+    0x1A, 0x1D, 0x14, 0x87, 0x07, 0x0E, 0x52, 0x56,
+    0xB2, 0x04, 0x00, 0x00, 0x00, 0xBA, 0x02, 0x1C,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x3C, 0x69, 0x94, 0xC5, 0x02,
+    0x07, 0x00, 0x00, 0x04, 0xA3, 0x3F, 0x00, 0x92,
+    0x47, 0x00, 0x84, 0x4F, 0x00, 0x77, 0x58, 0x00,
+    0x6B, 0x63, 0x00, 0x6B, 0x00, 0x00, 0x00, 0x00,
+    0xF0, 0x4A, 0x3A, 0xFF, 0xFF, 0x27, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x1C, 0x1A, 0x18, 0x16, 0x14, 0x12, 0x10, 0x0E,
+    0x0C, 0x0A, 0x08, 0x06, 0x04, 0x02, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x02,
+    0x04, 0x06, 0x08, 0x0A, 0x0C, 0x24, 0x22, 0x21,
+    0x20, 0x1F, 0x1E, 0x1D, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 };
 
 uint8_t GT911_WR_Reg(uint16_t reg, uint8_t *buf, uint8_t len)
@@ -85,7 +89,11 @@ uint8_t GT911_Send_Cfg(uint8_t mode)
         buf[0] += GT911_CFG_TBL[i];
     }
     buf[0] = (~buf[0]) + 1;
+    DBG_DIRECT("checksum by MCU:%x", buf[0]);
+
+
     GT911_WR_Reg(GT_CFGS_REG, (uint8_t *)GT911_CFG_TBL, sizeof(GT911_CFG_TBL));
+
     GT911_WR_Reg(GT_CHECK_REG, buf, 2);
     return 0;
 }
@@ -139,6 +147,7 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
         *y = (buf[4] | (buf[5] << 8));
         x_old = *x;
         y_old = *y;
+        DBG_DIRECT("x = %d, y = %d", *x, *y);
         return true;
     }
     else
@@ -167,7 +176,7 @@ void rtk_touch_hal_init(void)
     drv_pin_write(TOUCH_GT911_INT, 0);
     drv_pin_mode(TOUCH_GT911_RST, PIN_MODE_OUTPUT);
     drv_pin_write(TOUCH_GT911_RST, 0);
-    platform_delay_ms(10);
+    platform_delay_ms(100);
     drv_pin_write(TOUCH_GT911_INT, 1);
     platform_delay_ms(10);
     drv_pin_write(TOUCH_GT911_RST, 1);
@@ -176,7 +185,7 @@ void rtk_touch_hal_init(void)
 
     uint8_t iic_write_buf[2] = {0x81, 0x40};
     uint8_t iic_read_buf[5] = {0};
-    platform_delay_ms(255);
+
     drv_i2c0_write(TOUCH_GT911_ADDR, iic_write_buf, 2);
 
     drv_i2c0_read(TOUCH_GT911_ADDR, iic_read_buf, 4);
@@ -186,10 +195,19 @@ void rtk_touch_hal_init(void)
     uint8_t cmd_init[1] = {2};
     GT911_WR_Reg(GT_CTRL_REG, (uint8_t *)cmd_init, 1);
     GT911_RD_Reg(GT_CFGS_REG, (uint8_t *)cmd_init, 1);
-    if (cmd_init[0] < 0x60)
+
+    DBG_DIRECT("[GT_CFGS_REG]:%x\r\n", cmd_init[0]);
+    //if (cmd_init[0] < 0x60)
     {
-        GT911_Send_Cfg(1);
+        //GT911_Send_Cfg(1);
     }
+
+    uint8_t touch_read[200] = {0};
+
+    GT911_RD_Reg(GT_CFGS_REG, (uint8_t *)touch_read, 186);
+
+    APP_PRINT_INFO1("data = %b", TRACE_BINARY(186, touch_read));
+
     platform_delay_us(200);
     cmd_init[0] = 0;
     GT911_WR_Reg(GT_CTRL_REG, (uint8_t *)cmd_init, 1);
