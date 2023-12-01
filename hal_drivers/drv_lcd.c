@@ -14,14 +14,24 @@
 
 
 
-void drv_lcd_power_on(void)
+bool drv_lcd_power_on(void)
 {
-    rtk_lcd_hal_power_on();
+    return rtk_lcd_hal_power_on();
 }
 
-void drv_lcd_power_off(void)
+bool drv_lcd_power_off(void)
 {
-    rtk_lcd_hal_power_off();
+    return rtk_lcd_hal_power_off();
+}
+
+bool drv_lcd_dlps_check(void)
+{
+    return rtk_lcd_hal_dlps_check();
+}
+
+bool drv_lcd_wake_up(void)
+{
+    return rtk_lcd_wake_up();
 }
 
 void drv_lcd_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, uint16_t w,
@@ -67,6 +77,17 @@ uint32_t drv_lcd_get_pixel_bits(void)
     return rtk_lcd_hal_get_pixel_bits();
 }
 
+static void drv_lcd_dlps_init(void)
+{
+#ifdef RTK_HAL_DLPS
+    rtk_lcd_dlps_init();
+    drv_dlps_exit_cbacks_register("lcd", drv_lcd_power_on);
+    drv_dlps_enter_cbacks_register("lcd", drv_lcd_power_off);
+    drv_dlps_check_cbacks_register("lcd", drv_lcd_dlps_check);
+    drv_dlps_wakeup_cbacks_register("lcd", drv_lcd_wake_up);
+#endif
+}
+
 void Display_Handler(void)
 {
     DBG_DIRECT("Display_Handler1");
@@ -75,7 +96,7 @@ void Display_Handler(void)
 void hw_lcd_init(void)
 {
     rtk_lcd_hal_init();
-
+    drv_lcd_dlps_init();
     DBG_DIRECT("Drv lcd init");
 }
 

@@ -26,8 +26,11 @@ void rtk_lcd_hal_transfer_done(void);
 uint32_t rtk_lcd_hal_get_width(void);
 uint32_t rtk_lcd_hal_get_height(void);
 uint32_t rtk_lcd_hal_get_pixel_bits(void);
-uint32_t rtk_lcd_hal_power_off(void);
-uint32_t rtk_lcd_hal_power_on(void);
+bool rtk_lcd_hal_power_off(void);
+bool rtk_lcd_hal_power_on(void);
+bool rtk_lcd_hal_dlps_check(void);
+bool rtk_lcd_wake_up(void);
+void rtk_lcd_dlps_init(void);
 uint32_t rtk_lcd_hal_dlps_restore(void);
 
 

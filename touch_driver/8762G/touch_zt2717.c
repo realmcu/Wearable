@@ -13,8 +13,13 @@
 #include "touch_zt2717.h"
 #include "string.h"
 #include "trace.h"
+#include "os_timer.h"
 
 void (*touch_wakeup_indicate)(void) = NULL;
+bool TP_DLPS_FLAG = false;
+void *tp_dlps_timer_handle = NULL;
+
+#define TP_DLPS_TIME_OUT 5000
 
 static void ts_write_cmd(uint16_t cmd)
 {
@@ -76,6 +81,17 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     return true;
 }
 
+// void tp_dlps_timer_up_cb(void *parameter)
+// {
+//     TP_DLPS_FLAG = true;
+// }
+
+// void tp_indicate(void *p)
+// {
+//     DBG_DIRECT("tp_indicate");
+//     os_timer_restart(&tp_dlps_timer_handle, TP_DLPS_TIME_OUT);
+// }
+
 void rtk_touch_hal_set_indicate(void (*indicate)(void *))
 {
     drv_pin_mode(TOUCH_ZT2717_INT, PIN_MODE_INPUT);
@@ -97,60 +113,56 @@ void rtk_touch_hal_int_config(bool enable)
     }
 }
 
-static bool touch_enter_dlps(void)
+bool rtk_touch_hal_power_off(void)
 {
     drv_pin_mode(TOUCH_ZT2717_INT, PIN_MODE_INPUT);
     Pad_Config(TOUCH_ZT2717_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_HIGH);
     System_WakeUpPinEnable(TOUCH_ZT2717_INT, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
-    DBG_DIRECT("func = %s, line = %d", __func__, __LINE__);
     return true;
 }
 
-static bool touch_exit_dlps(void)
+bool rtk_touch_hal_power_on(void)
 {
+    rtk_touch_hal_init();
     Pad_Config(TOUCH_ZT2717_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_HIGH);
+    // TP_DLPS_FLAG = false;
     return true;
 }
 
-static bool touch_allowed_enter_dlps_check(void)
+bool rtk_touch_hal_dlps_check(void)
 {
+    DBG_DIRECT("rtk_touch_hal_dlps_check %d", TP_DLPS_FLAG);
     return true;
+    // return TP_DLPS_FLAG;
 }
 
-static bool touch_system_wakeup_dlps_check(void)
+bool rtk_touch_wake_up(void)
 {
-    // if (System_WakeUpInterruptValue(TOUCH_ZT2717_INT) == SET)
-    // {
-    //     Pad_ClearWakeupINTPendingBit(TOUCH_ZT2717_INT);
-    //     System_WakeUpPinDisable(TOUCH_ZT2717_INT);
-    //     DBG_DIRECT("Touch Wake up");
-    //     if (touch_wakeup_indicate != NULL)
-    //     {
-    //         touch_wakeup_indicate();
-    //     }
-    //     return true;
-    // }
+    if (System_WakeUpInterruptValue(TOUCH_ZT2717_INT) == SET)
+    {
+        Pad_ClearWakeupINTPendingBit(TOUCH_ZT2717_INT);
+        System_WakeUpPinDisable(TOUCH_ZT2717_INT);
+        DBG_DIRECT("Touch Wake up");
+        // tp_indicate(NULL);
+        return true;
+    }
     return false;
 }
 
-static void drv_touch_dlps_init(void)
+void rtk_touch_dlps_init(void)
 {
+    // os_timer_create(&tp_dlps_timer_handle, "tp_dlps_timer", 3, TP_DLPS_TIME_OUT, true, tp_dlps_timer_up_cb);
+    // os_timer_start(&tp_dlps_timer_handle);
     drv_pin_mode(TOUCH_ZT2717_INT, PIN_MODE_INPUT);
     Pad_Config(TOUCH_ZT2717_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_HIGH);
-#ifdef RTK_HAL_DLPS
-    drv_dlps_exit_cbacks_register("touch", touch_exit_dlps);
-    drv_dlps_enter_cbacks_register("touch", touch_enter_dlps);
-    drv_dlps_wakeup_cbacks_register("touch", touch_system_wakeup_dlps_check);
-    drv_dlps_check_cbacks_register("touch", touch_allowed_enter_dlps_check);
-#endif
+    // rtk_touch_hal_set_indicate(tp_indicate);
 }
 
 void rtk_touch_hal_init(void)
 {
-    drv_touch_dlps_init();
     drv_i2c0_init(TOUCH_ZT2717_SCL, TOUCH_ZT2717_SDA);
     drv_pin_mode(TOUCH_ZT2717_RST, PIN_MODE_OUTPUT);
     drv_pin_write(TOUCH_ZT2717_RST, 1);

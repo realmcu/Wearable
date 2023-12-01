@@ -52,6 +52,8 @@ void System_Handler(void)
 {
 #ifdef RTL8772F
     DBG_DIRECT("SYSTEM_HANDLER 0x%x", get_aon_wakeup_int());
+#else
+    DBG_DIRECT("DLPS WAKE UP , System_Handler");
 #endif
 
     dlps_slist_t *node;
@@ -60,10 +62,11 @@ void System_Handler(void)
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
         p_item->dlps_cb();
     }
-
+    gui_server_exit_dlps();
 #ifdef RTL8772F
     clear_aon_wakeup_int();
 #endif
+    DBG_DIRECT("DLPS WAKE UP , System_Handler END");
 }
 
 /**
@@ -85,10 +88,12 @@ static void app_enter_dlps_config(void)
     for (node = dlps_slist_first(&(drv_dlps_enter_slist)); node; node = dlps_slist_next(node))
     {
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
+        DBG_DIRECT("DLPS ENTER CB %s", p_item->name);
         p_item->dlps_cb();
     }
 
     dlps_flag = true;
+    DBG_DIRECT("DLPS ENTER END");
 }
 
 /**
@@ -103,11 +108,16 @@ static void app_enter_dlps_config(void)
 APP_RAM_TEXT_SECTION
 static void app_exit_dlps_config(void)
 {
+#ifdef RTL87x2G
+    DBG_DIRECT("DLPS EXIT, wake up reason 0x%x", power_get_wakeup_reason());
+#else
     DBG_DIRECT("DLPS EXIT");
+#endif
     dlps_slist_t *node;
     for (node = dlps_slist_first(&(drv_dlps_exit_slist)); node; node = dlps_slist_next(node))
     {
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
+        DBG_DIRECT("DLPS EXIT CB %s", p_item->name);
         p_item->dlps_cb();
     }
 
@@ -154,9 +164,9 @@ static POWER_CheckResult app_dlps_check_cb(void)
     for (node = dlps_slist_first(&(drv_dlps_check_slist)); node; node = dlps_slist_next(node))
     {
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
-        //DBG_DIRECT("%s check fail! Module[%s]", __func__, p_item->name);
         if (p_item->dlps_cb() == false)
         {
+            // DBG_DIRECT("%s check fail! Module[%s]", __func__, p_item->name);
             return POWER_CHECK_FAIL;
         }
     }

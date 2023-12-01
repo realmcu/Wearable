@@ -17,7 +17,7 @@
 #define BIT_TXSIM               (0x00000001 << 9)
 #define BIT_SEQ_EN              (0x00000001 << 3)
 
-
+bool lcd_init_flag = false;
 static void qspi_write(uint8_t *buf, uint32_t len)
 {
     uint32_t flag = os_lock();
@@ -360,42 +360,29 @@ static void incna3311_chip_reset(void)
     //no need HW do it
 }
 
-uint32_t rtk_lcd_hal_power_off(void)
+bool rtk_lcd_hal_power_off(void)
 {
-    DBG_DIRECT("func = %s, line = %d", __func__, __LINE__);
     incna3311_cmd(0x28);             /*sleep in*/
     platform_delay_ms(25);
     incna3311_cmd(0x10);             /*power off*/
     return 0;
 }
-uint32_t rtk_lcd_hal_power_on(void)
+
+bool rtk_lcd_hal_power_on(void)
 {
-    DBG_DIRECT("func = %s, line = %d", __func__, __LINE__);
-    incna3311_cmd(0x11);             /*sleep out*/
-    platform_delay_ms(25);
-    incna3311_cmd(0x29);             /*power on*/
+    // incna3311_cmd(0x29);             /*power on*/
+    rtk_lcd_hal_init();
     return 0;
 }
 
-static bool lcd_hal_power_on(void)
-{
-    rtk_lcd_hal_power_on();
-    return true;
-}
-
-static bool lcd_hal_power_off(void)
-{
-    rtk_lcd_hal_power_off();
-    return true;
-}
-static bool lcd_allowed_enter_dlps_check(void)
+bool rtk_lcd_hal_dlps_check(void)
 {
     return true;
 }
 
-static bool lcd_allowed_wakeup_dlps_check(void)
+bool rtk_lcd_wake_up(void)
 {
-    return true;
+    return 0;
 }
 
 uint32_t rtk_lcd_hal_dlps_restore(void)
@@ -403,14 +390,9 @@ uint32_t rtk_lcd_hal_dlps_restore(void)
     return 0;
 }
 
-static void drv_lcd_dlps_init(void)
+void rtk_lcd_dlps_init(void)
 {
-#ifdef RTK_HAL_DLPS
-    drv_dlps_exit_cbacks_register("lcd", lcd_hal_power_on);
-    drv_dlps_enter_cbacks_register("lcd", lcd_hal_power_off);
-    drv_dlps_wakeup_cbacks_register("lcd", lcd_allowed_enter_dlps_check);
-    drv_dlps_check_cbacks_register("lcd", lcd_allowed_enter_dlps_check);
-#endif
+
 }
 
 void rtk_lcd_hal_init(void)
@@ -505,9 +487,12 @@ void rtk_lcd_hal_init(void)
     incna3311_cmd(0x29);             /*power on*/
 
 
-    rtk_lcd_hal_set_window(0, 0, 280, 456);
-    rtk_lcd_hal_rect_fill(0, 0, 280, 456, 0x0000ff00);
-    drv_lcd_dlps_init();
+    if (lcd_init_flag == false)
+    {
+        rtk_lcd_hal_set_window(0, 0, 280, 456);
+        rtk_lcd_hal_rect_fill(0, 0, 280, 456, 0x0000ff00);
+        lcd_init_flag = true;
+    }
     DBG_DIRECT("[LCD Init Done]func = %s, line = %d", __func__, __LINE__);
 }
 
