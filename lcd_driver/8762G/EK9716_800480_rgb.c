@@ -91,7 +91,7 @@ static void ek9716_dma_init(uint8_t *init_buffer)
     LCDC_DMA_InitStruct.LCDC_DMA_DestinationInc      = LCDC_DMA_DestinationInc_Fix;
     LCDC_DMA_InitStruct.LCDC_DMA_SourceDataSize      = LCDC_DMA_DataSize_Word;
     LCDC_DMA_InitStruct.LCDC_DMA_DestinationDataSize = LCDC_DMA_DataSize_Word;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = LCDC_DMA_Msize_64;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = LCDC_DMA_Msize_16;
     LCDC_DMA_InitStruct.LCDC_DMA_DestinationMsize    = LCDC_DMA_Msize_64;
     LCDC_DMA_InitStruct.LCDC_DMA_SourceAddr          = 0;
 
@@ -239,8 +239,8 @@ void rtk_lcd_hal_init(void)
     lcdc_init.LCDC_InfiniteModeEn = 1;
     LCDC_Init(&lcdc_init);
 
-    uint32_t HSA = 48, HFP = 40, HBP = 40, HACT = EK9716_800480_LCD_WIDTH;
-    uint32_t VSA = 1, VFP = 13, VBP = 31, VACT = EK9716_800480_LCD_HEIGHT;
+    uint32_t HSA = 48, HFP = 20, HBP = 40, HACT = EK9716_800480_LCD_WIDTH;
+    uint32_t VSA = 1, VFP = 5, VBP = 31, VACT = EK9716_800480_LCD_HEIGHT;
 
     LCDC_eDPICfgTypeDef eDPICfg;//480*640  ---->   500 * 660
     eDPICfg.eDPI_ClockDiv = 4;
