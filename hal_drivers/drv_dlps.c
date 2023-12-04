@@ -62,7 +62,6 @@ void System_Handler(void)
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
         p_item->dlps_cb();
     }
-    gui_server_exit_dlps();
 #ifdef RTL8772F
     clear_aon_wakeup_int();
 #endif
