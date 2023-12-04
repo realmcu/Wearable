@@ -52,7 +52,7 @@ params->RGB.PLL_CLOCK=(19.8)
 #define LCDC_VSYNC          P0_1
 #define LCDC_CSN_DE         P0_0
 
-#if RTL87x2G_TYPEB
+#if !RTL87x2G_TYPEB
 #define GPD0                P2_5
 #define GPD1                P2_7
 #define GPD2                P9_0
@@ -324,7 +324,7 @@ void rtk_lcd_hal_init(void)
     eDPICfg.eDPI_VeriSyncPolarity = 0;
     eDPICfg.eDPI_DataEnPolarity = 1;
     eDPICfg.eDPI_LineIntMask = 1;
-    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB565_2;//for RGB888
+    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB888;//for RGB888
     eDPICfg.eDPI_OperateMode = 0;//video mode
     eDPICfg.eDPI_LcdArc = 0;
     eDPICfg.eDPI_ShutdnPolarity = 0;
