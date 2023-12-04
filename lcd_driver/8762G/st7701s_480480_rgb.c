@@ -398,15 +398,32 @@ uint32_t rtk_lcd_hal_get_pixel_bits(void)
 {
     return ST7701S_DRV_PIXEL_BITS;
 }
-uint32_t rtk_lcd_hal_power_off(void)
+bool rtk_lcd_hal_power_off(void)
 {
     return 0;
 }
-uint32_t rtk_lcd_hal_power_on(void)
+
+bool rtk_lcd_hal_power_on(void)
 {
     return 0;
 }
+
+bool rtk_lcd_hal_dlps_check(void)
+{
+    return true;
+}
+
+bool rtk_lcd_wake_up(void)
+{
+    return 0;
+}
+
 uint32_t rtk_lcd_hal_dlps_restore(void)
 {
     return 0;
+}
+
+void rtk_lcd_dlps_init(void)
+{
+
 }

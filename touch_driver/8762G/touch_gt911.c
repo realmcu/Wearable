@@ -168,6 +168,30 @@ void rtk_touch_hal_int_config(bool enable)
     (void)enable;
     return;
 }
+bool rtk_touch_hal_power_off(void)
+{
+    return true;
+}
+
+bool rtk_touch_hal_power_on(void)
+{
+    return true;
+}
+
+bool rtk_touch_hal_dlps_check(void)
+{
+    return true;
+}
+
+bool rtk_touch_wake_up(void)
+{
+    return false;
+}
+
+void rtk_touch_dlps_init(void)
+{
+}
+
 void rtk_touch_hal_init(void)
 {
     DBG_DIRECT("touch_gt911_init line = %d\n", __LINE__);
