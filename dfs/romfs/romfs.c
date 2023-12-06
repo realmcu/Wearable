@@ -201,7 +201,7 @@ int romfs_open(struct romfs_fd *file)
 
         if (file->flags & (O_CREAT | O_WRONLY | O_APPEND | O_TRUNC | O_RDWR))
         {
-            return -EINVAL;
+            return -FS_EINVAL;
         }
 
         dirent = romfs_lookup(root_dirent, file->path, &size);
