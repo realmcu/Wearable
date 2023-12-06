@@ -1,9 +1,14 @@
-
 #include "romfs.h"
 #include "trace.h"
 #include "stdarg.h"
 
-#define ROMFS_ADDR    0x4600000
+// default romfs address
+static void *romfs_addr = (void *)0x04400000;
+
+void romfs_mount(void *addr)
+{
+    romfs_addr = addr;
+}
 
 
 int check_dirent(struct romfs_dirent *dirent)
@@ -242,7 +247,7 @@ int open(const char *file, int flags, ...)
         fd->flags = flags;
         fd->size  = 0;
         fd->pos   = 0;
-        fd->data  = (void *)ROMFS_ADDR;
+        fd->data  = (void *)romfs_addr;
         fd->path = (char *)file;
     }
 

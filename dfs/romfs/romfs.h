@@ -201,6 +201,7 @@ struct stat
     uint32_t  st_blocks;
     long      st_spare4[2];
 };
+void romfs_mount(void *addr);
 extern const struct romfs_dirent romfs_root;
 int open(const char *file, int flags, ...);
 int close(int fd);
