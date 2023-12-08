@@ -200,10 +200,18 @@ static bool app_dlps_check_cb(void)
  */
 void pwr_mgr_init(void)
 {
+#if defined RTL8772F || defined RTL87x2G
     if (false == power_check_cb_register(app_dlps_check_cb))
     {
         APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
     }
+#endif
+#ifdef RTL8762D
+    if (false == dlps_check_cb_reg(app_dlps_check_cb))
+    {
+        APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
+    }
+#endif
     DLPS_IORegUserDlpsEnterCb(app_enter_dlps_config);
     DLPS_IORegUserDlpsExitCb(app_exit_dlps_config);
     DLPS_IORegister();
@@ -215,6 +223,9 @@ void pwr_mgr_init(void)
 #endif
 #ifdef RTL8772F
     lps_mode_set(PLATFORM_DLPS);
+#endif
+#ifdef RTL8762D
+    lps_mode_set(LPM_DLPS_MODE);
 #endif
 }
 

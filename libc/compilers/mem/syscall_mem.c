@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "mem_types.h"
 #include <os_mem.h>
 #include <os_sched.h>

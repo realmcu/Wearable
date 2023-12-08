@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include "romfs.h"
 #include "trace.h"
 #include "stdarg.h"
@@ -474,7 +475,6 @@ static int dfs_romfs_ioctl(struct romfs_fd *file, int cmd, void *args)
     {
     case 0:
         {
-            size_t length;
             struct romfs_dirent *dirent;
 
             dirent = (struct romfs_dirent *)file->data;
@@ -487,7 +487,6 @@ static int dfs_romfs_ioctl(struct romfs_fd *file, int cmd, void *args)
             return (int) & (dirent->data[file->pos]);
 
         }
-        break;
     }
     return -EIO;
 }

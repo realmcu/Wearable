@@ -34,34 +34,11 @@ void drv_touch_int_config(bool enable)
     rtk_touch_hal_int_config(enable);
 }
 
-bool drv_touch_power_on(void)
-{
-    return rtk_touch_hal_power_on();
-}
-
-bool drv_touch_power_off(void)
-{
-    return rtk_touch_hal_power_off();
-}
-
-bool drv_touch_dlps_check(void)
-{
-    return rtk_touch_hal_dlps_check();
-}
-
-bool drv_touch_wake_up(void)
-{
-    return rtk_touch_wake_up();
-}
 
 static void drv_touch_dlps_init(void)
 {
 #ifdef RTK_HAL_DLPS
-    rtk_touch_dlps_init();
-    drv_dlps_exit_cbacks_register("touch", drv_touch_power_on);
-    drv_dlps_enter_cbacks_register("touch", drv_touch_power_off);
-    drv_dlps_check_cbacks_register("touch", drv_touch_dlps_check);
-    drv_dlps_wakeup_cbacks_register("touch", drv_touch_wake_up);
+
 #endif
 }
 

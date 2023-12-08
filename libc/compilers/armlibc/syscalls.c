@@ -55,8 +55,7 @@ int _sys_read(FILEHANDLE fh, unsigned char *buf,
 }
 void _ttywrch(int ch)
 {
-    char c = ch;
-//  your_device_write(&c, 1);
+    return;
 }
 int _sys_istty(FILEHANDLE fh)
 {

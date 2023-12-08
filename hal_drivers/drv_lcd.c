@@ -16,22 +16,22 @@
 
 bool drv_lcd_power_on(void)
 {
-    return rtk_lcd_hal_power_on();
+    return true;
 }
 
 bool drv_lcd_power_off(void)
 {
-    return rtk_lcd_hal_power_off();
+    return true;
 }
 
 bool drv_lcd_dlps_check(void)
 {
-    return rtk_lcd_hal_dlps_check();
+    return true;
 }
 
 bool drv_lcd_wake_up(void)
 {
-    return rtk_lcd_wake_up();
+    return true;
 }
 
 void drv_lcd_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, uint16_t w,
@@ -80,7 +80,6 @@ uint32_t drv_lcd_get_pixel_bits(void)
 static void drv_lcd_dlps_init(void)
 {
 #ifdef RTK_HAL_DLPS
-    rtk_lcd_dlps_init();
     drv_dlps_exit_cbacks_register("lcd", drv_lcd_power_on);
     drv_dlps_enter_cbacks_register("lcd", drv_lcd_power_off);
     drv_dlps_check_cbacks_register("lcd", drv_lcd_dlps_check);
