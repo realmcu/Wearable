@@ -76,9 +76,6 @@ params->RGB.PLL_CLOCK=(19.8)
 #define TRANSFER_DMA_CHANNEL_NUM              0
 #define TRANSFER_DMA_CHANNEL_INDEX            GDMA_Channel0
 
-//static void *internal_frame_buffer1, *internal_frame_buffer2;
-//static bool using_frame_buffer1 = true;
-//static uint32_t pfb_probe = 0;
 
 static void write_command(uint32_t cmd)
 {
@@ -186,7 +183,9 @@ static void st7701s_dma_init(uint8_t *init_buffer)
                                  ST7701S_DRV_PIXEL_BITS / 8);
     LCDC_DMA_LinkList_Init(&LCDC_DMA_LLI_Init,
                            &LCDC_DMA_InitStruct);//LLI_TRANSFER or LLI_WITH_CONTIGUOUS_SAR
-
+#if LV_USE_GPU_RTK_PPE
+    LCDC_ForceBurst(ENABLE);
+#endif
     LCDC_ClearDmaFifo();
     LCDC_ClearTxPixelCnt();
 
@@ -227,25 +226,27 @@ static void lcd_pad_and_clk_init(void)
     Pad_Config(LCDC_DATA2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(LCDC_DATA5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(LCDC_DATA6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(LCDC_DATA7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA8, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA9, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA10, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA11, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA12, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA13, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(LCDC_DATA14, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(LCDC_DATA15, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA16, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA17, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA18, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA19, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA20, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+#if ST7701S_DRV_PIXEL_BITS == 24
+    Pad_Config(LCDC_DATA5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(LCDC_DATA6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(LCDC_DATA7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(LCDC_DATA14, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(LCDC_DATA15, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA21, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA22, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA23, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+#endif
 
     Pad_Config(LCDC_RGB_WRCLK, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_HIGH);
@@ -259,25 +260,29 @@ static void lcd_pad_and_clk_init(void)
     Pad_Dedicated_Config(LCDC_DATA2, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA3, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA4, ENABLE);
-    Pad_Dedicated_Config(LCDC_DATA5, ENABLE);
-    Pad_Dedicated_Config(LCDC_DATA6, ENABLE);
-    Pad_Dedicated_Config(LCDC_DATA7, ENABLE);
+
     Pad_Dedicated_Config(LCDC_DATA8, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA9, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA10, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA11, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA12, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA13, ENABLE);
-    Pad_Dedicated_Config(LCDC_DATA14, ENABLE);
-    Pad_Dedicated_Config(LCDC_DATA15, ENABLE);
+
     Pad_Dedicated_Config(LCDC_DATA16, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA17, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA18, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA19, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA20, ENABLE);
+#if ST7701S_DRV_PIXEL_BITS == 24
+    Pad_Dedicated_Config(LCDC_DATA5, ENABLE);
+    Pad_Dedicated_Config(LCDC_DATA6, ENABLE);
+    Pad_Dedicated_Config(LCDC_DATA7, ENABLE);
+    Pad_Dedicated_Config(LCDC_DATA14, ENABLE);
+    Pad_Dedicated_Config(LCDC_DATA15, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA21, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA22, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA23, ENABLE);
+#endif
 
     Pad_Dedicated_Config(LCDC_RGB_WRCLK, ENABLE);
     Pad_Dedicated_Config(LCDC_HSYNC, ENABLE);
@@ -296,8 +301,13 @@ void rtk_lcd_hal_init(void)
 
     LCDC_InitTypeDef lcdc_init = {0};
     lcdc_init.LCDC_Interface = LCDC_IF_DPI;
+#if ST7701S_DRV_PIXEL_BITS == 16
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB565;
+    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB565;
+#else
     lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB888;
     lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB888;
+#endif
     lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
     lcdc_init.LCDC_GroupSel = 1;
 
@@ -306,8 +316,8 @@ void rtk_lcd_hal_init(void)
     lcdc_init.LCDC_InfiniteModeEn = 1;
     LCDC_Init(&lcdc_init);
 
-    uint32_t HSA = 8, HFP = 10, HBP = 50, HACT = ST7701S_480480_LCD_WIDTH;
-    uint32_t VSA = 8, VFP = 10, VBP = 20, VACT = ST7701S_480480_LCD_HEIGHT;
+    uint32_t HSA = 10, HFP = 50, HBP = 50, HACT = ST7701S_480480_LCD_WIDTH;
+    uint32_t VSA = 10, VFP = 20, VBP = 20, VACT = ST7701S_480480_LCD_HEIGHT;
 
     LCDC_eDPICfgTypeDef eDPICfg;//480*640  ---->   500 * 660
     eDPICfg.eDPI_ClockDiv = 0x3;
@@ -324,7 +334,11 @@ void rtk_lcd_hal_init(void)
     eDPICfg.eDPI_VeriSyncPolarity = 0;
     eDPICfg.eDPI_DataEnPolarity = 1;
     eDPICfg.eDPI_LineIntMask = 1;
-    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB888;//for RGB888
+#if ST7701S_DRV_PIXEL_BITS == 16
+    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB565_2;
+#else
+    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB888;
+#endif
     eDPICfg.eDPI_OperateMode = 0;//video mode
     eDPICfg.eDPI_LcdArc = 0;
     eDPICfg.eDPI_ShutdnPolarity = 0;
@@ -347,10 +361,15 @@ void rtk_lcd_hal_init(void)
     platform_delay_ms(120);
     //*******************************/
 #include "st7701s_rgb.txt"
-
+    uint8_t *buf = (uint8_t *)SPIC1_ADDR;
+    for (int i = 0; i < 480 * 480 * 3; i = i + 3)
+    {
+        buf[i] = 0xFF;
+        buf[i + 1] = 0;
+        buf[i + 2] = 0;
+    }
     rtk_lcd_hal_update_framebuffer((uint8_t *)SPIC1_ADDR,
                                    ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT);
-
 }
 
 static bool flush_first = true;

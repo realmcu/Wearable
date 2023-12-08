@@ -239,11 +239,22 @@ write_data(0x00);
 write_command(0x36); 
 write_data(0x00); //10-180
 
-write_command(0x3A); 
-write_data(0x70); //16 bit  //0x70 24bit
+write_command(0x0C);
+#if ST7701S_DRV_PIXEL_BITS == 16
+write_data(0x50); //16 bit
+#else
+write_data(0x70); //24bit
+#endif
+
+write_command(0x3A);
+#if ST7701S_DRV_PIXEL_BITS == 16
+write_data(0x50); //16 bit
+#else
+write_data(0x70); //24bit
+#endif
 
 //Display on
-write_command(0x29);                     
+write_command(0x29);
 platform_delay_ms(25);
 #endif
 
