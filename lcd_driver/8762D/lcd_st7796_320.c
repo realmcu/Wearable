@@ -372,6 +372,7 @@ void rtk_lcd_hal_init(void)
     st7796_write_cmd(0x11);
     st7796_write_cmd(0x29);
     // lcd_set_backlight(100);
+    rtk_lcd_hal_rect_fill(0, 0, 320, 320, 0xF0F0F0F0);
 }
 
 
@@ -455,6 +456,58 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h,
                            uint32_t color)
 {
+    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
+    NVIC_InitTypeDef NVIC_InitStruct;
+    NVIC_InitStruct.NVIC_IRQChannel = LCD_DMA_CHANNEL_IRQ;
+    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+    NVIC_Init(&NVIC_InitStruct);
+    /* Initialize GDMA peripheral */
+    GDMA_InitTypeDef GDMA_InitStruct;
+    GDMA_StructInit(&GDMA_InitStruct);
+    GDMA_InitStruct.GDMA_ChannelNum          = LCD_DMA_CHANNEL_NUM;
+
+    GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Word;
+    GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Word;
+    GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_8;
+    GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_8;
+
+    GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_8080_TX;
+    GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToPeripheral;
+    GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Fix;
+    GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
+
+    GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
+    GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
+
+
+    rtk_lcd_hal_set_window(xStart, yStart, w, h);
+
+    static uint32_t color_buf = 0;
+    color_buf = (color >> 8) | (color << 8);
+    color_buf = color_buf | color_buf << 16;
+
+    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)&color_buf);
+    GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(&(IF8080->FIFO)));
+
+
+
+    uint32_t section_hight = 10;
+    uint32_t left_line = h % section_hight;
+
+    for (uint32_t i = 0; i < h / section_hight; i++)
+    {
+        GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, (w * section_hight * 2) >> 2);
+        GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
+        while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET);
+        GDMA_ClearINTPendingBit(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
+    }
+    if (left_line != 0)
+    {
+        GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, (w * left_line * 2) >> 2);
+        GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
+        rtk_lcd_hal_transfer_done();
+    }
 
 }
 
