@@ -657,6 +657,7 @@ void rtk_lcd_hal_init(void)
                                       | 0 << DSI_TEAR_FX_EN_POS
                                   );
     driver_ic_init();
+    rtk_lcd_hal_rect_fill(0, 0, 454, 454, 0xFF00FF00);
 }
 
 
