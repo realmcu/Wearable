@@ -23,8 +23,8 @@
 #include <app_msg.h>
 #include <ble_gap_cb.h>
 #include "trace.h"
-#ifdef RTL87x2G_DASHBOARD
 #include "gatt.h"
+#ifdef RTL87x2G_DASHBOARD
 #include <simple_ble_service.h>
 #endif
 
@@ -77,8 +77,9 @@ static uint8_t scan_rsp_data[] =
     /* place holder for Local Name, filled by BT stack. if not present */
     /* BT stack appends Local Name.                                    */
     0x03,           /* length     */
-    0x19,           /* type="Appearance" */
-    0x42, 0x0c,     /* wrist worn */
+    GAP_ADTYPE_APPEARANCE,            /* type="Appearance" */
+    LO_WORD(GAP_GATT_APPEARANCE_WRIST_WORN),
+    HI_WORD(GAP_GATT_APPEARANCE_WRIST_WORN),
 };
 
 // GAP - Advertisement data (max size = 31 bytes, though this is
@@ -89,17 +90,18 @@ uint8_t adv_data[] =
 {
     /* Core spec. Vol. 3, Part C, Chapter 18 */
     /* Flags */
-    /* place holder for Local Name, filled by BT stack. if not present */
-    /* BT stack appends Local Name.                                    */
     0x02,            /* length     */
     GAP_ADTYPE_FLAGS,
     GAP_ADTYPE_FLAGS_GENERAL | GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED,
+
+    /* Local name */
     0x09,           /* length     */
-    0x09,           /* type="Complete local name" */
-    'B', '3', 'P', 'W', 'a', 't', 'c', 'h', /* SmartBracelet */
+    GAP_ADTYPE_LOCAL_NAME_COMPLETE, /* type="Complete local name" */
+    'R', 'T', 'L', 'W', 'a', 't', 'c', 'h', /* SmartBracelet */
+
     /* Service */
     0x03,           /* length     */
-    0x03,           /* type="More 16-bit UUIDs available, service uuid 0xFEE7 0xA00A" */
+    GAP_ADTYPE_16BIT_COMPLETE, /* type="More 16-bit UUIDs available, service uuid 0xFEE7 0xA00A" */
     0xE7,
     0xFE,
     /* Manufacture specified data*/
@@ -127,7 +129,7 @@ void app_le_gap_init(void)
     uint16_t appearance = GAP_GATT_APPEARANCE_UNKNOWN;
     uint8_t  slave_init_mtu_req = true;
 #else
-    uint8_t  device_name[GAP_DEVICE_NAME_LEN] = "B3PWatch";
+    uint8_t  device_name[GAP_DEVICE_NAME_LEN] = "RTLWatch";
     uint16_t appearance = GAP_GATT_APPEARANCE_WRIST_WORN;
     uint8_t  slave_init_mtu_req = true;
 #endif

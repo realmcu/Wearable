@@ -2,7 +2,8 @@
 #include "trace.h"
 #include "ble_gap_msg.h"
 #include "ota_service.h"
-#include"ble_dfu_transport.h"
+#include "gap_conn_le.h"
+extern bool dfu_switch_to_ota_mode_pending;
 
 static T_SERVER_ID ota_srv_id;
 
@@ -16,6 +17,7 @@ static T_APP_RESULT app_ota_callback(T_SERVER_ID service_id, void *p_data)
         {
         case SERVICE_CALLBACK_TYPE_WRITE_CHAR_VALUE:
             {
+#ifdef RTL87x2G
                 if (OTA_WRITE_CHAR_VAL == p_ota_cb_data->msg_data.write.opcode &&
                     OTA_VALUE_ENTER == p_ota_cb_data->msg_data.write.value)
                 {
@@ -25,6 +27,17 @@ static T_APP_RESULT app_ota_callback(T_SERVER_ID service_id, void *p_data)
                     dfu_switch_to_ota_mode_pending = true;
                     le_disconnect(p_ota_cb_data->conn_id);
                 }
+#elif RTL8762D
+                if (OTA_WRITE_CHAR_VAL == p_ota_cb_data->msg_data.write.opcode &&
+                    OTA_VALUE_ENTER == p_ota_cb_data->msg_data.write.u.value)
+                {
+                    /*battery level is above 60 percent*/
+                    APP_PRINT_INFO0("Preparing switch into OTA mode\n");
+                    /*prepare to enter OTA mode, before switch action, we should disconnect first.*/
+                    dfu_switch_to_ota_mode_pending = true;
+                    le_disconnect(0);
+                }
+#endif
             }
             break;
         default:

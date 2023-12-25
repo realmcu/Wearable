@@ -20,6 +20,13 @@ static T_GAP_CONN_STATE gap_conn_state = GAP_CONN_STATE_DISCONNECTED; /**< GAP c
 
 static T_LE_MSG_CBACK_ITEM gap_msg_list = {NULL, NULL};
 static T_LE_MSG_CBACK_ITEM app_list = {NULL, NULL};
+#ifdef RTL87x2G
+#include "ble_dfu_transport.h"
+#include "rtl_wdg.h"
+#include "wdg.h"
+#else
+bool dfu_switch_to_ota_mode_pending = false;
+#endif
 
 void le_msg_handler_cback_register(P_LE_MSG_HANDLER_CBACK
                                    cback)//todo for return bool, cpp check fail
@@ -138,8 +145,54 @@ void app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new_state, uint
             {
                 APP_PRINT_ERROR1("app_handle_conn_state_evt: connection lost cause 0x%x", disc_cause);
             }
+#ifdef RTL87x2G
+            if (dfu_switch_to_ota_mode_pending)
+            {
+#if (SUPPORT_NORMAL_OTA == 1)
+                dfu_switch_to_ota_mode_pending = false;
 
+                dfu_switch_to_ota_mode();
+#endif
+            }
+            else
+            {
+                if (dfu_active_reset_pending)
+                {
+                    DBG_DIRECT("OTA APP Active reset....");
+                    dfu_active_reset_pending = false;
+
+#if (ENABLE_AUTO_BANK_SWITCH == 1)
+                    if (is_ota_support_bank_switch())
+                    {
+                        uint32_t ota_addr;
+                        ota_addr = get_header_addr_by_img_id(IMG_OTA);
+                        DBG_DIRECT("FOR QC Test: Bank switch Erase OTA Header=0x%x", ota_addr);
+                        flash_nor_erase_locked(ota_addr, FLASH_NOR_ERASE_SECTOR);
+                    }
+#endif
+
+                    //unlock_flash_bp_all();   //GRACE TO CHECK
+                    dfu_fw_reboot(RESET_ALL, DFU_ACTIVE_RESET);
+                }
+                else
+                {
+                    le_adv_start();
+                }
+            }
+#elif RTL8762D
+            if (dfu_switch_to_ota_mode_pending)
+            {
+                dfu_switch_to_ota_mode_pending = false;
+                extern void dfu_switch_to_ota_mode(void);
+                dfu_switch_to_ota_mode();
+            }
+            else
+            {
+                le_adv_start();
+            }
+#else
             le_adv_start();
+#endif
         }
         break;
 

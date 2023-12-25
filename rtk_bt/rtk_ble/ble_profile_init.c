@@ -74,11 +74,17 @@ void app_le_profile_init(void)
 
     server_register_app_cb(app_profile_callback);
 
-#if defined RTL87x2G
+#ifdef RTL87x2G
 //    extern void app_ble_ota_init(void);
 //    app_ble_ota_init();
 //    extern void app_ble_dfu_init(void);
 //    app_ble_dfu_init();
+#elif RTL8762D
+    extern void app_ble_ota_init(void);
+    app_ble_ota_init();
+    client_init(2);
+    ancs_init(1);
+    app_gatts_client_init();
 #else
     client_init(2);
     ancs_init(1);

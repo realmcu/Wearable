@@ -22,6 +22,8 @@ if GetDepend(['USING_BLE_TASK']):
 #     src += ['app_ble_bwps.c']
 if GetDepend(['CONFIG_RTK_OTA_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
     src += ['app_ble_ota.c']
+if GetDepend(['CONFIG_RTK_OTA_SERVICE']) and GetDepend(['USING_8762D_DEVICE']):
+    src += ['app_ble_ota.c']
 if GetDepend(['CONFIG_RTK_DFU_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
     src += ['app_ble_dfu.c']
 CPPPATH = [cwd]
