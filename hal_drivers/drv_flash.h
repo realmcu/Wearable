@@ -26,10 +26,10 @@ int realtek_flash_read(uint32_t addr, uint8_t *buf, uint32_t size);
 int realtek_flash_write(uint32_t addr, const uint8_t *buf, uint32_t size);
 int realtek_flash_erase(uint32_t addr, uint32_t size);
 
-#define REALTK_FLASH_START_ADDRESS                   BKP_DATA1_ADDR
-#define REALTEK_FLASH_SIZE                           (0x04400000 - REALTK_FLASH_START_ADDRESS)
+#define REALTK_FLASH_START_ADDRESS                   OTA_TMP_ADDR
+#define REALTEK_FLASH_SIZE                           (OTA_TMP_SIZE)
 #define FLASH_SECTOR_SIZE                            4096
-#define REALTEK_FLASH_END_ADDRESS                    (0x04400000)
+#define REALTEK_FLASH_END_ADDRESS                    (OTA_TMP_ADDR + OTA_TMP_SIZE)
 
 #ifdef __cplusplus
 }
