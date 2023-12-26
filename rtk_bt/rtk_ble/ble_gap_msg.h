@@ -84,7 +84,7 @@ typedef struct _T_LE_MSG_CBACK_ITEM
     P_LE_MSG_HANDLER_CBACK              cback;
 } T_LE_MSG_CBACK_ITEM;
 
-void app_handle_io_msg(T_IO_MSG io_msg);
+void app_handle_io_msg_bt(T_IO_MSG io_msg);
 
 void le_msg_handler_cback_register(P_LE_MSG_HANDLER_CBACK cback);
 void le_msg_handler_cback_unregister(P_LE_MSG_HANDLER_CBACK cback);

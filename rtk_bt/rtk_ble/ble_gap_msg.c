@@ -87,7 +87,7 @@ void app_msg_handler_cback_unregister(P_LE_MSG_HANDLER_CBACK cback)
 }
 
 
-void app_handle_dev_state_evt(T_GAP_DEV_STATE new_state, uint16_t cause)
+static void app_handle_dev_state_evt(T_GAP_DEV_STATE new_state, uint16_t cause)
 {
     APP_PRINT_INFO3("app_handle_dev_state_evt: init state %d, adv state %d, cause 0x%x",
                     new_state.gap_init_state, new_state.gap_adv_state, cause);
@@ -132,7 +132,8 @@ void app_handle_dev_state_evt(T_GAP_DEV_STATE new_state, uint16_t cause)
  * @param[in] disc_cause Use this cause when new_state is GAP_CONN_STATE_DISCONNECTED
  * @return   void
  */
-void app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new_state, uint16_t disc_cause)
+static void app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new_state,
+                                      uint16_t disc_cause)
 {
     APP_PRINT_INFO4("app_handle_conn_state_evt: conn_id %d old_state %d new_state %d, disc_cause 0x%x",
                     conn_id, gap_conn_state, new_state, disc_cause);
@@ -229,7 +230,7 @@ void app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new_state, uint
  * @param[in] cause Use this cause when new_state is GAP_AUTHEN_STATE_COMPLETE
  * @return   void
  */
-void app_handle_authen_state_evt(uint8_t conn_id, uint8_t new_state, uint16_t cause)
+static void app_handle_authen_state_evt(uint8_t conn_id, uint8_t new_state, uint16_t cause)
 {
     APP_PRINT_INFO2("app_handle_authen_state_evt:conn_id %d, cause 0x%x", conn_id, cause);
 
@@ -272,7 +273,7 @@ void app_handle_authen_state_evt(uint8_t conn_id, uint8_t new_state, uint16_t ca
  * @param[in] mtu_size  New mtu size
  * @return   void
  */
-void app_handle_conn_mtu_info_evt(uint8_t conn_id, uint16_t mtu_size)
+static void app_handle_conn_mtu_info_evt(uint8_t conn_id, uint16_t mtu_size)
 {
     APP_PRINT_INFO2("app_handle_conn_mtu_info_evt: conn_id %d, mtu_size %d", conn_id, mtu_size);
 }
@@ -285,7 +286,7 @@ void app_handle_conn_mtu_info_evt(uint8_t conn_id, uint16_t mtu_size)
  * @param[in] cause Use this cause when status is GAP_CONN_PARAM_UPDATE_STATUS_FAIL
  * @return   void
  */
-void app_handle_conn_param_update_evt(uint8_t conn_id, uint8_t status, uint16_t cause)
+static void app_handle_conn_param_update_evt(uint8_t conn_id, uint8_t status, uint16_t cause)
 {
     switch (status)
     {
@@ -421,7 +422,7 @@ void app_handle_gap_msg(T_IO_MSG *p_gap_msg)
 }
 
 
-void app_handle_io_msg(T_IO_MSG io_msg)
+void app_handle_io_msg_bt(T_IO_MSG io_msg)
 {
     uint16_t msg_type = io_msg.type;
     APP_PRINT_TRACE1("app_handle_io_msg %d", msg_type);

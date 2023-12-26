@@ -230,7 +230,7 @@ void bt_task_entry(void *p_param)
                 T_IO_MSG io_msg;
                 if (os_msg_recv(io_queue_handle, &io_msg, 0) == true)
                 {
-                    app_handle_io_msg(io_msg);
+                    app_handle_io_msg_bt(io_msg);
                 }
             }
 #if defined RTL8772F || defined RTL87x2G
