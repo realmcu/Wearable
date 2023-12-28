@@ -206,18 +206,25 @@ void app_handle_notification_attribute_data(T_APP_ANCS_LINK *p_ancs_link)
                    p_ancs_link->current_len);
             ds_notification_attr_total.total_len += p_ancs_link->current_len;
             ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = '\0';
-            set_notification(ds_notification_attr_total.total_len, ds_notification_attr_total.total_data);
             APP_PRINT_INFO1("%s", TRACE_STRING(ds_notification_attr_total.total_data));
+#ifdef RTK_MODULE_USING_DATABASE
+            set_notification(ds_notification_attr_total.total_len, ds_notification_attr_total.total_data);
+#endif
+
 
             ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = '\0';
 #if 1// test code
+#ifdef RTK_MODULE_USING_DATABASE
             uint8_t msg_num = notification_current_num_get();
 
             for (uint8_t i = msg_num; i > 0; i--)
             {
+#ifdef RTK_MODULE_USING_DATABASE
                 get_notification(ds_notification_attr_total.total_len, ds_notification_attr_total.total_data, i);
+#endif
                 APP_PRINT_INFO2("msg_num %d %s", i, TRACE_STRING(ds_notification_attr_total.total_data));
             }
+#endif
 #endif
             ds_notification_attr_total.total_len = 0;
         }
