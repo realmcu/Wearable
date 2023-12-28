@@ -22,8 +22,8 @@ static T_LE_MSG_CBACK_ITEM gap_msg_list = {NULL, NULL};
 static T_LE_MSG_CBACK_ITEM app_list = {NULL, NULL};
 #ifdef RTL87x2G
 #include "ble_dfu_transport.h"
-#include "rtl_wdg.h"
-#include "wdg.h"
+#include "rtl_wdt.h"
+#include "wdt.h"
 #else
 bool dfu_switch_to_ota_mode_pending = false;
 #endif
