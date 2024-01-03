@@ -12,6 +12,6 @@ libs += Split('''
 tuya_ble_sdk_lib_arm_m4f_keil
 ''')
 
-group = DefineGroup('tuya_ble_sdk', src, depend = ['TUYA_BLE_SDK'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('tuya_ble_sdk', src, depend = ['CONFIG_REALTEK_TUYA_BLE_SDK'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
 
 Return('group')

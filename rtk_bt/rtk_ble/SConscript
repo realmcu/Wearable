@@ -10,7 +10,7 @@ objs = []
 src = Split("""
 """)
 
-if GetDepend(['USING_BLE_TASK']):
+if GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     src += ['ble_gap_msg.c']
     src += ['ble_profile_init.c']
     src += ['ble_gap_init.c']
@@ -18,13 +18,13 @@ if GetDepend(['USING_BLE_TASK']):
     src += ['app_ble_bas.c']
     src += ['app_gatts_client.c']
     src += ['ancs.c']
-# if GetDepend(['PRIVATE_SERVICE']) or GetDepend(['CONFIG_RTK_PRIVATE_SERVICE']):
+# if GetDepend(['CONFIG_REALTEK_PRIVATE_SERVICE']) or GetDepend(['CONFIG_REALTEK_PRIVATE_SERVICE']):
 #     src += ['app_ble_bwps.c']
-if GetDepend(['CONFIG_RTK_OTA_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
+if GetDepend(['CONFIG_REALTEK_OTA_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
     src += ['app_ble_ota.c']
-if GetDepend(['CONFIG_RTK_OTA_SERVICE']) and GetDepend(['USING_8762D_DEVICE']):
+if GetDepend(['CONFIG_REALTEK_OTA_SERVICE']) and GetDepend(['CONFIG_REALTEK_8762D_DEVICE']):
     src += ['app_ble_ota.c']
-if GetDepend(['CONFIG_RTK_DFU_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
+if GetDepend(['CONFIG_REALTEK_DFU_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
     src += ['app_ble_dfu.c']
 CPPPATH = [cwd]
 

@@ -11,7 +11,7 @@ objs = []
 src = Split("""
 """)
 CPPDEFINES = []
-if GetDepend(['USING_BR_TASK']):
+if GetDepend(['CONFIG_REALTEK_BR_TASK']):
     src += ['br_gap_init.c']
     src += ['br_gap_cb.c']
     src += ['app_linkback.c']
@@ -20,24 +20,24 @@ if GetDepend(['USING_BR_TASK']):
     src += ['app_sniff_mode.c']
     src += ['app_relay.c']
     #src += ['app_capture_data.c']
-if GetDepend(['BR_PROFILE_SDP']):
+if GetDepend(['CONFIG_REALTEK_BR_PROFILE_SDP']):
     src += ['app_sdp.c']
     CPPDEFINES += ['RTK_BR_PROFILE_SDP']
-if GetDepend(['BR_PROFILE_SPP']):
+if GetDepend(['CONFIG_REALTEK_BR_PROFILE_SPP']):
     src += ['app_spp.c']
     CPPDEFINES += ['RTK_BR_PROFILE_SPP']
-if GetDepend(['BR_PROFILE_A2DP']):
+if GetDepend(['CONFIG_REALTEK_BR_PROFILE_A2DP']):
     src += ['app_audio_policy.c']
     src += ['app_audio_route.c']
     src += ['app_a2dp.c']
     CPPDEFINES += ['RTK_BR_PROFILE_A2DP']
-if GetDepend(['BR_PROFILE_AVRCP']):
+if GetDepend(['CONFIG_REALTEK_BR_PROFILE_AVRCP']):
     src += ['app_avrcp.c']
     CPPDEFINES += ['RTK_BR_PROFILE_AVRCP']
-if GetDepend(['BR_PROFILE_PBAP']):
+if GetDepend(['CONFIG_REALTEK_BR_PROFILE_PBAP']):
     src += ['app_pbap.c']
     CPPDEFINES += ['RTK_BR_PROFILE_PBAP']
-if GetDepend(['BR_PROFILE_HFP']):
+if GetDepend(['CONFIG_REALTEK_BR_PROFILE_HFP']):
     src += ['app_hfp.c']
     CPPDEFINES += ['RTK_BR_PROFILE_HFP']
 

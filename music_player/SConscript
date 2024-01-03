@@ -8,7 +8,7 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 CPPDEFINES = []
-if GetDepend(['MODULE_LOCAL_PLAYBACK']):
+if GetDepend(['CONFIG_REALTEK_MODULE_LOCAL_PLAYBACK']):
     src += ['app_playback.c']
     src += ['mp3_player.c']
     src += ['mp3_parser.c']

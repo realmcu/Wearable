@@ -8,9 +8,9 @@ src   = Glob('*.c')
 CPPPATH = [cwd]
 list = os.listdir(cwd)
 
-group = DefineGroup('tuya_ble_sdk', src, depend = ['TUYA_BLE_SDK'], CPPPATH = CPPPATH)
+group = DefineGroup('tuya_ble_sdk', src, depend = ['CONFIG_REALTEK_TUYA_BLE_SDK'], CPPPATH = CPPPATH)
 
-if GetDepend('TUYA_BLE_SDK'):
+if GetDepend('CONFIG_REALTEK_TUYA_BLE_SDK'):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):

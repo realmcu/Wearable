@@ -8,7 +8,7 @@ list = os.listdir(cwd)
 
 for d in list:
     path = os.path.join(cwd, d)
-    if GetDepend(['WITHOUT_WEARABLE']):
+    if GetDepend(['CONFIG_REALTEK_WITHOUT_WEARABLE']):
         Return('objs')
     else:
         if os.path.isfile(os.path.join(path, 'SConscript')):

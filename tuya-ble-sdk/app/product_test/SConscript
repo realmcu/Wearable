@@ -8,7 +8,7 @@ src   = Glob('*.c')
 CPPPATH = [cwd]
 
 
-group = DefineGroup('tuya_ble_sdk', src, depend = ['TUYA_BLE_SDK'], CPPPATH = CPPPATH)
+group = DefineGroup('tuya_ble_sdk', src, depend = ['CONFIG_REALTEK_TUYA_BLE_SDK'], CPPPATH = CPPPATH)
 
 
 Return('group')

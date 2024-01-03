@@ -32,7 +32,7 @@ path = [cwd,
         cwd + '/sm',
         cwd + '/vendor']
 
-group = DefineGroup('ali_iot', src, depend = ['MODULE_ALI_IOT'], CPPPATH = path, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('ali_iot', src, depend = ['CONFIG_REALTEK_MODULE_ALI_IOT'], CPPPATH = path, LIBS = libs, LIBPATH = libpath)
 
 objs = []
 list = os.listdir(cwd)

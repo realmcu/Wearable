@@ -13,7 +13,7 @@ CWM_LIB_Keil
 ''')
 	
 
-group = DefineGroup('CWM', src, depend = ['MODULE_USING_CWM'], CPPPATH = path, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('CWM', src, depend = ['CONFIG_REALTEK_MODULE_CWM'], CPPPATH = path, LIBS = libs, LIBPATH = libpath)
 
 Return('group')
 

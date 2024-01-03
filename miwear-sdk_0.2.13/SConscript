@@ -15,7 +15,7 @@ lib/miwear-sdk-RTL8762DK_M69-nanopb_0.2.13
 
 path = [cwd]
 
-group = DefineGroup('miwear', src, depend = ['RTK_MI_WEAR'], CPPPATH = path, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('miwear', src, depend = ['CONFIG_REALTEK_MI_WEAR'], CPPPATH = path, LIBS = libs, LIBPATH = libpath)
 
 objs = []
 list = os.listdir(cwd)

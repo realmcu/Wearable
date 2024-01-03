@@ -2,7 +2,7 @@ from building import *
 
 
 src   = Glob('*.c')
-if GetDepend(['USING_8762D_DEVICE']):
+if GetDepend(['CONFIG_REALTEK_8762D_DEVICE']):
     SrcRemove(src,'syscall_mem.c')
 group = []
 

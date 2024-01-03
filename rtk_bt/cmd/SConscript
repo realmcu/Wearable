@@ -9,7 +9,7 @@ list = os.listdir(cwd)
 src = Split("""
 """)
 
-if GetDepend(['USING_BR_TASK']):
+if GetDepend(['CONFIG_REALTEK_BR_TASK']):
     src += ['app_cmd.c']
     src += ['app_report.c']
 

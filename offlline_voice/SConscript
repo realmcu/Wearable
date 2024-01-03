@@ -8,7 +8,7 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-if GetDepend(['MODULE_OFFLINE_VOICE']):
+if GetDepend(['CONFIG_REALTEK_MODULE_OFFLINE_VOICE']):
     src     = Glob('*.c')
     
 
@@ -21,6 +21,6 @@ libs += Split('''
 libqvoice
 ''')
 
-group = DefineGroup('offline_voice', src, depend = ['MODULE_OFFLINE_VOICE'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('offline_voice', src, depend = ['CONFIG_REALTEK_MODULE_OFFLINE_VOICE'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
 
 Return('group')

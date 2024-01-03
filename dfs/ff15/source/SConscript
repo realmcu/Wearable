@@ -9,6 +9,6 @@ src = Split("""
 src = Glob('*.c')
 CPPPATH = [cwd]
 
-group = DefineGroup('fatfs', src, depend = ['MODULE_USING_FATFS'], CPPPATH = CPPPATH)
+group = DefineGroup('fatfs', src, depend = ['CONFIG_REALTEK_MODULE_FATFS'], CPPPATH = CPPPATH)
 
 Return('group')

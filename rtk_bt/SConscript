@@ -11,9 +11,9 @@ CPPDEFINES = ['DEFINE_RTK_BT_TODO']
     
 libs = ['']
 libpath = ['']
-if GetDepend(['USING_BR_TASK']) or GetDepend(['USING_BLE_TASK']):
+if GetDepend(['CONFIG_REALTEK_BR_TASK']) or GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     src += ['bt_task.c']
-if GetDepend(['USING_BR_TASK']):
+if GetDepend(['CONFIG_REALTEK_BR_TASK']):
     Import('SDK_ROOT')
     libpath = [SDK_ROOT + '/bin/mdk']
     libs += ['gap_utils']
@@ -30,14 +30,14 @@ if GetDepend(['USING_BR_TASK']):
     src += ['app_transfer.c']
     src += ['app_br_link_util.c']
     CPPDEFINES += ['RTK_BR_TASK']
-if GetDepend(['MODULE_USING_DATABASE']) and GetDepend(['USING_BLE_TASK']):
+if GetDepend(['CONFIG_REALTEK_MODULE_DATABASE']) and GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     src += ['app_le_link_util.c']
-if GetDepend(['USING_BLE_TASK']):
+if GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     CPPDEFINES += ['RTK_BLE_TASK']
     
 group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES, LIBS = libs, LIBPATH = libpath)
 
-if GetDepend(['USING_BR_TASK']) or GetDepend(['USING_BLE_TASK']):
+if GetDepend(['CONFIG_REALTEK_BR_TASK']) or GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):

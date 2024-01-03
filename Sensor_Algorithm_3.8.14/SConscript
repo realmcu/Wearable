@@ -11,6 +11,6 @@ libs += Split('''
 health_algorithm_3.8.14
 ''')
 
-group = DefineGroup('algorithm', src, depend = ['MODULE_USING_RTK_ALGO'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('algorithm', src, depend = ['CONFIG_REALTEK_MODULE_RTK_ALGO'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
 
 Return('group')

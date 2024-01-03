@@ -6,7 +6,7 @@ cwd  = GetCurrentDir()
 objs = []
 list = os.listdir(cwd)
 
-if GetDepend(['BUILD_USING_VG_LITE']):
+if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):
