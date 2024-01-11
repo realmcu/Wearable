@@ -17,7 +17,6 @@
 #define BIT_TXSIM               (0x00000001 << 9)
 #define BIT_SEQ_EN              (0x00000001 << 3)
 
-bool lcd_init_flag = false;
 static void qspi_write(uint8_t *buf, uint32_t len)
 {
     uint32_t flag = os_lock();
@@ -360,7 +359,7 @@ static void incna3311_chip_reset(void)
     //no need HW do it
 }
 
-bool rtk_lcd_hal_power_off(void)
+bool drv_lcd_power_off(void)
 {
     incna3311_cmd(0x28);             /*sleep in*/
     platform_delay_ms(25);
@@ -368,31 +367,74 @@ bool rtk_lcd_hal_power_off(void)
     return 0;
 }
 
-bool rtk_lcd_hal_power_on(void)
+bool drv_lcd_power_on(void)
 {
-    // incna3311_cmd(0x29);             /*power on*/
-    rtk_lcd_hal_init();
+    /* config LCD dev info */
+    RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK, ENABLE);
+
+    //from XTAL SOURCE = 40M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_ck_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_func_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_mux_clk_cg_en = 1;
+
+    //From PLL1, SOURCE = 100M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 1; //pll1_peri(0) or pll2(1, pll2 = 160M)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel1 = 1; //pll(1) or xtal(0)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_sel = 1; //div
+
+    LCDC_InitTypeDef lcdc_init = {0};
+    lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
+    lcdc_init.LCDC_GroupSel = 1; //QFN88 2 - QFN68 1
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB565;
+    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB565;
+    lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
+#if TE_VALID
+    lcdc_init.LCDC_TeEn = ENABLE;
+    lcdc_init.LCDC_TePolarity = LCDC_TE_EDGE_FALLING;
+    lcdc_init.LCDC_TeInputMux = LCDC_TE_LCD_INPUT;
+#endif
+    lcdc_init.LCDC_DmaThreshold =
+        8;    //only support threshold = 8 for DMA MSIZE = 8; the other threshold setting will be support later
+    LCDC_Init(&lcdc_init);
+
+    LCDC_DBICCfgTypeDef dbic_init = {0};
+    dbic_init.DBIC_SPEED_SEL         = 1;
+    dbic_init.DBIC_TxThr             = 0;//0 or 4
+    dbic_init.DBIC_RxThr             = 0;
+    dbic_init.SCPOL                  = DBIC_SCPOL_LOW;
+    dbic_init.SCPH                   = DBIC_SCPH_1Edge;
+    DBIC_Init(&dbic_init);
+
+    incna3311_cmd(0x11);             /*sleep out*/
+    platform_delay_ms(30);
+    incna3311_cmd(0x29);             /*power on*/
     return 0;
 }
 
-bool rtk_lcd_hal_dlps_check(void)
+bool drv_lcd_dlps_check(void)
 {
     return true;
 }
 
-bool rtk_lcd_wake_up(void)
+bool drv_lcd_wake_up(void)
 {
     return 0;
 }
 
-uint32_t rtk_lcd_hal_dlps_restore(void)
+uint32_t drv_lcd_dlps_restore(void)
 {
     return 0;
 }
 
-void rtk_lcd_dlps_init(void)
+static void drv_lcd_dlps_init(void)
 {
-
+#ifdef RTK_HAL_DLPS
+    drv_dlps_exit_cbacks_register("lcd", drv_lcd_power_on);
+    drv_dlps_enter_cbacks_register("lcd", drv_lcd_power_off);
+    drv_dlps_check_cbacks_register("lcd", drv_lcd_dlps_check);
+    drv_dlps_wakeup_cbacks_register("lcd", drv_lcd_wake_up);
+#endif
 }
 
 void rtk_lcd_hal_init(void)
@@ -486,13 +528,10 @@ void rtk_lcd_hal_init(void)
 
     incna3311_cmd(0x29);             /*power on*/
 
+    rtk_lcd_hal_set_window(0, 0, 280, 456);
+    rtk_lcd_hal_rect_fill(0, 0, 280, 456, 0x0000ff00);
+    drv_lcd_dlps_init();
 
-    if (lcd_init_flag == false)
-    {
-        rtk_lcd_hal_set_window(0, 0, 280, 456);
-        rtk_lcd_hal_rect_fill(0, 0, 280, 456, 0x0000ff00);
-        lcd_init_flag = true;
-    }
     DBG_DIRECT("[LCD Init Done]func = %s, line = %d", __func__, __LINE__);
 }
 

@@ -29,11 +29,6 @@ void rtk_touch_hal_int_config(bool enable);
 bool drv_touch_read(uint16_t *x, uint16_t *y, bool *pressing);
 void drv_touch_init(void);
 
-bool rtk_touch_hal_power_off(void);
-bool rtk_touch_hal_power_on(void);
-bool rtk_touch_hal_dlps_check(void);
-bool rtk_touch_wake_up(void);
-void rtk_touch_dlps_init(void);
 
 #endif  /* __DRV_TOUCH_H__ */
 

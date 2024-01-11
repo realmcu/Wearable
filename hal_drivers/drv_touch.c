@@ -35,18 +35,10 @@ void drv_touch_int_config(bool enable)
 }
 
 
-static void drv_touch_dlps_init(void)
-{
-#ifdef RTK_HAL_DLPS
-
-#endif
-}
-
 void drv_touch_init(void)
 {
     DBG_DIRECT("Drv touch init");
     rtk_touch_hal_init();
-    drv_touch_dlps_init();
 }
 
 

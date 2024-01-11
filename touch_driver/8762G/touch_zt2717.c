@@ -16,10 +16,6 @@
 #include "os_timer.h"
 
 void (*touch_wakeup_indicate)(void) = NULL;
-bool TP_DLPS_FLAG = false;
-void *tp_dlps_timer_handle = NULL;
-
-#define TP_DLPS_TIME_OUT 5000
 
 static void ts_write_cmd(uint16_t cmd)
 {
@@ -81,11 +77,6 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     return true;
 }
 
-// void tp_dlps_timer_up_cb(void *parameter)
-// {
-//     TP_DLPS_FLAG = true;
-// }
-
 // void tp_indicate(void *p)
 // {
 //     DBG_DIRECT("tp_indicate");
@@ -113,7 +104,7 @@ void rtk_touch_hal_int_config(bool enable)
     }
 }
 
-bool rtk_touch_hal_power_off(void)
+bool drv_touch_power_off(void)
 {
     drv_pin_mode(TOUCH_ZT2717_INT, PIN_MODE_INPUT);
     Pad_Config(TOUCH_ZT2717_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
@@ -122,23 +113,20 @@ bool rtk_touch_hal_power_off(void)
     return true;
 }
 
-bool rtk_touch_hal_power_on(void)
+bool drv_touch_power_on(void)
 {
-    rtk_touch_hal_init();
+    drv_i2c0_init(TOUCH_ZT2717_SCL, TOUCH_ZT2717_SDA);
     Pad_Config(TOUCH_ZT2717_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_HIGH);
-    // TP_DLPS_FLAG = false;
     return true;
 }
 
-bool rtk_touch_hal_dlps_check(void)
+bool drv_touch_dlps_check(void)
 {
-    DBG_DIRECT("rtk_touch_hal_dlps_check %d", TP_DLPS_FLAG);
     return true;
-    // return TP_DLPS_FLAG;
 }
 
-bool rtk_touch_wake_up(void)
+bool drv_touch_wake_up(void)
 {
     if (System_WakeUpInterruptValue(TOUCH_ZT2717_INT) == SET)
     {
@@ -151,14 +139,17 @@ bool rtk_touch_wake_up(void)
     return false;
 }
 
-void rtk_touch_dlps_init(void)
+static void drv_touch_dlps_init(void)
 {
-    // os_timer_create(&tp_dlps_timer_handle, "tp_dlps_timer", 3, TP_DLPS_TIME_OUT, true, tp_dlps_timer_up_cb);
-    // os_timer_start(&tp_dlps_timer_handle);
+#ifdef RTK_HAL_DLPS
     drv_pin_mode(TOUCH_ZT2717_INT, PIN_MODE_INPUT);
     Pad_Config(TOUCH_ZT2717_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_HIGH);
-    // rtk_touch_hal_set_indicate(tp_indicate);
+    drv_dlps_exit_cbacks_register("touch", drv_touch_power_on);
+    drv_dlps_enter_cbacks_register("touch", drv_touch_power_off);
+    drv_dlps_check_cbacks_register("touch", drv_touch_dlps_check);
+    drv_dlps_wakeup_cbacks_register("touch", drv_touch_wake_up);
+#endif
 }
 
 void rtk_touch_hal_init(void)
@@ -213,6 +204,6 @@ void rtk_touch_hal_init(void)
         ts_write_cmd(ZINITIX_CLEAR_INT_STATUS_CMD);
         platform_delay_us(10);
     }
-
+    drv_touch_dlps_init();
 }
 

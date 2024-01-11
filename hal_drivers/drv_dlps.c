@@ -203,7 +203,7 @@ void pwr_mgr_init(void)
 #if defined RTL8772F || defined RTL87x2G
     if (false == power_check_cb_register(app_dlps_check_cb))
     {
-        APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
+        // APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
     }
 #endif
 #ifdef RTL8762D
