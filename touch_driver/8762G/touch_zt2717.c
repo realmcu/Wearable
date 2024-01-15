@@ -80,7 +80,6 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
 // void tp_indicate(void *p)
 // {
 //     DBG_DIRECT("tp_indicate");
-//     os_timer_restart(&tp_dlps_timer_handle, TP_DLPS_TIME_OUT);
 // }
 
 void rtk_touch_hal_set_indicate(void (*indicate)(void *))

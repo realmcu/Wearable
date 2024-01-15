@@ -426,14 +426,23 @@ uint32_t drv_lcd_dlps_restore(void)
 {
     return 0;
 }
+bool rtk_lcd_hal_power_off(void)
+{
+    return drv_lcd_power_off();
+}
+
+bool rtk_lcd_hal_power_on(void)
+{
+    return drv_lcd_power_on();
+}
 
 static void drv_lcd_dlps_init(void)
 {
 #ifdef RTK_HAL_DLPS
-    drv_dlps_exit_cbacks_register("lcd", drv_lcd_power_on);
-    drv_dlps_enter_cbacks_register("lcd", drv_lcd_power_off);
-    drv_dlps_check_cbacks_register("lcd", drv_lcd_dlps_check);
-    drv_dlps_wakeup_cbacks_register("lcd", drv_lcd_wake_up);
+    // drv_dlps_exit_cbacks_register("lcd", drv_lcd_power_on);
+    // drv_dlps_enter_cbacks_register("lcd", drv_lcd_power_off);
+    // drv_dlps_check_cbacks_register("lcd", drv_lcd_dlps_check);
+    // drv_dlps_wakeup_cbacks_register("lcd", drv_lcd_wake_up);
 #endif
 }
 
