@@ -86,6 +86,10 @@ void app_le_profile_init(void)
     ancs_init(1);
     app_gatts_client_init();
 #else
+    extern void app_ble_ota_init(void);
+    app_ble_ota_init();
+    extern void app_ble_dfu_init(void);
+    app_ble_dfu_init();
     client_init(2);
     ancs_init(1);
     app_gatts_client_init();

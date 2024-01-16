@@ -22,10 +22,14 @@ if GetDepend(['CONFIG_REALTEK_BLE_TASK']):
 #     src += ['app_ble_bwps.c']
 if GetDepend(['CONFIG_REALTEK_OTA_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
     src += ['app_ble_ota.c']
-if GetDepend(['CONFIG_REALTEK_OTA_SERVICE']) and GetDepend(['CONFIG_REALTEK_8762D_DEVICE']):
-    src += ['app_ble_ota.c']
 if GetDepend(['CONFIG_REALTEK_DFU_SERVICE']) and GetDepend(['CONFIG_RTK_USING_RTL87x2G_DEVICE']):
     src += ['app_ble_dfu.c']
+if GetDepend(['CONFIG_REALTEK_OTA_SERVICE']) and GetDepend(['CONFIG_REALTEK_8772F_DEVICE']):
+    src += ['app_ble_ota.c']
+if GetDepend(['CONFIG_REALTEK_DFU_SERVICE']) and GetDepend(['CONFIG_REALTEK_8772F_DEVICE']):
+    src += ['app_ble_dfu.c']
+if GetDepend(['CONFIG_REALTEK_OTA_SERVICE']) and GetDepend(['CONFIG_REALTEK_8762D_DEVICE']):
+    src += ['app_ble_ota.c']
 CPPPATH = [cwd]
 
 CPPDEFINES = ['DEFINE_RTK_BT_TODO']

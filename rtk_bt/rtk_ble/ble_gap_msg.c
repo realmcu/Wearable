@@ -24,6 +24,8 @@ static T_LE_MSG_CBACK_ITEM app_list = {NULL, NULL};
 #include "ble_dfu_transport.h"
 #include "rtl_wdt.h"
 #include "wdt.h"
+#elif RTL8772F
+#include "ble_dfu_transport.h"
 #else
 bool dfu_switch_to_ota_mode_pending = false;
 #endif
