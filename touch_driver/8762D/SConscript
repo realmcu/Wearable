@@ -7,8 +7,11 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-if GetDepend(['CONFIG_REALTEK_BSP_TOUCH_816S_8762D_320']):
+if GetDepend(['BSP_TOUCH_816S_8762D_320']):
     src += ['touch_816s_8762d_320.c']
+
+if GetDepend(['BSP_TOUCH_FT6336_8762D']):
+    src += ['touch_ft6336_8762d.c']
 
 CPPPATH = [cwd]
 
