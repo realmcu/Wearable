@@ -85,11 +85,13 @@ void app_le_profile_init(void)
     client_init(2);
     ancs_init(1);
     app_gatts_client_init();
-#else
+#elif RTL8772F
+#if (SUPPORT_NORMAL_OTA == 1)
     extern void app_ble_ota_init(void);
     app_ble_ota_init();
     extern void app_ble_dfu_init(void);
     app_ble_dfu_init();
+#endif
     client_init(2);
     ancs_init(1);
     app_gatts_client_init();
