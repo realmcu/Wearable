@@ -23,10 +23,16 @@ static T_LE_MSG_CBACK_ITEM app_list = {NULL, NULL};
 #ifdef RTL87x2G
 #include "ble_dfu_transport.h"
 #include "rtl_wdt.h"
+#include "dfu_main.h"
 #include "wdt.h"
+#include "os_timer.h"
 #elif RTL8772F
 #if (SUPPORT_NORMAL_OTA == 1)
 #include "ble_dfu_transport.h"
+#include "dfu_main.h"
+#include "wdg.h"
+#include "rtl876x_wdg.h"
+#include "os_timer.h"
 #endif
 #else
 bool dfu_switch_to_ota_mode_pending = false;
@@ -151,21 +157,19 @@ static void app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new_stat
                 APP_PRINT_ERROR1("app_handle_conn_state_evt: connection lost cause 0x%x", disc_cause);
             }
 #ifdef RTL87x2G
-            if (dfu_switch_to_ota_mode_pending)
+            if (dfu_active_reset_pending)
             {
-#if (SUPPORT_NORMAL_OTA == 1)
-                dfu_switch_to_ota_mode_pending = false;
+                dfu_active_reset_pending = false;
 
-                dfu_switch_to_ota_mode();
-#endif
-            }
-            else
-            {
-                if (dfu_active_reset_pending)
+                /*when muti image in temp, need goto OTA mode*/
+                if (dfu_active_reset_to_ota_mode)
                 {
-                    DBG_DIRECT("OTA APP Active reset....");
-                    dfu_active_reset_pending = false;
-
+                    DBG_DIRECT("comb Mormal OTA, Reset to OTA Mode");
+                    dfu_active_reset_to_ota_mode = false;
+                    dfu_switch_to_ota_mode();
+                }
+                else
+                {
 #if (ENABLE_AUTO_BANK_SWITCH == 1)
                     if (is_ota_support_bank_switch())
                     {
@@ -176,13 +180,47 @@ static void app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new_stat
                     }
 #endif
 
-                    //unlock_flash_bp_all();   //GRACE TO CHECK
-                    dfu_fw_reboot(RESET_ALL, DFU_ACTIVE_RESET);
+                    //unlock_flash_bp_all();
+                    chip_reset(RESET_ALL);
+                }
+
+            }
+            else
+            {
+                dfu_fw_reboot(RESET_ALL, DFU_LINK_LOST_RESET);
+            }
+#elif RTL8772F
+            if (dfu_active_reset_pending)
+            {
+                dfu_active_reset_pending = false;
+
+                /*when muti image in temp, need goto OTA mode*/
+                if (dfu_active_reset_to_ota_mode)
+                {
+                    DBG_DIRECT("comb Mormal OTA, Reset to OTA Mode");
+                    dfu_active_reset_to_ota_mode = false;
+                    dfu_switch_to_ota_mode();
                 }
                 else
                 {
-                    le_adv_start();
+#if (ENABLE_AUTO_BANK_SWITCH == 1)
+                    if (is_ota_support_bank_switch())
+                    {
+                        uint32_t ota_addr;
+                        ota_addr = get_header_addr_by_img_id(IMG_OTA);
+                        DBG_DIRECT("FOR QC Test: Bank switch Erase OTA Header=0x%x", ota_addr);
+                        fmc_flash_nor_erase(ota_addr, FMC_FLASH_NOR_ERASE_SECTOR);
+                    }
+#endif
+
+                    //unlock_flash_bp_all();
+                    chip_reset(RESET_ALL);
                 }
+
+            }
+            else
+            {
+                dfu_fw_reboot(RESET_ALL, DFU_LINK_LOST_RESET);
             }
 #elif RTL8762D
             if (dfu_switch_to_ota_mode_pending)
@@ -216,6 +254,12 @@ static void app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new_stat
             APP_PRINT_INFO5("GAP_CONN_STATE_CONNECTED:remote_bd %s, remote_addr_type %d, conn_interval 0x%x, conn_latency 0x%x, conn_supervision_timeout 0x%x",
                             TRACE_BDADDR(remote_bd), remote_bd_type,
                             conn_interval, conn_latency, conn_supervision_timeout);
+
+#if (SUPPORT_NORMAL_OTA == 1)
+#if defined RTL8772F || defined RTL87x2G
+            os_timer_stop(&normal_ota_wait4_conn_timer_handle);
+#endif
+#endif
         }
         break;
 
