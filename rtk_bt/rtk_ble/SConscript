@@ -9,7 +9,7 @@ objs = []
 # add the general drivers.
 src = Split("""
 """)
-
+CPPDEFINES = ['DEFINE_RTK_BT_TODO']
 if GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     src += ['ble_gap_msg.c']
     src += ['ble_profile_init.c']
@@ -31,8 +31,9 @@ if GetDepend(['CONFIG_REALTEK_DFU_SERVICE']) and GetDepend(['CONFIG_REALTEK_8772
 if GetDepend(['CONFIG_REALTEK_OTA_SERVICE']) and GetDepend(['CONFIG_REALTEK_8762D_DEVICE']):
     src += ['app_ble_ota.c']
 CPPPATH = [cwd]
-
-CPPDEFINES = ['DEFINE_RTK_BT_TODO']
+if GetDepend(['CONFIG_REALTEK_BLE_COMPONENTS']):
+    src += ['ble_components_init.c']
+    CPPDEFINES += ['ENABLE_BLE_CONPONENTS']
 group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 for d in list:

@@ -9,6 +9,7 @@
 #include "ancs.h"
 #include "app_gatts_client.h"
 #include "app_ble_bas.h"
+#include "ble_components_init.h"
 #ifdef RTK_TUYA_BLE_SDK
 #include "tuya_ble_app_demo.h"
 #endif
@@ -73,7 +74,9 @@ void app_le_profile_init(void)
 #endif
 
     server_register_app_cb(app_profile_callback);
-
+#ifdef ENABLE_BLE_CONPONENTS
+    ble_components_init();
+#endif
 #ifdef RTL87x2G
 //    extern void app_ble_ota_init(void);
 //    app_ble_ota_init();
