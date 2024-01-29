@@ -209,7 +209,7 @@ void pwr_mgr_init(void)
 #ifdef RTL8762D
     if (false == dlps_check_cb_reg(app_dlps_check_cb))
     {
-        APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
+        // APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
     }
 #endif
     DLPS_IORegUserDlpsEnterCb(app_enter_dlps_config);
