@@ -21,17 +21,12 @@
 extern "C" {
 #endif
 
-#define TOUCH_816S_RST                                     H_0
-#define TOUCH_816S_INT                                     P2_3
-#define TOUCH_816S_SCL                                     H_2
-#define TOUCH_816S_SDA                                     P2_2
+#define TOUCH_FT6336_RST                                     H_0
+#define TOUCH_FT6336_INT                                     P2_3
+#define TOUCH_FT6336_SCL                                     H_2
+#define TOUCH_FT6336_SDA                                     P2_2
 
 #define FT6236_I2C_SLAVE_ADDR   (0x38)
-
-#define TOUCH_816S_ADDR                                      0x15
-#define TOUCH_CST816_CHIP_ID                                 0xA3     //chip ID 
-
-
 
 /* Maximum border values of the touchscreen pad that the chip can handle */
 #define  FT6X36_MAX_WIDTH              ((uint16_t)800)

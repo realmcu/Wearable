@@ -1,5 +1,5 @@
 #include "board.h"
-#include "lcd_st7796_320.h"
+#include "lcd_st7796_480_320.h"
 #include "app_section.h"
 #include "flash_device.h"
 #include "rtl_hal_peripheral.h"
@@ -81,12 +81,7 @@ static void lcd_pad_init(void)
     Pinmux_Config(LCD_8080_WR, IDLE_MODE);
 
     /*BL AND RESET ARE NOT FIX*/
-    Pad_Config(LCD_8080_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
-    //Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
-    //DBG_DIRECT("PAD_OUT_LOW %d", PAD_OUT_LOW);
-
-    Pinmux_Config(LCD_8080_BL, timer_pwm4);
-
+    Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
 }
 uint32_t rtk_lcd_hal_power_off(void)
 {
@@ -107,8 +102,8 @@ uint32_t rtk_lcd_hal_power_off(void)
     Pad_Config(LCD_8080_RD, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
     /* WR */
     Pad_Config(LCD_8080_WR, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-
-    Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    /* BL */
+    Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_DISABLE, PAD_OUT_LOW);
     return 0;
 }
 uint32_t rtk_lcd_hal_power_on(void)
@@ -131,7 +126,7 @@ uint32_t rtk_lcd_hal_power_on(void)
     /* WR */
     Pad_Config(LCD_8080_WR, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
 
-    Pad_Config(LCD_8080_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
     return 0;
 }
 
@@ -413,19 +408,11 @@ void lcd_set_backlight(uint32_t percent)
 {
     if (percent)
     {
-        if (percent > 100)
-        {
-            percent = 100;
-        }
-        TIM_Cmd(BL_PWM_TIM, DISABLE);
-        TIM_PWMChangeFreqAndDuty(BL_PWM_TIM, percent * 10, (100 - percent) * 10);
-        TIM_Cmd(BL_PWM_TIM, ENABLE);
-        Pad_Config(LCD_8080_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE,
+        Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE,
                    PAD_OUT_HIGH);
     }
     else
     {
-        TIM_Cmd(BL_PWM_TIM, DISABLE);
         Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
     }
     return;
@@ -434,10 +421,6 @@ void lcd_set_backlight(uint32_t percent)
 void rtk_lcd_hal_init(void)
 {
     lcd_device_init();
-    //lcd_set_reset(true);
-    //platform_delay_ms(50);
-    //lcd_set_reset(false);
-    //platform_delay_ms(50);
     lcd_set_reset(false);
     platform_delay_ms(1);
     lcd_set_reset(true);
@@ -450,8 +433,7 @@ void rtk_lcd_hal_init(void)
     st7796_write_cmd(0x29);
 
     lcd_set_backlight(100);
-    DBG_DIRECT("rtk_lcd_hal_rect_fill\n");
-    rtk_lcd_hal_rect_fill(0, 0, 320, 480, 0x00000000);
+    rtk_lcd_hal_rect_fill(0, 0, 320, 480, 0x26DA26DA);
 }
 
 
@@ -563,16 +545,17 @@ void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_
     rtk_lcd_hal_set_window(xStart, yStart, w, h);
 
     static uint32_t color_buf[64];
+    // static uint32_t color_buf;
     for (int i = 0; i < 64; i++)
     {
-        color_buf[i] = 0xF800F800;
+        color_buf[i] = color;
     }
-//    color_buf = (color >> 8) | (color << 8);
-//  DBG_DIRECT("color 0x%X", color);
-//  DBG_DIRECT("color_buf1 0x%X", color_buf);
-//    color_buf = color_buf | color_buf << 16;
-//  color_buf = 0xf800;
-//  DBG_DIRECT("color_buf2 0x%X", color_buf);
+    // color_buf = (color >> 8) | (color << 8);
+    // DBG_DIRECT("color 0x%X", color);
+    // DBG_DIRECT("color_buf1 0x%X", color_buf);
+    // color_buf = color_buf | color_buf << 16;
+    // DBG_DIRECT("color_buf2 0x%X", color_buf);
+    // color_buf = color;
 
     GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)color_buf);
     GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(&(IF8080->FIFO)));
