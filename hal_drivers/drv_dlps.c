@@ -216,9 +216,9 @@ void pwr_mgr_init(void)
     DLPS_IORegUserDlpsExitCb(app_exit_dlps_config);
     DLPS_IORegister();
 #ifdef RTL87x2G
-#if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+// #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
     bt_power_mode_set(BTPOWER_DEEP_SLEEP);
-#endif
+//#endif
     power_mode_set(POWER_DLPS_MODE);
 #endif
 #ifdef RTL8772F
