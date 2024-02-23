@@ -144,6 +144,8 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
     data[3] = yEnd & 0xff;
     rtl_lcd_qspi_cmd_param4(0x2B, data);
 
+    rtl_lcd_qspi_cmd_param(0x36, 0xA0);
+
     rtl_lcd_qspi_enter_data_output_mode();
 }
 
@@ -689,11 +691,35 @@ static void lcd_seq_init(void)
     platform_delay_ms(20);
 }
 
+
+uint32_t rtk_lcd_hal_power_on(void)
+{
+    rtl_lcd_qspi_write_cmd(0x11);   /*sleep out*/
+    platform_delay_ms(120);
+    DBG_DIRECT("sleep out");
+    rtl_lcd_qspi_write_cmd(0x29);   /*power on*/
+    platform_delay_ms(20);
+    DBG_DIRECT("power on");
+    return 0;
+}
+
+uint32_t rtk_lcd_hal_power_off(void)
+{
+    extern void drv_touch_int_config(bool enable);
+    drv_touch_int_config(true);
+    rtl_lcd_qspi_write_cmd(0x28);   /*sleep in*/
+    platform_delay_ms(120);
+
+    rtl_lcd_qspi_write_cmd(0x10);   /*power off*/
+    platform_delay_ms(20);
+    return 0;
+}
+
 void rtk_lcd_hal_init(void)
 {
     lcd_pad_init();
     qspi_lcd_platform_init();
-    SPIC2->baudr = 2;//by howie, this lcd panel can't set QSPI 45MHz
+    SPIC2->baudr = 2;
 
     lcd_set_reset(true);
     platform_delay_ms(120);
@@ -703,21 +729,9 @@ void rtk_lcd_hal_init(void)
 
     lcd_seq_init();
 
-    rtk_lcd_hal_rect_fill(0, 0, 320, 385, 0xF800F800);
+    rtk_lcd_hal_rect_fill(0, 0, 385, 320, 0xF800F800);
 
 }
-
-uint32_t rtk_lcd_hal_power_on(void)
-{
-    return 0;
-}
-
-uint32_t rtk_lcd_hal_power_off(void)
-{
-    return 0;
-}
-
-
 
 
 

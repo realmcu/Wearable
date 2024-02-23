@@ -19,7 +19,7 @@
 #include "board.h"
 #include "os_mem.h"
 
-#define CST816D_FIRMWARE_UPGRADE_ENABLE           0
+#define CST816D_FIRMWARE_UPGRADE_ENABLE           1
 
 void touch_write(uint16_t slave_address, uint16_t reg, uint8_t reg_len, uint8_t *data,
                  uint16_t data_len);
@@ -28,7 +28,6 @@ void touch_read(uint16_t slave_address, uint16_t reg, uint8_t reg_len, uint8_t *
 
 
 #if (CST816D_FIRMWARE_UPGRADE_ENABLE == 1)
-//#include "rtl876x_wdg.h"
 
 static bool cst816d_update_flag = false;
 static uint8_t cst816d_update_bin[] =
@@ -1211,19 +1210,19 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
         *pressing = false;
     }
 
-
-    *x = (((buf[3] & 0x0f) << 8) | buf[4]);
-    *y = (((buf[5] & 0x0f) << 8) | buf[6]);
+    *x = 385 - (((buf[5] & 0x0f) << 8) | buf[6]);
+    *y = (((buf[3] & 0x0f) << 8) | buf[4]);
 
     return true;
 }
 
 void rtk_touch_hal_set_indicate(void (*indicate)(void *))
 {
+    DBG_DIRECT("rtk_touch_hal_set_indicate");
     drv_pin_mode(TOUCH_CST816D_INT, PIN_MODE_INPUT);
     drv_pin_attach_irq(TOUCH_CST816D_INT, PIN_IRQ_MODE_RISING_FALLING, indicate,
                        NULL);
-    drv_pin_irq_enable(TOUCH_CST816D_INT, PIN_IRQ_DISABLE);
+    drv_pin_irq_enable(TOUCH_CST816D_INT, PIN_IRQ_ENABLE);
 }
 
 void rtk_touch_hal_int_config(bool enable)
@@ -1240,16 +1239,20 @@ void rtk_touch_hal_int_config(bool enable)
 
 static bool touch_enter_dlps(void)
 {
+    drv_pin_mode(TOUCH_CST816D_INT, PIN_MODE_INPUT);
     Pad_Config(TOUCH_CST816D_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
     System_WakeUpPinEnable(TOUCH_CST816D_INT, PAD_WAKEUP_POL_LOW, PAD_WK_DEBOUNCE_DISABLE);
-    return false;
+    DBG_DIRECT("touch_enter_dlps");
+    return true;
 }
 
 static bool touch_exit_dlps(void)
 {
+    drv_i2c1_init(TOUCH_CST816D_SCL, TOUCH_CST816D_SDA);
     Pad_Config(TOUCH_CST816D_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_LOW);
-    return false;
+    DBG_DIRECT("touch_exit_dlps");
+    return true;
 }
 
 static bool touch_allowed_enter_dlps_check(void)
@@ -1308,5 +1311,9 @@ void rtk_touch_hal_init(void)
 
     uint8_t chip_id = 0;
     touch_get_chip_id(chip_id);
+
+#ifdef RTK_HAL_DLPS
+    drv_touch_dlps_init();
+#endif
 }
 
