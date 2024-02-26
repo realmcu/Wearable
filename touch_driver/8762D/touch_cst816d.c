@@ -1267,6 +1267,8 @@ static bool touch_system_wakeup_dlps_check(void)
         Pad_ClearWakeupINTPendingBit(TOUCH_CST816D_INT);
         System_WakeUpPinDisable(TOUCH_CST816D_INT);
         DBG_DIRECT("Touch Wake up");
+        extern void gui_indev_wakeup(void);
+        gui_indev_wakeup();
         return true;
     }
     return false;

@@ -694,12 +694,13 @@ static void lcd_seq_init(void)
 
 uint32_t rtk_lcd_hal_power_on(void)
 {
+    lcd_pad_init();
+    qspi_lcd_platform_init();
+
     rtl_lcd_qspi_write_cmd(0x11);   /*sleep out*/
     platform_delay_ms(120);
-    DBG_DIRECT("sleep out");
     rtl_lcd_qspi_write_cmd(0x29);   /*power on*/
     platform_delay_ms(20);
-    DBG_DIRECT("power on");
     return 0;
 }
 
@@ -719,13 +720,11 @@ void rtk_lcd_hal_init(void)
 {
     lcd_pad_init();
     qspi_lcd_platform_init();
-    SPIC2->baudr = 2;
 
     lcd_set_reset(true);
     platform_delay_ms(120);
     lcd_set_reset(false);
     platform_delay_ms(50);
-
 
     lcd_seq_init();
 
