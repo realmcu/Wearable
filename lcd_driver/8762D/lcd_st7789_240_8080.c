@@ -106,17 +106,25 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
     IF8080_SwitchMode(IF8080_MODE_MANUAL);
     uint16_t xEnd = xStart + w - 1;
     uint16_t yEnd = yStart + h - 1;
-    st7796_write_cmd(0x2a);
-    st7796_write_data(xStart >> 8);
-    st7796_write_data(xStart & 0xff);
-    st7796_write_data(xEnd >> 8);
-    st7796_write_data(xEnd & 0xff);
+#if(LCD_DIRECTION_SELECTION_90_READINGS == 1)
+    xStart += 80;
+    xEnd += 80;
+#else
+    yStart = yStart + 80;
+    yEnd = yEnd + 80;
+#endif
 
-    st7796_write_cmd(0x2b);
-    st7796_write_data(yStart >> 8);
-    st7796_write_data(yStart & 0xff);
-    st7796_write_data(yEnd >> 8);
-    st7796_write_data(yEnd & 0xff);
+    st7789_write_cmd(0x2a);
+    st7789_write_data(xStart >> 8);
+    st7789_write_data(xStart & 0xff);
+    st7789_write_data(xEnd >> 8);
+    st7789_write_data(xEnd & 0xff);
+
+    st7789_write_cmd(0x2b);
+    st7789_write_data(yStart >> 8);
+    st7789_write_data(yStart & 0xff);
+    st7789_write_data(yEnd >> 8);
+    st7789_write_data(yEnd & 0xff);
     IF8080_SetCS();
     /* Enable Auto mode */
     IF8080_SwitchMode(IF8080_MODE_AUTO);
@@ -131,7 +139,7 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
     IF8080_GDMACmd(ENABLE);
 
     /* Configure pixel number */
-    uint32_t len = w * h * RGB16BIT_565 >> 3;
+    uint32_t len = (xEnd - xStart + 1) * (yEnd - yStart + 1) * RGB16BIT_565 >> 3;
     IF8080_SetTxDataLen(len);
 
     /* Start output */
@@ -158,7 +166,7 @@ uint32_t rtk_lcd_hal_power_off(void)
     /* WR */
     Pad_Config(LCD_8080_WR, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
     /* BL */
-    Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_DISABLE, PAD_OUT_LOW);
+    Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
 
     extern void drv_touch_int_config(bool enable);
     drv_touch_int_config(true);
@@ -191,7 +199,7 @@ uint32_t rtk_lcd_hal_power_on(void)
 
     st7789_write_cmd(0x11);
     st7789_write_cmd(0x29);
-    lcd_set_backlight(100);
+    //lcd_set_backlight(100);
     return 0;
 }
 
@@ -207,6 +215,7 @@ void lcd_device_init(void)
     IF8080_InitTypeDef IF8080_InitStruct;
     IF8080_StructInit(&IF8080_InitStruct);
     extern uint32_t SystemCpuClock;
+
     if (SystemCpuClock == 100000000)
     {
         IF8080_InitStruct.IF8080_ClockDiv          = IF8080_CLOCK_DIV_5;
@@ -218,6 +227,10 @@ void lcd_device_init(void)
     else if (SystemCpuClock == 8000000)
     {
         IF8080_InitStruct.IF8080_ClockDiv          = IF8080_CLOCK_DIV_4;
+    }
+    else if (SystemCpuClock == 6000000)
+    {
+        IF8080_InitStruct.IF8080_ClockDiv          = IF8080_CLOCK_DIV_5;
     }
     else if (SystemCpuClock == 40000000)
     {
@@ -237,7 +250,7 @@ void lcd_device_init(void)
     lcd_pad_init();
 }
 
-void rtl_gui_dma_single_block_init(uint32_t dir_type)
+void rtl_gui_dma_single_block_init(void)
 {
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     NVIC_InitTypeDef NVIC_InitStruct;
@@ -253,24 +266,12 @@ void rtl_gui_dma_single_block_init(uint32_t dir_type)
     GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Word;
     GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Word;
 
-
-    if (dir_type == GDMA_DIR_MemoryToMemory)
-    {
-        GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_1;
-        GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_1;
-        GDMA_InitStruct.GDMA_DIR                 = dir_type;
-        GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
-        GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Inc;
-    }
-    else if (dir_type == GDMA_DIR_MemoryToPeripheral)
-    {
-        GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_8;
-        GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_8;
-        GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_8080_TX;
-        GDMA_InitStruct.GDMA_DIR                 = dir_type;
-        GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
-        GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
-    }
+    GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_8;
+    GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_8;
+    GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_8080_TX;
+    GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToPeripheral;
+    GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
+    GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
 
     GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
     GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
@@ -347,15 +348,12 @@ void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_
 
     rtk_lcd_hal_set_window(xStart, yStart, w, h);
 
-    static uint32_t color_buf[64];
-    for (int i = 0; i < 64; i++)
-    {
-        color_buf[i] = color;
-    }
+//    static uint32_t color_buf = 0;
+//    color_buf = (color >> 8) | (color << 8);
+//    color_buf = color_buf | color_buf << 16;
 
-    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)color_buf);
+    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)&color);
     GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(&(IF8080->FIFO)));
-
 
     uint32_t section_hight = 10;
     uint32_t left_line = h % section_hight;
@@ -380,7 +378,7 @@ static uint32_t pfb_tx_xnt = 0;
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
 {
     pfb_tx_xnt = len;
-    rtl_gui_dma_single_block_init(GDMA_DIR_MemoryToPeripheral);
+    rtl_gui_dma_single_block_init();
     lcd_dma_single_block_start(buf, len * 2);
 }
 void rtk_lcd_hal_transfer_done(void)
@@ -427,7 +425,11 @@ void lcd_seq_init(void)
 #endif
 
     st7789_write_cmd(0x36);
+#if(LCD_DIRECTION_SELECTION_90_READINGS == 1)
+    st7789_write_data(0x20);
+#else
     st7789_write_data(0x40);
+#endif
 
     st7789_write_cmd(0x3A);
     st7789_write_data(0x05);
@@ -602,7 +604,7 @@ void rtk_lcd_hal_init(void)
     lcd_device_init();
 
     lcd_set_reset(true);
-    platform_delay_ms(120);
+    platform_delay_ms(50);
     lcd_set_reset(false);
     platform_delay_ms(50);
 
@@ -610,10 +612,9 @@ void rtk_lcd_hal_init(void)
 
     st7789_write_cmd(0x11);
     st7789_write_cmd(0x29);
-    lcd_set_backlight(100);
+    //lcd_set_backlight(100);
 
-    rtk_lcd_hal_rect_fill(0, 0, 240, 320, 0xF800F800);
-
+    rtk_lcd_hal_rect_fill(0, 0, LCD_WIDTH, LCD_HEIGHT, 0xF800F800);
 }
 
 

@@ -17,10 +17,18 @@
 #include "stdint.h"
 #include "stdbool.h"
 
+
+#if USING_8762CK_VD_DEVICE
+#define TOUCH_CST816D_RST                                     P2_2
+#define TOUCH_CST816D_INT                                     P2_1
+#define TOUCH_CST816D_SCL                                     H_2
+#define TOUCH_CST816D_SDA                                     H_1
+#else
 #define TOUCH_CST816D_RST                                     P2_3
 #define TOUCH_CST816D_INT                                     P0_4
 #define TOUCH_CST816D_SCL                                     P0_0
 #define TOUCH_CST816D_SDA                                     P0_2
+#endif
 
 #define TOUCH_WORK_MODE_SLAVE_ADDRESS             0x15
 #define TOUCH_UPGRADE_MODE_SLAVE_ADDRESS          0x6a
