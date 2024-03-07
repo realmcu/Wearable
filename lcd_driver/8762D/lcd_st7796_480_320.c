@@ -344,7 +344,7 @@ static void lcd_st7796_init(void)
     st7796_write_cmd(0xf0) ;
     st7796_write_data(0x96) ;
     st7796_write_cmd(0x36);
-    st7796_write_data(0x48);
+    st7796_write_data(0x28);
     st7796_write_cmd(0x3A);
     st7796_write_data(0x55);
     st7796_write_cmd(0xB4);
@@ -433,7 +433,7 @@ void rtk_lcd_hal_init(void)
     st7796_write_cmd(0x29);
 
     lcd_set_backlight(100);
-    rtk_lcd_hal_rect_fill(0, 0, 320, 480, 0x26DA26DA);
+    rtk_lcd_hal_rect_fill(0, 0, 480, 320,  0x26DA26DA);
 }
 
 

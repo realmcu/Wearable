@@ -7,8 +7,8 @@ extern "C" {
 #include "stdint.h"
 
 
-#define ST7796_LCD_WIDTH                  320
-#define ST7796_LCD_HIGHT                  480
+#define ST7796_LCD_WIDTH                  480
+#define ST7796_LCD_HIGHT                  320
 #define INPUT_PIXEL_BYTES                   2
 #define OUTPUT_PIXEL_BYTES                  2
 #define ST7796_DRV_PIXEL_BITS               16

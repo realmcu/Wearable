@@ -26,6 +26,36 @@ static void i2c_reg_read8(uint8_t slave_addr, uint8_t register_addr, uint8_t *da
     drv_i2c0_read(slave_addr, data_buf, size);
 }
 
+static void rtk_touch_hal_binding(uint16_t *x, uint16_t *y)
+{
+    /** binding tp to display coordinate
+     *
+     * sbee2 86box
+     * tp: 320*480,  width-320.  height-480
+     * display: 480*320, width-480, height-320
+     * scan: left to right, up to down
+     * --------------
+     * |*(tp)      +| (display)
+     * |            |
+     * |            |
+     * |            |
+     * |            |
+     * |            |
+     * |            |
+     * |            |
+     * --------------
+     *
+     */
+#define DISPLAY_LCD_WIDTH 480
+#define DISPLAY_LCD_HEIGHT 320
+
+    uint16_t x_pos = *x;
+    uint16_t y_pos = *y;
+
+    *x = y_pos;
+    *y = DISPLAY_LCD_HEIGHT - x_pos;
+}
+
 
 bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
 {
@@ -56,13 +86,19 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
         //         (data_buf[0] & FT6X36_TOUCH_EVT_FLAG_MASK) >> FT6X36_TOUCH_EVT_FLAG_SHIFT, ispressing);
     }
 
+    // if (ispressing)
+    // {
+    //     DBG_DIRECT("[TOUCH] x: %d, y: %d", x_pos, y_pos);
+    // }
+
     *x = x_pos;
     *y = y_pos;
     *pressing = ispressing;
-
+    // binding tp to display coordinate
+    rtk_touch_hal_binding(x, y);
     if (ispressing)
     {
-        DBG_DIRECT("[TOUCH] x: %d, y: %d", x_pos, y_pos);
+        DBG_DIRECT("[TOUCH] x: %d, y: %d", *x, *y);
     }
     return true;
 }
