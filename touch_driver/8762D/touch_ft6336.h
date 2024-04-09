@@ -5,11 +5,11 @@
  *
  * Change Logs:
  * Date           Author        Notes
- * 2020-08-04     howie  first version
+ * 2024-04-09     roy  first version
  */
 
-#ifndef __TOUCH_816S_H
-#define __TOUCH_816S_H
+#ifndef __TOUCH_FT6336_H
+#define __TOUCH_FT6336_H
 
 
 #include "board.h"

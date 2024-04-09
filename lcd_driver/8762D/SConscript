@@ -19,7 +19,8 @@ if GetDepend(['CONFIG_REALTEK_ST77916G5_320_QSPI']):
     src += ['lcd_st77916g5_320_qspi.c']
 if GetDepend(['CONFIG_REALTEK_ST7789_240240_8080']):
     src += ['lcd_st7789_240_8080.c']
-
+if GetDepend(['CONFIG_REALTEK_ST7789_320240_8080']):
+    src += ['lcd_st7789_320_240_8080.c']
 
 CPPPATH = [cwd]
 

@@ -1,5 +1,5 @@
-#ifndef _LCD_ST7796_320_H_
-#define _LCD_ST7796_320_H_
+#ifndef _LCD_ST7796_480_320_H_
+#define _LCD_ST7796_480_320_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,4 +33,4 @@ void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_
 }
 #endif
 
-#endif /* _LCD_ST7796_320_H_ */
+#endif /* _LCD_ST7796_480_320_H_ */

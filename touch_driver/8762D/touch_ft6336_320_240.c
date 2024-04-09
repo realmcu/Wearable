@@ -5,14 +5,14 @@
  *
  * Change Logs:
  * Date           Author        Notes
- * 2020-08-04     howie  first version
+ * 2024-04-09     roy  first version
  */
 
 #include "rtl_hal_peripheral.h"
 #include "drv_gpio.h"
 #include "drv_i2c.h"
 #include "drv_touch.h"
-#include "touch_ft6336_8762d.h"
+#include "touch_ft6336.h"
 #include "string.h"
 #include "trace.h"
 #include "board.h"
@@ -31,8 +31,8 @@ static void rtk_touch_hal_binding(uint16_t *x, uint16_t *y)
     /** binding tp to display coordinate
      *
      * sbee2 86box
-     * tp: 320*480,  width-320.  height-480
-     * display: 480*320, width-480, height-320
+     * tp: 240*320,  width-240.  height-320
+     * display: 320*240, width-320, height-240
      * scan: left to right, up to down
      * --------------
      * |*(tp)      +| (display)
@@ -46,8 +46,8 @@ static void rtk_touch_hal_binding(uint16_t *x, uint16_t *y)
      * --------------
      *
      */
-#define DISPLAY_LCD_WIDTH 480
-#define DISPLAY_LCD_HEIGHT 320
+#define DISPLAY_LCD_WIDTH 320
+#define DISPLAY_LCD_HEIGHT 240
 
     uint16_t x_pos = *x;
     uint16_t y_pos = *y;
