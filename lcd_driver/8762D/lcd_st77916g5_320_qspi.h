@@ -6,7 +6,7 @@ extern "C" {
 #endif
 #include "stdint.h"
 
-#define TE_VALID                            0
+#define TE_VALID                            1
 
 #define ST77916_LCD_WIDTH                  385
 #define ST77916_LCD_HEIGHT                 320

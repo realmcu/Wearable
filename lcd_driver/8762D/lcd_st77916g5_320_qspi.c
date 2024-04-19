@@ -270,6 +270,7 @@ void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
     GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)buf);
     GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
 }
+
 void rtk_lcd_hal_transfer_done(void)
 {
     while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET);
@@ -728,7 +729,7 @@ void rtk_lcd_hal_init(void)
 
     lcd_seq_init();
 
-    rtk_lcd_hal_rect_fill(0, 0, 385, 320, 0xF800F800);
+    rtk_lcd_hal_rect_fill(0, 0, ST77916_LCD_WIDTH, ST77916_LCD_HEIGHT, 0xF800F800);
 
 }
 

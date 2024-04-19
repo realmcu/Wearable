@@ -19,7 +19,7 @@
 #include "board.h"
 #include "os_mem.h"
 
-#define CST816D_FIRMWARE_UPGRADE_ENABLE           1
+#define CST816D_FIRMWARE_UPGRADE_ENABLE           0
 
 void touch_write(uint16_t slave_address, uint16_t reg, uint8_t reg_len, uint8_t *data,
                  uint16_t data_len);
@@ -30,6 +30,7 @@ void touch_read(uint16_t slave_address, uint16_t reg, uint8_t reg_len, uint8_t *
 #if (CST816D_FIRMWARE_UPGRADE_ENABLE == 1)
 
 static bool cst816d_update_flag = false;
+
 static uint8_t cst816d_update_bin[] =
 {
     0x00, 0x00, 0x00, 0x3c, 0x30, 0x98,

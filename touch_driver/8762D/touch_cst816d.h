@@ -16,6 +16,7 @@
 #include "board.h"
 #include "stdint.h"
 #include "stdbool.h"
+#include "menu_config.h"
 
 
 #if USING_8762CK_VD_DEVICE
