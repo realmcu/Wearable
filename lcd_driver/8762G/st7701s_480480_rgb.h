@@ -10,7 +10,7 @@ extern "C" {
 #define ST7701S_480480_LCD_WIDTH                   480
 #define ST7701S_480480_LCD_HEIGHT                  480
 
-#define ST7701S_DRV_PIXEL_BITS                     24
+#define ST7701S_DRV_PIXEL_BITS                     16
 
 
 

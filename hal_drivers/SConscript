@@ -10,7 +10,6 @@ src = Split("""
 
 
 CPPDEFINES = ['RTK_HAL_DRIVER']
-
 if GetDepend(['CONFIG_REALTEK_BSP_FLASH']):
     src += ['drv_flash.c']
     CPPDEFINES += ['RTK_HAL_FLASH']
@@ -22,6 +21,7 @@ if GetDepend(['CONFIG_REALTEK_BSP_DLPS']):
 if GetDepend(['CONFIG_REALTEK_BSP_SPI']):
     src += ['drv_spi.c']
     CPPDEFINES += ['RTK_HAL_SPI']
+
 
 if GetDepend(['CONFIG_REALTEK_BSP_UART']):
     src += ['drv_uart.c']
@@ -68,7 +68,7 @@ if GetDepend(['CONFIG_REALTEK_BSP_TOUCH']) or GetDepend(['CONFIG_REALTEK_BSP_GPI
 
 if GetDepend(['CONFIG_REALTEK_BSP_TOUCH']):
     src += ['drv_touch.c']
-    CPPDEFINES += ['RTK_HAL_TOUCH']
+    CPPDEFINES += ['RTK_HAL_TOUCH = "1"']
 
 if GetDepend(['CONFIG_REALTEK_BSP_ONCHIP_RTC']):
     src += ['drv_rtc.c']
