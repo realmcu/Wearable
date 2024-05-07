@@ -1211,8 +1211,11 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
         *pressing = false;
     }
 
-    *x = 385 - (((buf[5] & 0x0f) << 8) | buf[6]);
-    *y = (((buf[3] & 0x0f) << 8) | buf[4]);
+//    *x = 385 - (((buf[5] & 0x0f) << 8) | buf[6]);
+//    *y = (((buf[3] & 0x0f) << 8) | buf[4]);
+
+    *x = (((buf[3] & 0x0f) << 8) | buf[4]);
+    *y = (((buf[5] & 0x0f) << 8) | buf[6]);
 
     return true;
 }
