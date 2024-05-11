@@ -78,10 +78,10 @@ void app_le_profile_init(void)
     ble_components_init();
 #endif
 #ifdef RTL87x2G
-//    extern void app_ble_ota_init(void);
-//    app_ble_ota_init();
-//    extern void app_ble_dfu_init(void);
-//    app_ble_dfu_init();
+    extern void app_ble_ota_init(void);
+    app_ble_ota_init();
+    extern void app_ble_dfu_init(void);
+    app_ble_dfu_init();
 #elif RTL8762D
     extern void app_ble_ota_init(void);
     app_ble_ota_init();
