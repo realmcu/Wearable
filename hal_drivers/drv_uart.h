@@ -43,6 +43,13 @@ typedef struct
 
 void hw_uart_init(void);
 
+void drv_uart0_init(uint8_t tx_pin, uint8_t rx_pin);
+uint32_t drv_uart0_write(const void *buffer, uint32_t size);
+void drv_uart0_set_rx_indicate(void (*rx_ind)(uint8_t ch));
+
+void drv_uart1_init(uint8_t tx_pin, uint8_t rx_pin);
+uint32_t drv_uart1_write(const void *buffer, uint32_t size);
+void drv_uart1_set_rx_indicate(void (*rx_ind)(uint8_t ch));
 
 void drv_uart2_init(uint8_t tx_pin, uint8_t rx_pin);
 uint32_t drv_uart2_write(const void *buffer, uint32_t size);

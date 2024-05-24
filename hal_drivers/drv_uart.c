@@ -93,6 +93,14 @@ static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
     UART_INTConfig(UARTx, UART_INT_RD_AVA |  UART_INT_RX_LINE_STS, ENABLE);
 }
 
+void UART0_Handler(void)
+{
+    uart_isr(uart0_rx_indicate, UART0);
+}
+void UART1_Handler(void)
+{
+    uart_isr(uart1_rx_indicate, UART2);
+}
 void UART2_Handler(void)
 {
     uart_isr(uart2_rx_indicate, UART2);
@@ -148,7 +156,23 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
     uint8_t rx_pin_func = UART2_RX;
     uint32_t periph = APBPeriph_UART2;
     uint32_t periph_clock = APBPeriph_UART2_CLOCK;
-    if (UARTx == UART2)
+    if (UARTx == UART0)
+    {
+        irq_type = UART0_IRQn;
+        tx_pin_func = UART0_TX;
+        rx_pin_func = UART0_RX;
+        periph = APBPeriph_UART0;
+        periph_clock = APBPeriph_UART0_CLOCK;
+    }
+    else if (UARTx == UART1)
+    {
+        irq_type = UART1_IRQn;
+        tx_pin_func = UART1_TX;
+        rx_pin_func = UART1_RX;
+        periph = APBPeriph_UART1;
+        periph_clock = APBPeriph_UART1_CLOCK;
+    }
+    else if (UARTx == UART2)
     {
         irq_type = UART2_IRQn;
         tx_pin_func = UART2_TX;
@@ -206,7 +230,14 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStruct);
 }
-
+void drv_uart0_init(uint8_t tx_pin, uint8_t rx_pin)
+{
+    drv_uart_init(UART0, tx_pin, rx_pin);
+}
+void drv_uart1_init(uint8_t tx_pin, uint8_t rx_pin)
+{
+    drv_uart_init(UART1, tx_pin, rx_pin);
+}
 void drv_uart2_init(uint8_t tx_pin, uint8_t rx_pin)
 {
     drv_uart_init(UART2, tx_pin, rx_pin);
@@ -226,6 +257,14 @@ void drv_uart5_init(uint8_t tx_pin, uint8_t rx_pin)
 }
 #endif
 
+uint32_t drv_uart0_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART0, buffer, size);
+}
+uint32_t drv_uart1_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART1, buffer, size);
+}
 uint32_t drv_uart2_write(const void *buffer, uint32_t size)
 {
     return drv_uart_write(UART2, buffer, size);
@@ -244,7 +283,14 @@ uint32_t drv_uart5_write(const void *buffer, uint32_t size)
     return drv_uart_write(UART5, buffer, size);
 }
 #endif
-
+void drv_uart0_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+{
+    uart0_rx_indicate = rx_ind;
+}
+void drv_uart1_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+{
+    uart1_rx_indicate = rx_ind;
+}
 void drv_uart2_set_rx_indicate(void (*rx_ind)(uint8_t ch))
 {
     uart2_rx_indicate = rx_ind;
