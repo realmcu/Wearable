@@ -11,12 +11,13 @@
 #include "os_timer.h"
 #include "board.h"
 
-void (*uart0_rx_indicate)(uint8_t ch) = NULL;
-void (*uart1_rx_indicate)(uint8_t ch) = NULL;
-void (*uart2_rx_indicate)(uint8_t ch) = NULL;
-void (*uart3_rx_indicate)(uint8_t ch) = NULL;
-void (*uart4_rx_indicate)(uint8_t ch) = NULL;
-void (*uart5_rx_indicate)(uint8_t ch) = NULL;
+pfunc_uart_rx_indicate uart0_rx_indicate = NULL;
+pfunc_uart_rx_indicate uart1_rx_indicate = NULL;
+pfunc_uart_rx_indicate uart2_rx_indicate = NULL;
+pfunc_uart_rx_indicate uart3_rx_indicate = NULL;
+pfunc_uart_rx_indicate uart4_rx_indicate = NULL;
+pfunc_uart_rx_indicate uart5_rx_indicate = NULL;
+
 
 static const UART_BaudRate_TypeDef BaudRate_Table[10] =
 {
@@ -32,9 +33,9 @@ static const UART_BaudRate_TypeDef BaudRate_Table[10] =
     {1,   1,  0x36D}, // BAUD_RATE_6000000
 };
 
-static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
+static void uart_isr(pfunc_uart_rx_indicate rx_ind, UART_TypeDef *UARTx)
 {
-    uint8_t ch;
+    uint8_t uart_rev_data[32];
     /* Read interrupt type */
     uint32_t int_status = UART_GetIID(UARTx);
 
@@ -47,15 +48,9 @@ static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
     {
     case UART_INT_ID_RX_DATA_TIMEOUT:
         {
-            while (UART_GetFlagStatus(UARTx, UART_FLAG_RX_DATA_AVA) == SET)
-            {
-                //HAVE RECIVE TIMEOUT THE LEFT
-                ch = UART_ReceiveByte(UARTx);
-                if (rx_ind != NULL)
-                {
-                    rx_ind(ch);
-                }
-            }
+            uint16_t rx_len = UART_GetRxFIFODataLen(UARTx);
+            UART_ReceiveData(UARTx, uart_rev_data, rx_len);
+            rx_ind(uart_rev_data, rx_len);
             break;
         }
     case UART_INT_ID_LINE_STATUS:
@@ -69,14 +64,9 @@ static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
         }
     case UART_INT_ID_RX_LEVEL_REACH:
         {
-            while (UART_GetFlagStatus(UARTx, UART_FLAG_RX_DATA_AVA) == SET)
-            {
-                ch = UART_ReceiveByte(UARTx);
-                if (rx_ind != NULL)
-                {
-                    rx_ind(ch);
-                }
-            }
+            uint16_t rx_len = UART_GetRxFIFODataLen(UARTx);
+            UART_ReceiveData(UARTx, uart_rev_data, rx_len);
+            rx_ind(uart_rev_data, rx_len);
             break;
         }
     case UART_INT_ID_TX_EMPTY:
@@ -283,27 +273,27 @@ uint32_t drv_uart5_write(const void *buffer, uint32_t size)
     return drv_uart_write(UART5, buffer, size);
 }
 #endif
-void drv_uart0_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+void drv_uart0_set_rx_indicate(pfunc_uart_rx_indicate rx_ind)
 {
     uart0_rx_indicate = rx_ind;
 }
-void drv_uart1_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+void drv_uart1_set_rx_indicate(pfunc_uart_rx_indicate rx_ind)
 {
     uart1_rx_indicate = rx_ind;
 }
-void drv_uart2_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+void drv_uart2_set_rx_indicate(pfunc_uart_rx_indicate rx_ind)
 {
     uart2_rx_indicate = rx_ind;
 }
-void drv_uart3_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+void drv_uart3_set_rx_indicate(pfunc_uart_rx_indicate rx_ind)
 {
     uart3_rx_indicate = rx_ind;
 }
-void drv_uart4_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+void drv_uart4_set_rx_indicate(pfunc_uart_rx_indicate rx_ind)
 {
     uart4_rx_indicate = rx_ind;
 }
-void drv_uart5_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+void drv_uart5_set_rx_indicate(pfunc_uart_rx_indicate rx_ind)
 {
     uart5_rx_indicate = rx_ind;
 }
