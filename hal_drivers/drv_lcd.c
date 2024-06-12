@@ -63,7 +63,6 @@ void Display_Handler(void)
 void hw_lcd_init(void)
 {
     rtk_lcd_hal_init();
-    DBG_DIRECT("Drv lcd init");
 }
 
 /************** end of file ********************/

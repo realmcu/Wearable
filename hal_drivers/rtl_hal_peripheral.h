@@ -64,6 +64,23 @@
 #include "rtl876x_rtc.h"
 #include "rtl876x_if8080.h"
 
+#elif defined RTL8752H
+
+#include "app_section.h"
+#include "platform_utils.h"
+#include "rtl876x_nvic.h"
+#include "rtl876x_pinmux.h"
+#include "rtl876x_rcc.h"
+#include "rtl876x_io_dlps.h"
+#include "rtl876x_uart.h"
+
+
+#include "rtl876x_gpio.h"
+#include "rtl876x_i2c.h"
+#include "rtl876x_spi.h"
+#include "rtl876x_gdma.h"
+#include "rtl876x_rtc.h"
+#include "rtl876x_if8080.h"
 
 
 #define RTL_HAL_RAM_CODE    DATA_RAM_FUNCTION

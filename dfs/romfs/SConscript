@@ -14,6 +14,6 @@ CPPPATH = [cwd]
 
 
 
-group = DefineGroup('fs', src, depend = [], CPPPATH = CPPPATH)
+group = DefineGroup('fs', src, depend = ['CONFIG_REALTEK_ROMFS'], CPPPATH = CPPPATH)
 
 Return('group')

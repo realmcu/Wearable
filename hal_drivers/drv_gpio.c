@@ -54,6 +54,8 @@ static void DRV_GPIO_HANDLER(uint32_t pin)
 #include "drv_gpio_8772f.c"
 #elif defined RTL8762D
 #include "drv_gpio_8762d.c"
+#elif defined RTL8752H
+#include "drv_gpio_8752h.c"
 #elif defined RTL87x2G
 #include "drv_gpio_8762g.c"
 #endif
@@ -92,7 +94,7 @@ void drv_pin_mode(uint32_t pin, uint32_t mode)
 
 #if defined RTL8772F || defined RTL87x2G
     GPIO_Init(GPIO_GetPort(pin), &GPIO_InitStruct);
-#elif defined RTL8762D
+#elif defined RTL8762D || defined RTL8752H
     GPIO_Init(&GPIO_InitStruct);
 #endif
 }
@@ -101,7 +103,7 @@ void drv_pin_write(uint32_t pin, uint32_t value)
 {
 #if defined RTL8772F || defined RTL87x2G
     GPIO_WriteBit(GPIO_GetPort(pin), GPIO_GetPin(pin), (BitAction)(value));
-#elif defined RTL8762D
+#elif defined RTL8762D || defined RTL8752H
     GPIO_WriteBit(GPIO_GetPin(pin), (BitAction)(value));
 #endif
 }
