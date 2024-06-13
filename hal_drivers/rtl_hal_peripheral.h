@@ -54,6 +54,7 @@
 #include "rtl876x_rcc.h"
 #include "rtl876x_io_dlps.h"
 #include "rtl876x_uart.h"
+#include "rtl876x_tim.h"
 #include "flash_device.h"
 
 
