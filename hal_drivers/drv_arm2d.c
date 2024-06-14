@@ -10,7 +10,7 @@
 #include "drv_lcd.h"
 
 
-
+uint32_t SystemCoreClock = 90000000;
 void (*tim5_indicate)(void) = NULL;
 void (*tim6_indicate)(void) = NULL;
 
