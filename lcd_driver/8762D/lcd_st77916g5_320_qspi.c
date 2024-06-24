@@ -144,7 +144,7 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
     data[3] = yEnd & 0xff;
     rtl_lcd_qspi_cmd_param4(0x2B, data);
 
-    //rtl_lcd_qspi_cmd_param(0x36, 0xA0);
+    rtl_lcd_qspi_cmd_param(0x36, 0xA0);
 
     rtl_lcd_qspi_enter_data_output_mode();
 }
