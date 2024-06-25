@@ -721,7 +721,7 @@ void rtk_lcd_hal_init(void)
     platform_delay_ms(50);
 
     lcd_seq_init();
-    rtk_lcd_hal_rect_fill(0, 0, 320, 385, 0xf800f800);
+    rtk_lcd_hal_rect_fill(0, 0, 320, 385, 0x00000000);
 }
 
 

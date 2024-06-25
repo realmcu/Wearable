@@ -164,5 +164,5 @@ void qspi_lcd_platform_init(void)
 
     SPIC1->USER_LENGTH = 3 << 16 | 1 << 12 | 0;
 
-    SPIC1->CTRLR2 = (BIT13 | BIT12 | BIT1 | 4 << 4 | 3 << 8);
+    SPIC1->CTRLR2 = (BIT13 | BIT12 | BIT0 | 4 << 4 | 3 << 8);
 }

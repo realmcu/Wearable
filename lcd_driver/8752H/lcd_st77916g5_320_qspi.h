@@ -8,8 +8,8 @@ extern "C" {
 
 #define TE_VALID                            0
 
-#define ST77916_LCD_WIDTH                  240
-#define ST77916_LCD_HEIGHT                 240
+#define ST77916_LCD_WIDTH                  256
+#define ST77916_LCD_HEIGHT                 160
 
 
 #define ST77916_DRV_PIXEL_BITS             16
