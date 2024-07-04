@@ -18,6 +18,8 @@ if GetDepend(['CONFIG_REALTEK_ST7701S_480480_RGB']):
 #     src += ['EK9716_800480_rgb.c']
 if GetDepend(['CONFIG_REALTEK_NV3047_480272_RGB']):
     src += ['NV3047_480272_rgb.c']
+if GetDepend(['CONFIG_REALTEK_ST7701S_480640_RGB']):
+    src += ['st7701s_480640_rgb.c']
 
 CPPPATH = [cwd]
 

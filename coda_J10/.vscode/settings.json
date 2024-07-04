@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "jdi.h": "c",
+        "regdefine.h": "c",
+        "jpurun.h": "c",
+        "jpuconfig.h": "c",
+        "*.txt": "c",
+        "jpuapifunc_rt.h": "c",
+        "jpeg_heap.h": "c"
+    }
+}
