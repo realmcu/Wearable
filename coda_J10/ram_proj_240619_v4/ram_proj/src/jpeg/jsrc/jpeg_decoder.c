@@ -778,10 +778,10 @@ ERR_DEC_INIT:
     // jdi_free_dma_memory(&vbStream);
 
 
-    if (pYuv)
-    {
-        jpg_free(pYuv);
-    }
+    // if (pYuv)
+    // {
+    //     jpg_free(pYuv);
+    // }
 
     // if (pFileBuf)
     //  free(pFileBuf);
@@ -825,7 +825,7 @@ uint32_t CODA_Test(uint8_t cmd)
                 decConfig.roiHeight = 100;
             }
             // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
-            decConfig.packedFormat = 5;
+            decConfig.packedFormat = 4;
             // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
             decConfig.chromaInterleave = 0;
             decConfig.StreamEndian = JPU_STREAM_ENDIAN;

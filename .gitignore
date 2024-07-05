@@ -64,3 +64,6 @@ coda_J10/2024_0701_v11_ram_proj/ram_proj/keil_proj/JLinkSettings.ini
 *.roy_xie
 coda_J10/ram_proj_240619_v4/ram_proj/src/io_demo/ir/send\177/ir_send_interrupt_demo.c
 coda_J10/ram_proj_240619_v4/ram_proj/src/io_demo/ir/send\177/ir_send_polling_mode_demo.c
+coda_J10/ram_proj_240705/ram_proj/keil_proj/bin/
+coda_J10/ram_proj_240705/ram_proj/keil_proj/JLinkSettings.ini
+coda_J10/ram_proj_240705/ram_proj/keil_proj/JLinkLog.txt
