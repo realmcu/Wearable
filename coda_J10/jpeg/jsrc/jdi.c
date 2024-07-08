@@ -369,7 +369,6 @@ int jdi_allocate_dma_memory(jpu_buffer_t *vb)
     static uint8_t cnt = 0;
 
     cnt ++;
-//  DBG_DIRECT("jdi_allocate_dma_memory ENTER %d!!\n", cnt);
     if (!s_pjip || s_jpu_fd == -1 || s_jpu_fd == 0x00)
     {
         DBG_DIRECT("jdi_allocate_dma_memory FAILD %d!!\n", cnt);
@@ -379,29 +378,14 @@ int jdi_allocate_dma_memory(jpu_buffer_t *vb)
     jdb.size = vb->size;
     // jdb.phys_addr = (unsigned long)jmem_alloc(&s_pjip->vmem, jdb.size, 0);
 
-    jdb.phys_addr = (unsigned long)jpg_malloc(jdb.size + 7);
+    jdb.phys_addr = (unsigned long)jpg_malloc_align(jdb.size, 8);
     DBG_DIRECT("jdi_allocate_dma_memory get 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
                jdb.size + 7);
-    // if (cnt == 1)
-    {
-        if ((uint32_t)jdb.phys_addr % 8)
-        {
-            jdb.phys_addr = (((uint32_t)jdb.phys_addr + 7) >> 3) << 3;
-            DBG_DIRECT("jdi_allocate_dma_memory act 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
-                       jdb.size);
-        }
-
-    }
-    // else
-    // {
-    //  jdb.phys_addr = (unsigned long)(&video_mm[40 * 1024]);
-    // }
 
     if (jdb.phys_addr == (unsigned long) - 1)
     {
         return -1;    // not enough memory
     }
-
 
     offset = (unsigned long)(jdb.phys_addr - s_jdb_video_memory.phys_addr);
     jdb.base = (unsigned long)s_jdb_video_memory.base + offset;

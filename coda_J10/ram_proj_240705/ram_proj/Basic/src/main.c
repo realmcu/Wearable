@@ -47,6 +47,7 @@ int main(void)
     DBG_DIRECT("Hello");
 
     jpg_tlsf_init();
+    coda_init();
 
     DBG_DIRECT("Hello");
     // MJPEG_Test();

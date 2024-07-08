@@ -37,7 +37,7 @@
 #define MAX_MJPG_PIC_HEIGHT  32768
 
 
-#define MAX_FRAME               (19*MAX_NUM_INSTANCE) // For AVC decoder, 16(reference) + 2(current) + 1(rotator)
+#define MAX_FRAME               (4*MAX_NUM_INSTANCE) // For AVC decoder, 16(reference) + 2(current) + 1(rotator)
 
 #define STREAM_FILL_SIZE        0x10000
 #define STREAM_END_SIZE         0

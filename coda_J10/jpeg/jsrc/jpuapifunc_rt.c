@@ -1336,9 +1336,9 @@ int JpegDecodeConcealError(JpgDecInfo *jpg)
     unsigned int code;
     int ret;
     BYTE *b;
-    Uint32 size, wrOffset;
-    Uint32 rstMarkerPtr;
-    Uint32 rstIdx;
+    uint32_t size, wrOffset;
+    uint32_t rstMarkerPtr;
+    uint32_t rstIdx;
     int numMcu = 0, numErrMcu = 0, numMcuCol = 0, numMcuRow = 0;
 
 
@@ -1892,7 +1892,7 @@ JpgRet JpgLeaveLock()
     return JPG_RET_SUCCESS;
 }
 
-JpgRet JpgSetClockGate(Uint32 on)
+JpgRet JpgSetClockGate(uint32_t on)
 {
     JpgInst *inst;
     jpu_instance_pool_t *jip;

@@ -217,9 +217,6 @@ typedef struct
 #define MAX_FILE_PATH   256
 typedef struct
 {
-    char yuvFileName[MAX_FILE_PATH];
-    char bitstreamFileName[MAX_FILE_PATH];
-
     int outNum;
     int rotAngle;
     int mirDir;
@@ -270,7 +267,7 @@ typedef JpgEncInst *JpgEncHandle;
 typedef struct
 {
     PhysicalAddress bitstreamBuffer;
-    Uint32 bitstreamBufferSize;
+    uint32_t bitstreamBufferSize;
     int picWidth;
     int picHeight;
     int sourceFormat;
@@ -299,7 +296,7 @@ typedef struct
 typedef struct
 {
     PhysicalAddress bitstreamBuffer;
-    Uint32 bitstreamSize;
+    uint32_t bitstreamSize;
 } JpgEncOutputInfo;
 
 typedef struct
@@ -321,15 +318,15 @@ extern "C" {
 
 
 int         JPU_IsBusy();
-Uint32      JPU_GetStatus();
-void        JPU_ClrStatus(Uint32 val);
-Uint32      JPU_IsInit(void);
-Uint32      JPU_WaitInterrupt(int timeout);
+uint32_t      JPU_GetStatus();
+void        JPU_ClrStatus(uint32_t val);
+uint32_t      JPU_IsInit(void);
+uint32_t      JPU_WaitInterrupt(int timeout);
 
 JpgRet      JPU_Init();
 void        JPU_DeInit();
 int         JPU_GetOpenInstanceNum();
-JpgRet     JPU_GetVersionInfo(Uint32 *versionInfo);
+JpgRet     JPU_GetVersionInfo(uint32_t *versionInfo);
 
 // function for decode
 JpgRet JPU_DecOpen(JpgDecHandle *, JpgDecOpenParam *);
@@ -381,37 +378,6 @@ JpgRet JPU_DecGiveCommand(
     JpgDecHandle handle,
     JpgCommand cmd,
     void *parameter);
-// function for encode
-JpgRet JPU_EncOpen(JpgEncHandle *, JpgEncOpenParam *);
-JpgRet JPU_EncClose(JpgEncHandle);
-JpgRet JPU_EncGetInitialInfo(JpgEncHandle, JpgEncInitialInfo *);
-JpgRet JPU_EncGetBitstreamBuffer(
-    JpgEncHandle handle,
-    PhysicalAddress *prdPrt,
-    PhysicalAddress *pwrPtr,
-    int *size);
-JpgRet JPU_EncUpdateBitstreamBuffer(
-    JpgEncHandle handle,
-    int size);
-JpgRet JPU_EncStartOneFrame(
-    JpgEncHandle handle,
-    JpgEncParam *param);
-JpgRet JPU_EncGetOutputInfo(
-    JpgEncHandle handle,
-    JpgEncOutputInfo *info);
-JpgRet JPU_EncIssueStop(
-    JpgDecHandle handle);
-JpgRet JPU_EncCompleteStop(
-    JpgDecHandle handle);
-JpgRet JPU_EncGiveCommand(
-    JpgEncHandle handle,
-    JpgCommand cmd,
-    void *parameter);
-void JPU_EncSetHostParaAddr(
-    PhysicalAddress baseAddr,
-    PhysicalAddress paraAddr);
-
-
 
 #ifdef __cplusplus
 }

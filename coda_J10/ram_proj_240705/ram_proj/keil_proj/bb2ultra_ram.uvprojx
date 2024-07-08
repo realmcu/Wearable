@@ -341,7 +341,7 @@
               <MiscControls>-gdwarf-3 -mfpu=fpv5-sp-d16</MiscControls>
               <Define>IC_TYPE_BB2U</Define>
               <Undefine></Undefine>
-              <IncludePath>.\;..\src\system_init\inc;..\Basic\inc;..\os\freertos\include;..\os\freertos\portable\GCC\ARM_CM33_NTZ;..\src\peripheral;..\autotest;..\manual_test;..\src\BB2_IO_driver\inc;..\src\hal_io;..\src\sd_mgr\config;..\src\sd_mgr\sd_lib;..\src\jpeg\jinc;..\src\jpeg\tlsf</IncludePath>
+              <IncludePath>.\;..\src\system_init\inc;..\Basic\inc;..\os\freertos\include;..\os\freertos\portable\GCC\ARM_CM33_NTZ;..\src\peripheral;..\autotest;..\manual_test;..\src\BB2_IO_driver\inc;..\src\hal_io;..\src\sd_mgr\config;..\src\sd_mgr\sd_lib;..\..\..\jpeg\jinc;..\..\..\jpeg\tlsf</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1297,44 +1297,44 @@
           <GroupName>jpeg</GroupName>
           <Files>
             <File>
-              <FileName>mixer.c</FileName>
+              <FileName>jdi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\mixer.c</FilePath>
-            </File>
-            <File>
-              <FileName>jpuhelper_rt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpuhelper_rt.c</FilePath>
-            </File>
-            <File>
-              <FileName>jpuapifunc_rt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpuapifunc_rt.c</FilePath>
-            </File>
-            <File>
-              <FileName>jpuapi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpuapi.c</FilePath>
+              <FilePath>..\..\..\jpeg\jsrc\jdi.c</FilePath>
             </File>
             <File>
               <FileName>jpeg_decoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpeg_decoder.c</FilePath>
+              <FilePath>..\..\..\jpeg\jsrc\jpeg_decoder.c</FilePath>
             </File>
             <File>
-              <FileName>jdi.c</FileName>
+              <FileName>jpuapi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jdi.c</FilePath>
+              <FilePath>..\..\..\jpeg\jsrc\jpuapi.c</FilePath>
+            </File>
+            <File>
+              <FileName>jpuapifunc_rt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\jpuapifunc_rt.c</FilePath>
+            </File>
+            <File>
+              <FileName>jpuhelper_rt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\jpuhelper_rt.c</FilePath>
+            </File>
+            <File>
+              <FileName>mixer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\mixer.c</FilePath>
             </File>
             <File>
               <FileName>tlsf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\tlsf\tlsf.c</FilePath>
+              <FilePath>..\..\..\jpeg\tlsf\tlsf.c</FilePath>
             </File>
             <File>
               <FileName>jpeg_heap.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\tlsf\jpeg_heap.c</FilePath>
+              <FilePath>..\..\..\jpeg\tlsf\jpeg_heap.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2529,44 +2529,44 @@
           <GroupName>jpeg</GroupName>
           <Files>
             <File>
-              <FileName>mixer.c</FileName>
+              <FileName>jdi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\mixer.c</FilePath>
-            </File>
-            <File>
-              <FileName>jpuhelper_rt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpuhelper_rt.c</FilePath>
-            </File>
-            <File>
-              <FileName>jpuapifunc_rt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpuapifunc_rt.c</FilePath>
-            </File>
-            <File>
-              <FileName>jpuapi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpuapi.c</FilePath>
+              <FilePath>..\..\..\jpeg\jsrc\jdi.c</FilePath>
             </File>
             <File>
               <FileName>jpeg_decoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jpeg_decoder.c</FilePath>
+              <FilePath>..\..\..\jpeg\jsrc\jpeg_decoder.c</FilePath>
             </File>
             <File>
-              <FileName>jdi.c</FileName>
+              <FileName>jpuapi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\jsrc\jdi.c</FilePath>
+              <FilePath>..\..\..\jpeg\jsrc\jpuapi.c</FilePath>
+            </File>
+            <File>
+              <FileName>jpuapifunc_rt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\jpuapifunc_rt.c</FilePath>
+            </File>
+            <File>
+              <FileName>jpuhelper_rt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\jpuhelper_rt.c</FilePath>
+            </File>
+            <File>
+              <FileName>mixer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\mixer.c</FilePath>
             </File>
             <File>
               <FileName>tlsf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\tlsf\tlsf.c</FilePath>
+              <FilePath>..\..\..\jpeg\tlsf\tlsf.c</FilePath>
             </File>
             <File>
               <FileName>jpeg_heap.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\jpeg\tlsf\jpeg_heap.c</FilePath>
+              <FilePath>..\..\..\jpeg\tlsf\jpeg_heap.c</FilePath>
             </File>
           </Files>
         </Group>

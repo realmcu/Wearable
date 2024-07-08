@@ -125,8 +125,8 @@ int WriteBsBufFromBufHelper(JpgDecHandle handle,
                             int endian);
 
 
-int LoadYuvImageHelperFormat(Uint8 *pic_yuv,
-                             Uint8 *pYuv,
+int LoadYuvImageHelperFormat(uint8_t *pic_yuv,
+                             uint8_t *pYuv,
                              PhysicalAddress addrY,
                              PhysicalAddress addrCb,
                              PhysicalAddress addrCr,
@@ -141,7 +141,7 @@ int LoadYuvImageHelperFormat(Uint8 *pic_yuv,
 
 
 int SaveYuvImageHelperFormat(void *yuvFp,
-                             Uint8 *pYuv,
+                             uint8_t *pYuv,
                              PhysicalAddress addrY,
                              PhysicalAddress addrCb,
                              PhysicalAddress addrCr,
@@ -154,7 +154,7 @@ int SaveYuvImageHelperFormat(void *yuvFp,
                              int packed);
 
 int SaveYuvPartialImageHelperFormat(void *yuvFp,
-                                    Uint8 *pYuv,
+                                    uint8_t *pYuv,
                                     PhysicalAddress addrY,
                                     PhysicalAddress addrCb,
                                     PhysicalAddress addrCr,

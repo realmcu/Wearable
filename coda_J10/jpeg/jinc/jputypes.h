@@ -8,21 +8,19 @@
 #define _JPU_TYPES_H_
 
 
-typedef unsigned char   Uint8;
-typedef unsigned int    Uint32;
-typedef unsigned short  Uint16;
-typedef char            Int8;
-typedef int             Int32;
-typedef short           Int16;
-#if defined(_MSC_VER)
-typedef unsigned _int64 Uint64;
-typedef _int64 Int64;
-#else
-typedef unsigned long long Uint64;
-typedef long long Int64;
-#endif
+typedef unsigned char   uint8_t;
+typedef unsigned int    uint32_t;
+typedef unsigned short  uint16_t;
+// typedef char            int8_t;
+typedef int             int32_t;
+typedef short           int16_t;
+
+
+typedef unsigned long long uint64_t;
+typedef long long int64_t;
+
 #ifndef PhysicalAddress
-typedef Uint32 PhysicalAddress;
+typedef uint32_t PhysicalAddress;
 #endif
 #ifndef BYTE
 typedef unsigned char   BYTE;

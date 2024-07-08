@@ -32,8 +32,8 @@ typedef enum
 
 typedef struct
 {
-    Uint32  tag;
-    Uint32  type;
+    uint32_t  tag;
+    uint32_t  type;
     int     count;
     int     offset;
 } TAG;
@@ -57,8 +57,8 @@ typedef struct
     int         SamplePerPixel;
     int         PlanrConfig; // 1 for chunky / 2 for planar
     int         YCbCrSubSample; // 00020002 for YCbCr 4:2:0 / 00020001 for YCbCr 4:2:2
-    Uint32      JpegOffset;
-    Uint32      JpegThumbSize;
+    uint32_t      JpegOffset;
+    uint32_t      JpegThumbSize;
 } EXIF_INFO;
 
 
@@ -128,8 +128,8 @@ typedef struct
     BYTE cInfoTab[4][6];
     BYTE qMatTab[4][64];
 
-    Uint32 huffMin[4][16];
-    Uint32 huffMax[4][16];
+    uint32_t huffMin[4][16];
+    uint32_t huffMax[4][16];
     BYTE huffPtr[4][16];
 
     // partial
@@ -228,8 +228,8 @@ typedef struct
     int quantMode;
     int stuffByteEnable;
 
-    Uint32 huffCode[4][256];
-    Uint32 huffSize[4][256];
+    uint32_t huffCode[4][256];
+    uint32_t huffSize[4][256];
 
     int huffSizeTmp[256];
     int huffCodeTmp[256];
@@ -290,7 +290,7 @@ void JpgDecGramSetup(JpgDecInfo *jpg);
 
 JpgRet JpgEnterLock();
 JpgRet JpgLeaveLock();
-JpgRet JpgSetClockGate(Uint32 on);
+JpgRet JpgSetClockGate(uint32_t on);
 
 void SetJpgPendingInst(JpgInst *inst);
 void ClearJpgPendingInst();

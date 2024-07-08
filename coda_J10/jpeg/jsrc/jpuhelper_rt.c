@@ -16,9 +16,10 @@
 #include "trace.h"
 #include "jpuhelper_rt.h"
 
-static int FillSdramBurst(BufInfo *pBufInfo, Uint32 targetAddr, PhysicalAddress bsBufStartAddr,
-                          PhysicalAddress bsBufEndAddr, Uint32 size, int checkeos, int *streameos, int endian);
-static int StoreYuvImageBurstFormat(Uint8 *dst, int picWidth, int picHeight, int addrY,  int addrCb,
+static int FillSdramBurst(BufInfo *pBufInfo, uint32_t targetAddr, PhysicalAddress bsBufStartAddr,
+                          PhysicalAddress bsBufEndAddr, uint32_t size, int checkeos, int *streameos, int endian);
+static int StoreYuvImageBurstFormat(uint8_t *dst, int picWidth, int picHeight, int addrY,
+                                    int addrCb,
                                     int addrCr,  int stride,  int interLeave, int format, int endian, int packed);
 
 
@@ -139,7 +140,7 @@ FILL_BS_ERROR:
 
 
 int SaveYuvImageHelperFormat(void *yuvFp,
-                             Uint8 *pYuv,
+                             uint8_t *pYuv,
                              PhysicalAddress addrY,
                              PhysicalAddress addrCb,
                              PhysicalAddress addrCr,
@@ -166,7 +167,7 @@ int SaveYuvImageHelperFormat(void *yuvFp,
 }
 
 int SaveYuvPartialImageHelperFormat(void *yuvFp,
-                                    Uint8 *pYuv,
+                                    uint8_t *pYuv,
                                     PhysicalAddress addrY,
                                     PhysicalAddress addrCb,
                                     PhysicalAddress addrCr,
@@ -289,7 +290,7 @@ int SaveYuvPartialImageHelperFormat(void *yuvFp,
         fseek(yuvFp, (frameIdx * frameSize), SEEK_SET);
         pos = LumaPartialSize * partPosIdx;
         fseek(yuvFp, pos, SEEK_CUR);
-        if (!fwrite(pYuv, sizeof(Uint8), LumaPartialSize, yuvFp))
+        if (!fwrite(pYuv, sizeof(uint8_t), LumaPartialSize, yuvFp))
         {
             DBG_DIRECT("Frame Data fwrite failed file handle is 0x%x \n", yuvFp);
             return 0;
@@ -307,7 +308,7 @@ int SaveYuvPartialImageHelperFormat(void *yuvFp,
             fseek(yuvFp, (frameIdx * frameSize), SEEK_SET);
             pos = LumaPicSize + ChromaPartialSize * partPosIdx;
             fseek(yuvFp, pos, SEEK_CUR);
-            if (!fwrite(pYuv + LumaPartialSize, sizeof(Uint8), ChromaPartialSize, yuvFp))
+            if (!fwrite(pYuv + LumaPartialSize, sizeof(uint8_t), ChromaPartialSize, yuvFp))
             {
                 DBG_DIRECT("Frame Data fwrite failed file handle is 0x%x \n", yuvFp);
                 return 0;
@@ -323,7 +324,7 @@ int SaveYuvPartialImageHelperFormat(void *yuvFp,
             fseek(yuvFp, (frameIdx * frameSize), SEEK_SET);
             pos = LumaPicSize + ChromaPicSize + ChromaPartialSize * partPosIdx;
             fseek(yuvFp, pos, SEEK_CUR);
-            if (!fwrite(pYuv + LumaPartialSize + ChromaPartialSize, sizeof(Uint8), ChromaPartialSize, yuvFp))
+            if (!fwrite(pYuv + LumaPartialSize + ChromaPartialSize, sizeof(uint8_t), ChromaPartialSize, yuvFp))
             {
                 DBG_DIRECT("Frame Data fwrite failed file handle is 0x%x \n", yuvFp);
                 return 0;
@@ -391,10 +392,10 @@ int GetFrameBufSize(int framebufFormat, int picWidth, int picHeight)
 
 
 
-int FillSdramBurst(BufInfo *pBufInfo, Uint32 targetAddr, PhysicalAddress bsBufStartAddr,
-                   PhysicalAddress bsBufEndAddr, Uint32 size,  int checkeos, int *streameos, int endian)
+int FillSdramBurst(BufInfo *pBufInfo, uint32_t targetAddr, PhysicalAddress bsBufStartAddr,
+                   PhysicalAddress bsBufEndAddr, uint32_t size,  int checkeos, int *streameos, int endian)
 {
-    Uint8 *pBuf;
+    uint8_t *pBuf;
     int room;
 
     pBufInfo->count = 0;
@@ -431,7 +432,7 @@ int FillSdramBurst(BufInfo *pBufInfo, Uint32 targetAddr, PhysicalAddress bsBufSt
 }
 
 
-int StoreYuvImageBurstFormat(Uint8 *dst, int picWidth, int picHeight,
+int StoreYuvImageBurstFormat(uint8_t *dst, int picWidth, int picHeight,
                              int addrY, int addrCb, int addrCr, int stride, int interLeave, int format, int endian, int packed)
 {
     int size;
@@ -439,7 +440,7 @@ int StoreYuvImageBurstFormat(Uint8 *dst, int picWidth, int picHeight,
     int addr;
     int lumaSize, chromaSize, chromaStride, chromaWidth, chromaHeight;
 
-    Uint8 *puc;
+    uint8_t *puc;
 
     switch (format)
     {
@@ -511,7 +512,7 @@ int StoreYuvImageBurstFormat(Uint8 *dst, int picWidth, int picHeight,
     if (picWidth == stride)
     {
         DBG_DIRECT("addr 0x%x", addr);
-        JpuReadMem(addr, (Uint8 *)(puc), lumaSize, endian);
+        JpuReadMem(addr, (uint8_t *)(puc), lumaSize, endian);
 
         if (packed)
         {
@@ -522,24 +523,24 @@ int StoreYuvImageBurstFormat(Uint8 *dst, int picWidth, int picHeight,
         {
             puc = dst + lumaSize;
             addr = addrCb;
-            JpuReadMem(addr, (Uint8 *)(puc), chromaSize * 2, endian);
+            JpuReadMem(addr, (uint8_t *)(puc), chromaSize * 2, endian);
         }
         else
         {
             puc = dst + lumaSize;
             addr = addrCb;
-            JpuReadMem(addr, (Uint8 *)(puc), chromaSize, endian);
+            JpuReadMem(addr, (uint8_t *)(puc), chromaSize, endian);
 
             puc = dst + lumaSize + chromaSize;
             addr = addrCr;
-            JpuReadMem(addr, (Uint8 *)(puc), chromaSize, endian);
+            JpuReadMem(addr, (uint8_t *)(puc), chromaSize, endian);
         }
     }
     else
     {
         for (y = 0; y < nY; ++y)
         {
-            JpuReadMem(addr + stride * y, (Uint8 *)(puc + y * picWidth), picWidth,  endian);
+            JpuReadMem(addr + stride * y, (uint8_t *)(puc + y * picWidth), picWidth,  endian);
         }
 
         if (packed)
@@ -553,7 +554,7 @@ int StoreYuvImageBurstFormat(Uint8 *dst, int picWidth, int picHeight,
             addr = addrCb;
             for (y = 0; y < (chromaHeight / 2); ++y)
             {
-                JpuReadMem(addr + (chromaStride * 2)*y, (Uint8 *)(puc + y * (chromaWidth * 2)), (chromaWidth * 2),
+                JpuReadMem(addr + (chromaStride * 2)*y, (uint8_t *)(puc + y * (chromaWidth * 2)), (chromaWidth * 2),
                            endian);
             }
         }
@@ -563,14 +564,14 @@ int StoreYuvImageBurstFormat(Uint8 *dst, int picWidth, int picHeight,
             addr = addrCb;
             for (y = 0; y < nCb; ++y)
             {
-                JpuReadMem(addr + chromaStride * y, (Uint8 *)(puc + y * chromaWidth), chromaWidth,  endian);
+                JpuReadMem(addr + chromaStride * y, (uint8_t *)(puc + y * chromaWidth), chromaWidth,  endian);
             }
 
             puc = dst + lumaSize + chromaSize;
             addr = addrCr;
             for (y = 0; y < nCr; ++y)
             {
-                JpuReadMem(addr + chromaStride * y, (Uint8 *)(puc + y * chromaWidth), chromaWidth,  endian);
+                JpuReadMem(addr + chromaStride * y, (uint8_t *)(puc + y * chromaWidth), chromaWidth,  endian);
             }
         }
 
