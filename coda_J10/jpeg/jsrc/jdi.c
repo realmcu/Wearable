@@ -92,47 +92,22 @@ int jdi_init()
     // }
 
     uint8_t *pmem = jpeg_heap_get_mem();
-//  if((uint32_t)pmem % 8)
-//  {
-//      uint8_t offset = (uint32_t)pmem % 8;
-//      s_jdb_video_memory.phys_addr = (unsigned long)pmem + offset;
-//      s_jdb_video_memory.size = TLSF_MEM_SIZE - offset;
-//  }
-//  else
-//  {
-//      s_jdb_video_memory.phys_addr = (unsigned long)pmem;
-//      s_jdb_video_memory.size = TLSF_MEM_SIZE;
-//  }
     s_jdb_video_memory.phys_addr = (unsigned long)pmem;
     s_jdb_video_memory.size = TLSF_MEM_SIZE;
     DBG_DIRECT("pmem 0x%x, 0x%x \n", pmem, s_jdb_video_memory.phys_addr);
 
 
-    // DBG_DIRECT("%s %d: phys_addr 0x%x, %d \n", __FUNCTION__, __LINE__, s_jdb_video_memory.phys_addr, s_jdb_video_memory.size);
+// DBG_DIRECT("%s %d: phys_addr 0x%x, %d \n", __FUNCTION__, __LINE__, s_jdb_video_memory.phys_addr, s_jdb_video_memory.size);
 //  DBG_DIRECT("phys_addr 0x%x, %d \n", s_jdb_video_memory.phys_addr, s_jdb_video_memory.size);
 
-    if (!s_pjip->instance_pool_inited)
-    {
-        memset(&s_pjip->vmem, 0x00, sizeof(jpeg_mm_t));
-        // ret = jmem_init(&s_pjip->vmem, (unsigned long)s_jdb_video_memory.phys_addr, s_jdb_video_memory.size);
-        ret = 0;
-        if (ret < 0)
-        {
-            DBG_DIRECT("[JDI] fail to init jpu memory management logic\n");
-            goto ERR_JDI_INIT;
-        }
-    }
 
     s_jdb_register.phys_addr = JPU_BIT_REG_BASE;
     s_jdb_register.virt_addr = JPU_BIT_REG_BASE;
     s_jdb_register.size = JPU_BIT_REG_SIZE;
 
-
     jdi_set_clock_gate(1);
 
     s_task_num++;
-
-//  DBG_DIRECT("[jdi] success to init driver \n");
     return s_jpu_fd;
 
 ERR_JDI_INIT:
@@ -487,31 +462,6 @@ int jdi_wait_interrupt(int timeout)
     return 0;
 }
 
-void jdi_log(int cmd, int step)
-{
-    int i;
-
-    switch (cmd)
-    {
-    case JDI_LOG_CMD_PICRUN:
-        if (step == 1)  //
-        {
-            DBG_DIRECT("\n**PIC_RUN start\n");
-        }
-        else
-        {
-            DBG_DIRECT("\n**PIC_RUN end \n");
-        }
-        break;
-    }
-
-    for (i = 0; i <= 0x238; i = i + 16)
-    {
-        DBG_DIRECT("0x%04xh: 0x%08x 0x%08x 0x%08x 0x%08x\n", i,
-                   jdi_read_register(i), jdi_read_register(i + 4),
-                   jdi_read_register(i + 8), jdi_read_register(i + 0xc));
-    }
-}
 
 int jpu_swap_endian(unsigned char *data, int len, int endian)
 {

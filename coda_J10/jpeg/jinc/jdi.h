@@ -10,11 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-// #include "../jpuapi/jpuconfig.h"
-// #include "../jpuapi/regdefine.h"
 #include "jpuconfig.h"
 #include "regdefine.h"
-#include "mm.h"
 
 #include "trace.h"
 
@@ -43,7 +40,7 @@ typedef struct jpu_instance_pool_t
     int jpu_instance_num;
     int instance_pool_inited;
     void *pendingInst;
-    jpeg_mm_t vmem;
+    // jpeg_mm_t vmem;
 } jpu_instance_pool_t;
 
 #ifdef SUPPORT_128BIT_BUS
@@ -116,19 +113,6 @@ int jdi_read_memory(unsigned int addr, unsigned char *data, int len, int endian)
 
 int jdi_lock();
 void jdi_unlock();
-void jdi_log(int cmd, int step);
-
-#ifdef CNM_FPGA_PLATFORM
-#define HPI_SET_TIMING_MAX 1000
-int jdi_set_timing_opt();
-int jdi_set_clock_freg(int Device, int OutFreqMHz, int InFreqMHz);
-#define ACLK_MAX                    30
-#define ACLK_MIN                    16
-#define CCLK_MAX                    30
-#define CCLK_MIN                    16
-#endif
-
-
 
 #if defined (__cplusplus)
 }

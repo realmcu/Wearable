@@ -8,7 +8,6 @@
 #ifndef _JPU_CONFIG_H_
 #define _JPU_CONFIG_H_
 
-// #include "../config.h"
 #include "jputypes.h"
 
 // #define MAX_NUM_INSTANCE             8
@@ -39,7 +38,8 @@
 
 #define MAX_FRAME               (4*MAX_NUM_INSTANCE) // For AVC decoder, 16(reference) + 2(current) + 1(rotator)
 
-#define STREAM_FILL_SIZE        0x10000
+// #define STREAM_FILL_SIZE        0x10000
+#define STREAM_FILL_SIZE        (40 * 1024)
 #define STREAM_END_SIZE         0
 
 #define JPU_GBU_SIZE            512

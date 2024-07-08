@@ -185,68 +185,6 @@ typedef struct
     int hwVersion;
 } JpgDecInfo;
 
-typedef struct
-{
-
-    JpgEncOpenParam openParam;
-    JpgEncInitialInfo initialInfo;
-    PhysicalAddress streamRdPtr;
-    PhysicalAddress streamWrPtr;
-    PhysicalAddress streamBufStartAddr;
-    PhysicalAddress streamBufEndAddr;
-    int streamBufSize;
-
-    FrameBuffer *frameBufPool;
-    int numFrameBuffers;
-    int stride;
-    int rotationEnable;
-    int mirrorEnable;
-    int mirrorDirection;
-    int rotationAngle;
-    int initialInfoObtained;
-
-    int picWidth;
-    int picHeight;
-    int alignedWidth;
-    int alignedHeight;
-    int seqInited;
-    int frameIdx;
-    int format;
-
-    int streamEndian;
-    int frameEndian;
-    int chromaInterleave;
-
-    int rstIntval;
-    int busReqNum;
-    int mcuBlockNum;
-    int compNum;
-    int compInfo[3];
-
-    // give command
-    int disableAPPMarker;
-    int quantMode;
-    int stuffByteEnable;
-
-    uint32_t huffCode[4][256];
-    uint32_t huffSize[4][256];
-
-    int huffSizeTmp[256];
-    int huffCodeTmp[256];
-
-    BYTE *pHuffVal[4];
-    BYTE *pHuffBits[4];
-    BYTE *pCInfoTab[4];
-    BYTE *pQMatTab[4];
-    // partial
-    int usePartial;
-    int partiallineNum;
-    int partialBufNum;
-    int packedFormat;
-
-    JpgEncParamSet *paraSet;
-
-} JpgEncInfo;
 
 typedef struct JpgInst
 {
@@ -255,7 +193,7 @@ typedef struct JpgInst
     int loggingEnable;
     union
     {
-        JpgEncInfo encInfo;
+//        JpgEncInfo encInfo;
         JpgDecInfo decInfo;
     } JpgInfo;
 } JpgInst;

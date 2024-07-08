@@ -1034,10 +1034,10 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
     }
 
 
-    if (pJpgInst->loggingEnable)
-    {
-        jdi_log(JDI_LOG_CMD_PICRUN, 1);
-    }
+//    if (pJpgInst->loggingEnable)
+//    {
+//        jdi_log(JDI_LOG_CMD_PICRUN, 1);
+//    }
 
     JpuWriteReg(MJPEG_PIC_START_REG, (1 << JPG_START_PIC));
 
@@ -1154,10 +1154,10 @@ JpgRet JPU_DecGetOutputInfo(JpgDecHandle handle, JpgDecOutputInfo *info)
         JpuWriteReg(MJPEG_PIC_STATUS_REG, val);
     }
 
-    if (pJpgInst->loggingEnable)
-    {
-        jdi_log(JDI_LOG_CMD_PICRUN, 0);
-    }
+//    if (pJpgInst->loggingEnable)
+//    {
+//        jdi_log(JDI_LOG_CMD_PICRUN, 0);
+//    }
 
     SetJpgPendingInst(0);
     JpgLeaveLock();

@@ -8,7 +8,6 @@
 #define JPUAPI_H_INCLUDED
 
 #include "jpuconfig.h"
-// #include "../jdi/jdi.h"
 #include "jdi.h"
 
 //------------------------------------------------------------------------------
@@ -214,7 +213,6 @@ typedef struct
     int fillendbs;
 } BufInfo;
 
-#define MAX_FILE_PATH   256
 typedef struct
 {
     int outNum;
@@ -255,61 +253,6 @@ typedef struct
     int filePlay;
 
 } DecConfigParam;
-
-//------------------------------------------------------------------------------
-// encode struct and definition
-//------------------------------------------------------------------------------
-
-typedef struct JpgInst JpgEncInst;
-typedef JpgEncInst *JpgEncHandle;
-
-
-typedef struct
-{
-    PhysicalAddress bitstreamBuffer;
-    uint32_t bitstreamBufferSize;
-    int picWidth;
-    int picHeight;
-    int sourceFormat;
-    int restartInterval;
-    int streamEndian;
-    int frameEndian;
-    CbCrInterLeave chromaInterleave;
-    BYTE huffVal[4][162];
-    BYTE huffBits[4][256];
-    BYTE qMatTab[4][64];
-    PackedOutputFormat packedFormat;
-} JpgEncOpenParam;
-
-typedef struct
-{
-    int minFrameBufferCount;
-    int colorComponents;
-} JpgEncInitialInfo;
-
-typedef struct
-{
-    FrameBuffer *sourceFrame;
-} JpgEncParam;
-
-
-typedef struct
-{
-    PhysicalAddress bitstreamBuffer;
-    uint32_t bitstreamSize;
-} JpgEncOutputInfo;
-
-typedef struct
-{
-    PhysicalAddress paraSet;
-    BYTE *pParaSet;
-    int size;
-    int headerMode;
-    int quantMode;
-    int huffMode;
-    int disableAPPMarker;
-} JpgEncParamSet;
-
 
 
 #ifdef __cplusplus
@@ -360,10 +303,6 @@ JpgRet JPU_DecUpdateBitstreamBuffer(
     int size);
 JpgRet JPU_HWReset();
 JpgRet JPU_SWReset();
-JpgRet JPU_EncSetWrPtr(
-    JpgEncHandle handle,
-    PhysicalAddress addr,
-    int updateRdPtr);
 JpgRet JPU_DecStartOneFrame(
     JpgDecHandle handle,
     JpgDecParam *param);

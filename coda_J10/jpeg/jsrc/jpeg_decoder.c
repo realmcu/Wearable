@@ -78,7 +78,7 @@ uint32_t CODA_Test_write(uint32_t addr, uint32_t val)
 
 static DecConfigParam jdec_config;
 
-static int coda_decode(void)
+static int coda_decode_partial(void)
 {
     JpgDecHandle handle     = {0};
     JpgDecOpenParam decOP       = {0};
@@ -213,8 +213,8 @@ static int coda_decode(void)
         {
             jdec_config.partialBufNum = partMaxIdx;
         }
-        // DBG_DIRECT("Num of Buffer for Partial : %d\n ", jdec_config.partialBufNum);
-        // DBG_DIRECT("Num of Line for Partial   : %d\n ", partialHeight);
+        DBG_DIRECT("Num of Buffer for Partial : %d\n ", jdec_config.partialBufNum);
+        DBG_DIRECT("Num of Line for Partial   : %d\n ", partialHeight);
     }
 
     if (initialInfo.sourceFormat == FORMAT_420 || initialInfo.sourceFormat == FORMAT_422)
@@ -640,6 +640,8 @@ SKIP_BUF_DUMP:
         }
 
     }
+
+
     if (totalNumofErrMbs)
     {
         suc = 0;
@@ -667,6 +669,373 @@ ERR_DEC_INIT:
 }
 
 
+
+static int coda_decode(void)
+{
+    JpgDecHandle handle     = {0};
+    JpgDecOpenParam decOP       = {0};
+    JpgDecInitialInfo initialInfo = {0};
+    JpgDecOutputInfo outputInfo = {0};
+    JpgDecParam decParam    = {0};
+    JpgRet ret = JPG_RET_SUCCESS;
+    FrameBuffer frameBuf[NUM_FRAME_BUF];
+    jpu_buffer_t vbStream    = {0};
+    BufInfo bufInfo     = {0};
+    FRAME_BUF *pFrame[NUM_FRAME_BUF];
+    FRAME_BUF *pDispFrame = NULL;
+    uint32_t bsSize = 0, framebufSize = 0, framebufWidth = 0, framebufHeight = 0, framebufStride = 0,
+             framebufFormat = FORMAT_420;
+    int dispWidth = 0, dispHeight = 0;
+    int i = 0, ppIdx = 0, saveIdx = 0, totalNumofErrMbs = 0, streameos = 0, dispImage = 0;
+    int suc = 1;
+    uint8_t *pYuv  =  NULL;
+    void *fpYuv  =  NULL;
+    int needFrameBufCount = 0, regFrameBufCount = 0;
+    int rotEnable = 0;
+    int int_reason = 0;
+    int instIdx;
+    int partPosIdx = 0;
+    int partBufIdx = 0;
+    int partMaxIdx = 0;
+    int partialHeight = 0;
+
+    memset(&pFrame, 0x00, sizeof(FRAME_BUF *)*NUM_FRAME_BUF);
+    memset(&frameBuf, 0x00, sizeof(FrameBuffer)*NUM_FRAME_BUF);
+
+    instIdx = jdec_config.instNum;
+
+    // source image buffer
+    bsSize = sizeof(pic) / sizeof(pic[0]);
+    bufInfo.buf = pic;
+    bufInfo.size = bsSize;
+    bufInfo.point = 0;
+
+    ret = JPU_Init();
+    if (ret != JPG_RET_SUCCESS &&
+        ret != JPG_RET_CALLED_BEFORE)
+    {
+        suc = 0;
+        DBG_DIRECT("JPU_Init failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_INIT;
+    }
+    DBG_DIRECT("JPU_Init Done\n");
+
+    // Open an instance and get initial information for decoding.
+    vbStream.size = ((bsSize + 1023) >> 10 << 10);
+
+    // vbStream.size = STREAM_BUF_SIZE;
+    if (jdi_allocate_dma_memory(&vbStream) < 0)
+    {
+        DBG_DIRECT("fail to allocate bitstream buffer\n");
+        goto ERR_DEC_INIT;
+    }
+    DBG_DIRECT("jdi_allocate_dma_memory Done\n");
+
+    decOP.streamEndian = jdec_config.StreamEndian;
+    decOP.frameEndian = jdec_config.FrameEndian;
+    decOP.chromaInterleave = (CbCrInterLeave)jdec_config.chromaInterleave;
+    decOP.bitstreamBuffer = vbStream.phys_addr;
+    decOP.bitstreamBufferSize = vbStream.size;
+    decOP.pBitStream = (BYTE *)vbStream.virt_addr; // set virtual address mapped of physical address
+    decOP.packedFormat = jdec_config.packedFormat;
+
+    decOP.roiEnable = jdec_config.roiEnable;
+    decOP.roiOffsetX = jdec_config.roiOffsetX;
+    decOP.roiOffsetY = jdec_config.roiOffsetY;
+    decOP.roiWidth = jdec_config.roiWidth;
+    decOP.roiHeight = jdec_config.roiHeight;
+
+    ret = JPU_DecOpen(&handle, &decOP);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        DBG_DIRECT("JPU_DecOpen failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_INIT;
+    }
+    DBG_DIRECT("JPU_DecOpen Done\n");
+
+    ret = WriteJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
+                              decOP.bitstreamBuffer + decOP.bitstreamBufferSize, 0, 0, &streameos, decOP.streamEndian);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        DBG_DIRECT("WriteBsBufHelper failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_OPEN;
+    }
+    DBG_DIRECT("WriteJpgBsBufHelper Done\n");
+
+    ret = JPU_DecGetInitialInfo(handle, &initialInfo);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        DBG_DIRECT("JPU_DecGetInitialInfo failed Error code is 0x%x, inst=%d \n", ret, instIdx);
+        goto ERR_DEC_OPEN;
+    }
+    DBG_DIRECT("JPU_DecGetInitialInfo Done\n");
+
+    // roi
+    if (jdec_config.roiEnable)
+    {
+        framebufWidth  = initialInfo.roiFrameWidth ;
+        framebufHeight = initialInfo.roiFrameHeight;
+    }
+    else
+    {
+        if (initialInfo.sourceFormat == FORMAT_420 || initialInfo.sourceFormat == FORMAT_422)
+        {
+            framebufWidth = ((initialInfo.picWidth + 15) / 16) * 16;
+        }
+        else
+        {
+            framebufWidth = ((initialInfo.picWidth + 7) / 8) * 8;
+        }
+
+        if (initialInfo.sourceFormat == FORMAT_420 || initialInfo.sourceFormat == FORMAT_224)
+        {
+            framebufHeight = ((initialInfo.picHeight + 15) / 16) * 16;
+        }
+        else
+        {
+            framebufHeight = ((initialInfo.picHeight + 7) / 8) * 8;
+        }
+
+
+        // scaler constraint when conformance test is disable
+        if (framebufWidth < 128 || framebufHeight < 128)
+        {
+            if (jdec_config.iHorScaleMode || jdec_config.iVerScaleMode)
+            {
+                DBG_DIRECT("Invalid operation mode : Not supported resolution with Scaler, width=%d, height=%d\n",
+                           framebufWidth, framebufHeight);
+            }
+            jdec_config.iHorScaleMode = 0;
+            jdec_config.iVerScaleMode = 0;
+        }
+
+        if (jdec_config.iHorScaleMode || jdec_config.iVerScaleMode)
+        {
+            framebufHeight = ((framebufHeight + 1) / 2) * 2;
+            framebufWidth = ((framebufWidth + 1) / 2) * 2;
+        }
+
+        framebufWidth  >>= jdec_config.iHorScaleMode;
+        framebufHeight >>= jdec_config.iVerScaleMode;
+    }
+
+    // rotate
+    if (jdec_config.rotAngle == 90 || jdec_config.rotAngle == 270)
+    {
+        dispWidth = framebufHeight;
+        dispHeight = framebufWidth;
+        framebufStride = framebufHeight;
+        framebufHeight = framebufWidth;
+        framebufFormat = (framebufFormat == FORMAT_422) ? FORMAT_224 : (framebufFormat == FORMAT_224) ?
+                         FORMAT_422 : framebufFormat;
+    }
+    else
+    {
+        dispWidth = framebufWidth;
+        dispHeight = framebufHeight;
+        framebufStride = framebufWidth;
+    }
+    JPU_DecGiveCommand(handle, SET_JPG_DISP_WIDTH, &dispWidth);
+
+    if (jdec_config.iHorScaleMode || jdec_config.iVerScaleMode)
+    {
+        framebufStride = ((framebufStride + 15) / 16) * 16;
+    }
+
+    framebufFormat = initialInfo.sourceFormat;
+    if (decOP.packedFormat >= PACKED_FORMAT_422_YUYV && decOP.packedFormat <= PACKED_FORMAT_422_VYUY)
+    {
+        framebufWidth = framebufWidth * 2;
+        framebufStride = framebufStride * 2;
+        framebufFormat = FORMAT_422;
+        if (jdec_config.rotAngle == 90 || jdec_config.rotAngle == 270)
+        {
+            framebufFormat = FORMAT_224;
+        }
+
+    }
+    else if (decOP.packedFormat == PACKED_FORMAT_444)
+    {
+        framebufWidth = framebufWidth * 3;
+        framebufStride = framebufStride * 3;
+        framebufFormat = FORMAT_444;
+    }
+
+    DBG_DIRECT("framebufFormat %d", framebufFormat);
+    framebufSize = GetFrameBufSize(framebufFormat, initialInfo.picWidth, initialInfo.picHeight);
+    DBG_DIRECT("framebufSize %d frame width: %d, stride : %d, height = %d\n", framebufSize,
+               framebufWidth, framebufStride, framebufHeight);
+
+
+    //Allocate frame buffer
+    regFrameBufCount = initialInfo.minFrameBufferCount + EXTRA_FRAME_BUFFER_NUM;
+    needFrameBufCount = regFrameBufCount;
+
+    if (AllocateFrameBuffer(instIdx, framebufFormat, framebufStride, framebufHeight, needFrameBufCount,
+                            (decOP.packedFormat >= PACKED_FORMAT_422_YUYV)) == 0)
+    {
+        DBG_DIRECT("fail to AllocateFrameBuffer\n");
+        goto ERR_DEC_OPEN;
+    }
+    DBG_DIRECT("AllocateFrameBuffer DONE\n");
+
+    JpgEnterLock();
+    for (i = 0; i < needFrameBufCount; ++i)
+    {
+        pFrame[i] = GetFrameBuffer(instIdx, i);
+        frameBuf[i].bufY = pFrame[i]->vbY.phys_addr;
+        frameBuf[i].bufCb = pFrame[i]->vbCb.phys_addr;
+        if (decOP.chromaInterleave == CBCR_SEPARATED)
+        {
+            frameBuf[i].bufCr = pFrame[i]->vbCr.phys_addr;
+        }
+    }
+    JpgLeaveLock();
+
+    ret = JPU_DecGiveCommand(handle, SET_JPG_USE_PARTIAL_MODE,  &(jdec_config.usePartialMode));
+    if (ret != JPG_RET_SUCCESS)
+    {
+        DBG_DIRECT("JPU_DecGiveCommand[SET_JPG_USE_PARTIAL_MODE] failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_OPEN;
+    }
+
+    // Register frame buffers requested by the decoder.
+    ret = JPU_DecRegisterFrameBuffer(handle, frameBuf, regFrameBufCount, framebufStride);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        DBG_DIRECT("JPU_DecRegisterFrameBuffer failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_OPEN;
+    }
+    ppIdx = 0;
+
+    while (1)
+    {
+        if (jdec_config.useRot)
+        {
+            JPU_DecGiveCommand(handle, SET_JPG_ROTATION_ANGLE, &(jdec_config.rotAngle));
+            JPU_DecGiveCommand(handle, SET_JPG_MIRROR_DIRECTION, &(jdec_config.mirDir));
+            JPU_DecGiveCommand(handle, SET_JPG_ROTATOR_OUTPUT, &frameBuf[ppIdx]);
+            JPU_DecGiveCommand(handle, SET_JPG_ROTATOR_STRIDE, &framebufStride);
+
+            JPU_DecGiveCommand(handle, ENABLE_JPG_ROTATION, 0);
+            JPU_DecGiveCommand(handle, ENABLE_JPG_MIRRORING, 0);
+        }
+
+        JPU_DecGiveCommand(handle, SET_JPG_SCALE_HOR,  &(jdec_config.iHorScaleMode));
+        JPU_DecGiveCommand(handle, SET_JPG_SCALE_VER,  &(jdec_config.iVerScaleMode));
+
+        // Start decoding a frame.
+        DBG_DIRECT("S\n");
+        ret = JPU_DecStartOneFrame(handle, &decParam);
+        if (ret != JPG_RET_SUCCESS && ret != JPG_RET_EOS)
+        {
+            if (ret == JPG_RET_BIT_EMPTY)
+            {
+                ret = WriteJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
+                                          decOP.bitstreamBuffer + decOP.bitstreamBufferSize, STREAM_FILL_SIZE, 0, &streameos,
+                                          decOP.streamEndian);
+                if (ret != JPG_RET_SUCCESS)
+                {
+                    DBG_DIRECT("WriteBsBufHelper failed Error code is 0x%x \n", ret);
+                    goto ERR_DEC_OPEN;
+                }
+                continue;
+            }
+
+            DBG_DIRECT("JPU_DecStartOneFrame failed Error code is 0x%x \n", ret);
+            goto ERR_DEC_OPEN;
+        }
+        if (ret == JPG_RET_EOS)
+        {
+            goto JPU_END_OF_STREAM;
+        }
+
+        while (1)
+        {
+            int_reason = JPU_WaitInterrupt(JPU_INTERRUPT_TIMEOUT_MS);
+            if (int_reason == -1)
+            {
+                DBG_DIRECT("Error : timeout happened\n");
+                JPU_SWReset();
+                break;
+            }
+
+            if (int_reason & (1 << INT_JPU_DONE) ||
+                int_reason & (1 << INT_JPU_ERROR)) // Must catch PIC_DONE interrupt before catching EMPTY interrupt
+            {
+                DBG_DIRECT("D\n");
+                // Do no clear INT_JPU_DONE and INT_JPU_ERROR interrupt. these will be cleared in JPU_DecGetOutputInfo.
+                break;
+            }
+
+            if (int_reason & (1 << INT_JPU_BIT_BUF_EMPTY))
+            {
+                DBG_DIRECT("INT_JPU_BIT_BUF_EMPTY \n");
+                ret = WriteJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
+                                          decOP.bitstreamBuffer + decOP.bitstreamBufferSize, STREAM_FILL_SIZE, 0, &streameos,
+                                          decOP.streamEndian);
+                if (ret != JPG_RET_SUCCESS)
+                {
+                    DBG_DIRECT("WriteBsBufHelper failed Error code is 0x%x \n", ret);
+                    goto ERR_DEC_OPEN;
+                }
+                JPU_ClrStatus((1 << INT_JPU_BIT_BUF_EMPTY));
+            }
+
+            if (int_reason & (1 << INT_JPU_BIT_BUF_STOP))
+            {
+                DBG_DIRECT("INT_JPU_BIT_BUF_STOP \n");
+                ret = JPU_DecCompleteStop(handle);
+                if (ret != JPG_RET_SUCCESS)
+                {
+                    DBG_DIRECT("JPU_DecCompleteStop failed Error code is 0x%x \n", ret);
+                    goto ERR_DEC_OPEN;
+                }
+                JPU_ClrStatus((1 << INT_JPU_BIT_BUF_STOP));
+                break;
+            }
+        }
+
+JPU_END_OF_STREAM:
+//      DBG_DIRECT("\nEnter JPU_END_OF_STREAM. \n");
+        // DBG_DIRECT("framebufFormat 0x%x %d dispHeight 0x%x %d", &framebufFormat, framebufFormat,
+        //            &dispHeight, dispHeight);
+        ret = JPU_DecGetOutputInfo(handle, &outputInfo);
+        if (ret != JPG_RET_SUCCESS)
+        {
+            DBG_DIRECT("JPU_DecGetOutputInfo failed Error code is 0x%x \n", ret);
+            goto ERR_DEC_OPEN;
+        }
+        if ((outputInfo.decodingSuccess == 0) || (outputInfo.indexFrameDisplay == -1))
+        {
+            DBG_DIRECT("JPU_DecGetOutputInfo decode fail\n");
+            break;
+        }
+
+        // indexFrameDisplay points to the frame buffer, among ones registered, which holds
+        // the output of the decoder.
+        // YUV2RGB here
+
+SKIP_BUF_DUMP:
+        break;
+    }
+
+ERR_DEC_OPEN:
+    // Now that we are done with decoding, close the open instance.
+    DBG_DIRECT("\nEnter Dec End. \n");
+    ret = JPU_DecClose(handle);
+
+ERR_DEC_INIT:
+    DBG_DIRECT("\nEnter ERR_DEC_INIT. \n");
+
+    // FreeFrameBuffer(instIdx);
+    // jdi_free_dma_memory(&vbStream);
+
+    //sw_mixer_close(instIdx);
+    JPU_DeInit();
+
+    return suc;
+}
 
 
 
@@ -786,9 +1155,9 @@ uint32_t CODA_Test(uint8_t cmd)
                 decConfig.FrameEndian = JPU_FRAME_ENDIAN;
 
                 // partial Mode(0: OFF 1: ON);
-                decConfig.usePartialMode = 0;
+                decConfig.usePartialMode = 1;
                 // Num of Frame Buffer[ 2 ~ 4 ] ;
-                // decConfig.partialBufNum = 2;
+                decConfig.partialBufNum = 4;
 
                 //// Can NOT do rotation and mirror, when partial mode enable.
                 // rotation angle in degrees(0, 90, 180, 270);
