@@ -10,7 +10,6 @@
 
 #include "jpurun.h"
 #include "regdefine.h"
-//#include "jdi.h"
 #include "jpuconfig.h"
 #include "jpuapi.h"
 #include "mixer.h"
@@ -18,29 +17,16 @@
 #include "jpuapifunc_rt.h"
 #include "jpeg_heap.h"
 
-#define JPEG_DECODER_EN
-// #define JPEG_ENCODER_EN
-
-
-#ifdef JPEG_DECODER_EN
 // #include "pic_hex.txt"
 // #include "pic_hex_122144.txt"
-// #include "pic_hex_1632.txt"
+// #include "pic_hex_16_32.txt"
 #include "pic_hex_184_96.txt"
-#else
-static uint8_t *pic;
-#endif
 
-#ifdef JPEG_ENCODER_EN
-#include "pic_yuv_122144.txt"
-#else
-static uint8_t *pic_yuv;
-#endif
 
 
 
 //PCC config functin
-uint32_t RCC_MJPEG_Config_Enable(void)
+uint32_t coda_init(void)
 {
     DBG_DIRECT("MJPEG RCC ENABLE");
     RCC_PeriphClockCmd(APBPeriph_JPEG, APBPeriph_JPEG_CLOCK, ENABLE);
@@ -50,7 +36,7 @@ uint32_t RCC_MJPEG_Config_Enable(void)
     // DBG_DIRECT("BIT16_17 reg_0x23c = 0x%x", *((uint32_t*) 0x4000023C));
     return 0;
 }
-uint32_t RCC_MJPEG_Config_Disable(void)
+uint32_t coda_deinit(void)
 {
     RCC_PeriphClockCmd(APBPeriph_JPEG, APBPeriph_JPEG_CLOCK, DISABLE);
     //Function enable
@@ -92,8 +78,9 @@ uint32_t CODA_Test_write(uint32_t addr, uint32_t val)
 #define EXTRA_FRAME_BUFFER_NUM  0
 #define MAX_ROT_BUF_NUM         1
 
-#ifdef JPEG_DECODER_EN
-static int CODA_Decode_Test(DecConfigParam *param)
+static DecConfigParam jdec_config;
+
+static int coda_decode(void)
 {
     JpgDecHandle handle     = {0};
     JpgDecOpenParam decOP       = {0};
@@ -124,34 +111,11 @@ static int CODA_Decode_Test(DecConfigParam *param)
     int partialHeight = 0;
     Uint32 product_version;
 
-    DecConfigParam decConfig;
-
-
-    memcpy(&decConfig, param, sizeof(DecConfigParam));
     memset(&pFrame, 0x00, sizeof(FRAME_BUF *)*NUM_FRAME_BUF);
     memset(&frameBuf, 0x00, sizeof(FrameBuffer)*NUM_FRAME_BUF);
 
-    instIdx = decConfig.instNum;
-    if (decConfig.usePartialMode && decConfig.roiEnable)
-    {
-        DBG_DIRECT("Invalid operation mode : partial and ROI mode can not be worked\n");
-        goto ERR_DEC_INIT;
-    }
-    if (decConfig.packedFormat && decConfig.roiEnable)
-    {
-        DBG_DIRECT("Invalid operation mode : packed mode and ROI mode can not be worked\n");
-        goto ERR_DEC_INIT;
-    }
-    if ((decConfig.iHorScaleMode || decConfig.iVerScaleMode) && decConfig.roiEnable)
-    {
-        DBG_DIRECT("Invalid operation mode : Scaler mode and ROI mode can not be worked\n");
-        goto ERR_DEC_INIT;
-    }
-    if (decConfig.useRot && decConfig.roiEnable)
-    {
-        DBG_DIRECT("Invalid operation mode : Rotator mode and ROI mode can not be worked\n");
-        goto ERR_DEC_INIT;
-    }
+    instIdx = jdec_config.instNum;
+
 
     // store file or display
     dispImage = 1;
@@ -194,18 +158,18 @@ static int CODA_Decode_Test(DecConfigParam *param)
     }
 //  DBG_DIRECT("jdi_allocate_dma_memory Done\n");
 
-    decOP.streamEndian = decConfig.StreamEndian;
-    decOP.frameEndian = decConfig.FrameEndian;
-    decOP.chromaInterleave = (CbCrInterLeave)decConfig.chromaInterleave;
+    decOP.streamEndian = jdec_config.StreamEndian;
+    decOP.frameEndian = jdec_config.FrameEndian;
+    decOP.chromaInterleave = (CbCrInterLeave)jdec_config.chromaInterleave;
     decOP.bitstreamBuffer = vbStream.phys_addr;
     decOP.bitstreamBufferSize = vbStream.size;
     decOP.pBitStream = (BYTE *)vbStream.virt_addr; // set virtual address mapped of physical address
-    decOP.packedFormat = decConfig.packedFormat;
-    decOP.roiEnable = decConfig.roiEnable;
-    decOP.roiOffsetX = decConfig.roiOffsetX;
-    decOP.roiOffsetY = decConfig.roiOffsetY;
-    decOP.roiWidth = decConfig.roiWidth;
-    decOP.roiHeight = decConfig.roiHeight;
+    decOP.packedFormat = jdec_config.packedFormat;
+    decOP.roiEnable = jdec_config.roiEnable;
+    decOP.roiOffsetX = jdec_config.roiOffsetX;
+    decOP.roiOffsetY = jdec_config.roiOffsetY;
+    decOP.roiWidth = jdec_config.roiWidth;
+    decOP.roiHeight = jdec_config.roiHeight;
 
     ret = JPU_DecOpen(&handle, &decOP);
     if (ret != JPG_RET_SUCCESS)
@@ -220,7 +184,7 @@ static int CODA_Decode_Test(DecConfigParam *param)
 
     //JPU_DecGiveCommand(handle, ENABLE_LOGGING, NULL);
 
-    if (decConfig.useRot)
+    if (jdec_config.useRot)
     {
         rotEnable = 1;
     }
@@ -247,19 +211,19 @@ static int CODA_Decode_Test(DecConfigParam *param)
     }
 
 
-    if (decConfig.usePartialMode)
+    if (jdec_config.usePartialMode)
     {
         // disable Rotator, Scaler
         rotEnable = 0;
-        decConfig.iHorScaleMode = 0;
-        decConfig.iVerScaleMode = 0;
+        jdec_config.iHorScaleMode = 0;
+        jdec_config.iVerScaleMode = 0;
         partialHeight = (initialInfo.sourceFormat == FORMAT_420 ||
                          initialInfo.sourceFormat == FORMAT_224) ? 16 : 8;
 
         partMaxIdx  = ((initialInfo.picHeight + 15) & ~15) / partialHeight;
-        if (partMaxIdx < decConfig.partialBufNum)
+        if (partMaxIdx < jdec_config.partialBufNum)
         {
-            decConfig.partialBufNum = partMaxIdx;
+            jdec_config.partialBufNum = partMaxIdx;
         }
     }
 
@@ -281,7 +245,7 @@ static int CODA_Decode_Test(DecConfigParam *param)
         framebufHeight = ((initialInfo.picHeight + 7) / 8) * 8;
     }
 
-    if (decConfig.roiEnable)
+    if (jdec_config.roiEnable)
     {
         framebufWidth  = initialInfo.roiFrameWidth ;
         framebufHeight = initialInfo.roiFrameHeight;
@@ -291,46 +255,46 @@ static int CODA_Decode_Test(DecConfigParam *param)
     // scaler constraint when conformance test is disable
     if (framebufWidth < 128 || framebufHeight < 128)
     {
-        if (decConfig.iHorScaleMode || decConfig.iVerScaleMode)
+        if (jdec_config.iHorScaleMode || jdec_config.iVerScaleMode)
         {
             DBG_DIRECT("Invalid operation mode : Not supported resolution with Scaler, width=%d, height=%d\n",
                        framebufWidth, framebufHeight);
         }
-        decConfig.iHorScaleMode = 0;
-        decConfig.iVerScaleMode = 0;
+        jdec_config.iHorScaleMode = 0;
+        jdec_config.iVerScaleMode = 0;
     }
 
 
 //  DBG_DIRECT("* Dec InitialInfo =>\n instance #%d, \n minframeBuffercount: %u\n ", instIdx, initialInfo.minFrameBufferCount);
 //  DBG_DIRECT("picWidth: %u\n picHeight: %u\n roiWidth: %u\n rouHeight: %u\n ", initialInfo.picWidth, initialInfo.picHeight, initialInfo.roiFrameWidth, initialInfo.roiFrameHeight);
 
-    if (decConfig.usePartialMode)
+    if (jdec_config.usePartialMode)
     {
         DBG_DIRECT("Partial Mode Enable\n ");
-        DBG_DIRECT("Num of Buffer for Partial : %d\n ", decConfig.partialBufNum);
+        DBG_DIRECT("Num of Buffer for Partial : %d\n ", jdec_config.partialBufNum);
         DBG_DIRECT("Num of Line for Partial   : %d\n ", partialHeight);
     }
 
     framebufFormat = initialInfo.sourceFormat;
     DBG_DIRECT("framebufFormat %d framebufHeight %d", framebufFormat, framebufHeight);
 
-    if (decConfig.iHorScaleMode || decConfig.iVerScaleMode)
+    if (jdec_config.iHorScaleMode || jdec_config.iVerScaleMode)
     {
         framebufHeight = ((framebufHeight + 1) / 2) * 2;
         framebufWidth = ((framebufWidth + 1) / 2) * 2;
     }
 
-    framebufWidth  >>= decConfig.iHorScaleMode;
-    framebufHeight >>= decConfig.iVerScaleMode;
+    framebufWidth  >>= jdec_config.iHorScaleMode;
+    framebufHeight >>= jdec_config.iVerScaleMode;
 
-    dispWidth = (decConfig.rotAngle == 90 ||
-                 decConfig.rotAngle == 270) ? framebufHeight : framebufWidth;
-    dispHeight = (decConfig.rotAngle == 90 ||
-                  decConfig.rotAngle == 270) ? framebufWidth : framebufHeight;
+    dispWidth = (jdec_config.rotAngle == 90 ||
+                 jdec_config.rotAngle == 270) ? framebufHeight : framebufWidth;
+    dispHeight = (jdec_config.rotAngle == 90 ||
+                  jdec_config.rotAngle == 270) ? framebufWidth : framebufHeight;
     JPU_DecGiveCommand(handle, SET_JPG_DISP_WIDTH, &dispWidth);
 
 
-    if (decConfig.rotAngle == 90 || decConfig.rotAngle == 270)
+    if (jdec_config.rotAngle == 90 || jdec_config.rotAngle == 270)
     {
         framebufStride = framebufHeight;
         framebufHeight = framebufWidth;
@@ -342,7 +306,7 @@ static int CODA_Decode_Test(DecConfigParam *param)
         framebufStride = framebufWidth;
     }
 
-    if (decConfig.iHorScaleMode || decConfig.iVerScaleMode)
+    if (jdec_config.iHorScaleMode || jdec_config.iVerScaleMode)
     {
         framebufStride = ((framebufStride + 15) / 16) * 16;
     }
@@ -352,7 +316,7 @@ static int CODA_Decode_Test(DecConfigParam *param)
         framebufWidth = framebufWidth * 2;
         framebufStride = framebufStride * 2;
         framebufFormat = FORMAT_422;
-        if (decConfig.rotAngle == 90 || decConfig.rotAngle == 270)
+        if (jdec_config.rotAngle == 90 || jdec_config.rotAngle == 270)
         {
             framebufFormat = FORMAT_224;
         }
@@ -365,16 +329,16 @@ static int CODA_Decode_Test(DecConfigParam *param)
         framebufFormat = FORMAT_444;
     }
 
-    if (decConfig.rotAngle == 90 || decConfig.rotAngle == 270)
-    {
-        param->picWidth = framebufHeight ;
-        param->picHeight = framebufWidth ;
-    }
-    else
-    {
-        param->picWidth = framebufWidth ;
-        param->picHeight = framebufHeight ;
-    }
+    // if (jdec_config.rotAngle == 90 || jdec_config.rotAngle == 270)
+    // {
+    //     param->picWidth = framebufHeight ;
+    //     param->picHeight = framebufWidth ;
+    // }
+    // else
+    // {
+    //     param->picWidth = framebufWidth ;
+    //     param->picHeight = framebufHeight ;
+    // }
 
     DBG_DIRECT("framebufFormat %d", framebufFormat);
 
@@ -389,14 +353,14 @@ static int CODA_Decode_Test(DecConfigParam *param)
     regFrameBufCount = initialInfo.minFrameBufferCount + EXTRA_FRAME_BUFFER_NUM;
 
 
-    if (decConfig.usePartialMode)
+    if (jdec_config.usePartialMode)
     {
-        if (decConfig.partialBufNum > 4)
+        if (jdec_config.partialBufNum > 4)
         {
-            decConfig.partialBufNum = 4;
+            jdec_config.partialBufNum = 4;
         }
 
-        regFrameBufCount *= decConfig.partialBufNum;
+        regFrameBufCount *= jdec_config.partialBufNum;
     }
 
     needFrameBufCount = regFrameBufCount;
@@ -440,13 +404,13 @@ static int CODA_Decode_Test(DecConfigParam *param)
         goto ERR_DEC_OPEN;
     }
 
-    ret = JPU_DecGiveCommand(handle, SET_JPG_USE_PARTIAL_MODE,  &(decConfig.usePartialMode));
+    ret = JPU_DecGiveCommand(handle, SET_JPG_USE_PARTIAL_MODE,  &(jdec_config.usePartialMode));
     if (ret != JPG_RET_SUCCESS)
     {
         DBG_DIRECT("JPU_DecGiveCommand[SET_JPG_USE_PARTIAL_MODE] failed Error code is 0x%x \n", ret);
         goto ERR_DEC_OPEN;
     }
-    ret = JPU_DecGiveCommand(handle, SET_JPG_PARTIAL_FRAME_NUM, &(decConfig.partialBufNum));
+    ret = JPU_DecGiveCommand(handle, SET_JPG_PARTIAL_FRAME_NUM, &(jdec_config.partialBufNum));
     if (ret != JPG_RET_SUCCESS)
     {
         DBG_DIRECT("JPU_DecGiveCommand[SET_JPG_PARTIAL_FRAME_NUM] failed Error code is 0x%x \n", ret);
@@ -471,15 +435,15 @@ static int CODA_Decode_Test(DecConfigParam *param)
 //  DBG_DIRECT("Dec Start : Press enter key to show menu.\n" );
 //  DBG_DIRECT("          : Press space key to stop.\n" );
     DBG_DIRECT("framebufFormat %d dispHeight %d", framebufFormat, dispHeight);
-    DBG_DIRECT("decConfig.outNum 0x%x 0x%x %d  frameIdx  0x%x %d ", &decConfig, &decConfig.outNum,
-               decConfig.outNum, &frameIdx, frameIdx);
+    DBG_DIRECT("decConfig.outNum 0x%x 0x%x %d  frameIdx  0x%x %d ", &jdec_config, &jdec_config.outNum,
+               jdec_config.outNum, &frameIdx, frameIdx);
     while (1)
     {
 
         if (rotEnable)
         {
-            JPU_DecGiveCommand(handle, SET_JPG_ROTATION_ANGLE, &(decConfig.rotAngle));
-            JPU_DecGiveCommand(handle, SET_JPG_MIRROR_DIRECTION, &(decConfig.mirDir));
+            JPU_DecGiveCommand(handle, SET_JPG_ROTATION_ANGLE, &(jdec_config.rotAngle));
+            JPU_DecGiveCommand(handle, SET_JPG_MIRROR_DIRECTION, &(jdec_config.mirDir));
             JPU_DecGiveCommand(handle, SET_JPG_ROTATOR_OUTPUT, &frameBuf[ppIdx]);
             JPU_DecGiveCommand(handle, SET_JPG_ROTATOR_STRIDE, &framebufStride);
 
@@ -487,10 +451,10 @@ static int CODA_Decode_Test(DecConfigParam *param)
             JPU_DecGiveCommand(handle, ENABLE_JPG_MIRRORING, 0);
         }
 
-        JPU_DecGiveCommand(handle, SET_JPG_SCALE_HOR,  &(decConfig.iHorScaleMode));
-        JPU_DecGiveCommand(handle, SET_JPG_SCALE_VER,  &(decConfig.iVerScaleMode));
+        JPU_DecGiveCommand(handle, SET_JPG_SCALE_HOR,  &(jdec_config.iHorScaleMode));
+        JPU_DecGiveCommand(handle, SET_JPG_SCALE_VER,  &(jdec_config.iVerScaleMode));
 
-        if (decConfig.usePartialMode)
+        if (jdec_config.usePartialMode)
         {
             partPosIdx = 0;
             partBufIdx = 0;
@@ -534,9 +498,9 @@ static int CODA_Decode_Test(DecConfigParam *param)
             }
 
 
-            if (decConfig.usePartialMode && (int_reason & 0xf0))
+            if (jdec_config.usePartialMode && (int_reason & 0xf0))
             {
-                partBufIdx = ((partPosIdx) % decConfig.partialBufNum);
+                partBufIdx = ((partPosIdx) % jdec_config.partialBufNum);
 
                 if ((1 << partBufIdx) & ((int_reason & 0xf0) >> 4))
                 {
@@ -555,7 +519,7 @@ static int CODA_Decode_Test(DecConfigParam *param)
                         saveIdx = partBufIdx;
                         if (!SaveYuvPartialImageHelperFormat(fpYuv, pYuv,
                                                              frameBuf[saveIdx].bufY, frameBuf[saveIdx].bufCb, frameBuf[saveIdx].bufCr,
-                                                             dispWidth, dispHeight, partialHeight, framebufStride, decConfig.chromaInterleave, framebufFormat,
+                                                             dispWidth, dispHeight, partialHeight, framebufStride, jdec_config.chromaInterleave, framebufFormat,
                                                              decOP.frameEndian, partPosIdx, frameIdx,
                                                              decOP.packedFormat))
                         {
@@ -661,7 +625,7 @@ JPU_END_OF_STREAM:
 
         // YUV Dump Done when partial buffer is all displayed.
         int_reason = JPU_GetStatus();
-        if (decConfig.usePartialMode && !(int_reason & 0xF0))
+        if (jdec_config.usePartialMode && !(int_reason & 0xF0))
         {
             goto SKIP_BUF_DUMP;
         }
@@ -692,10 +656,10 @@ JPU_END_OF_STREAM:
                 pDispFrame = FindFrameBuffer(instIdx, frameBuf[ppIdx].bufY);
 #ifdef CNM_FPGA_PLATFORM
                 SetMixerDecOutFrame(pDispFrame,
-                                    (decConfig.rotAngle == 90 ||
-                                     decConfig.rotAngle == 270) ? outputInfo.decPicHeight : outputInfo.decPicWidth,
-                                    (decConfig.rotAngle == 90 ||
-                                     decConfig.rotAngle == 270) ? outputInfo.decPicWidth : outputInfo.decPicHeight);
+                                    (jdec_config.rotAngle == 90 ||
+                                     jdec_config.rotAngle == 270) ? outputInfo.decPicHeight : outputInfo.decPicWidth,
+                                    (jdec_config.rotAngle == 90 ||
+                                     jdec_config.rotAngle == 270) ? outputInfo.decPicWidth : outputInfo.decPicHeight);
 #endif
 
                 ppIdx = (ppIdx - regFrameBufCount + 1) % MAX_ROT_BUF_NUM;
@@ -712,7 +676,7 @@ JPU_END_OF_STREAM:
                 if (!SaveYuvImageHelperFormat(fpYuv, pYuv,
                                               frameBuf[saveIdx].bufY, frameBuf[saveIdx].bufCb, frameBuf[saveIdx].bufCr,
                                               dispWidth, dispHeight, framebufStride,
-                                              decConfig.chromaInterleave, framebufFormat, decOP.frameEndian,
+                                              jdec_config.chromaInterleave, framebufFormat, decOP.frameEndian,
                                               decOP.packedFormat))
                 {
                     goto ERR_DEC_OPEN;
@@ -725,7 +689,7 @@ JPU_END_OF_STREAM:
                 if (!SaveYuvImageHelperFormat(fpYuv, pYuv,
                                               frameBuf[saveIdx].bufY, frameBuf[saveIdx].bufCb, frameBuf[saveIdx].bufCr,
                                               dispWidth, dispHeight,
-                                              framebufStride, decConfig.chromaInterleave, framebufFormat, decOP.frameEndian,
+                                              framebufStride, jdec_config.chromaInterleave, framebufFormat, decOP.frameEndian,
                                               decOP.packedFormat))
                 {
                     goto ERR_DEC_OPEN;
@@ -746,10 +710,11 @@ SKIP_BUF_DUMP:
             // DBG_DIRECT("Error restart Idx : %d, MCU x:%d, y:%d, in Frame : %d \n", errRstIdx, errPosX, errPosY, frameIdx);
         }
         frameIdx++;
-        decConfig.outNum = 1;
-        DBG_DIRECT("decConfig.outNum 0x%x 0x%x %d  frameIdx  0x%x %d ", &decConfig, &(decConfig.outNum),
-                   decConfig.outNum, &frameIdx, frameIdx);
-        if (decConfig.outNum && (frameIdx == decConfig.outNum))
+        jdec_config.outNum = 1;
+        DBG_DIRECT("jdec_config.outNum 0x%x 0x%x %d  frameIdx  0x%x %d ", &jdec_config,
+                   &(jdec_config.outNum),
+                   jdec_config.outNum, &frameIdx, frameIdx);
+        if (jdec_config.outNum && (frameIdx == jdec_config.outNum))
         {
             break;
         }
@@ -767,9 +732,6 @@ ERR_DEC_OPEN:
     ret = JPU_DecClose(handle);
 
     // DBG_DIRECT("\nDec End. Tot Frame %d\n", frameIdx);
-
-
-
 
 ERR_DEC_INIT:
 //  DBG_DIRECT("\nEnter DEC_INIT. \n");
@@ -793,13 +755,98 @@ ERR_DEC_INIT:
 
 }
 
-#endif
+JpgRet coda_prepare(DecConfigParam *jdc)
+{
+    memset(&jdec_config, 0, sizeof(DecConfigParam));
+
+    jdec_config.roiEnable = jdc->roiEnable;
+    if (jdec_config.roiEnable)
+    {
+        jdec_config.roiOffsetX = jdc->roiOffsetX;
+        jdec_config.roiOffsetY = jdc->roiOffsetY;
+        jdec_config.roiWidth  = jdc->roiWidth;
+        jdec_config.roiHeight = jdc->roiHeight;
+    }
+
+    // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
+    jdec_config.packedFormat = jdc->packedFormat;
+    // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
+    jdec_config.chromaInterleave = jdc->chromaInterleave;
+    jdec_config.StreamEndian = jdc->StreamEndian;
+    jdec_config.FrameEndian = jdc->FrameEndian;
+
+
+    if (!jdec_config.roiEnable && !jdec_config.packedFormat)
+    {
+        // partial Mode(0: OFF 1: ON);
+        jdec_config.usePartialMode = jdc->usePartialMode;
+        if (jdec_config.usePartialMode)
+        {
+            // Num of Frame Buffer[ 2 ~ 4 ] ;
+            jdec_config.partialBufNum = jdc->partialBufNum;
+        }
+    }
+
+    if (!jdec_config.usePartialMode)
+    {
+        // rotation angle in degrees(0, 90, 180, 270);
+        jdec_config.rotAngle = jdc->rotAngle;
+        if (jdec_config.rotAngle != 0 && jdec_config.rotAngle != 90 && jdec_config.rotAngle != 180 &&
+            jdec_config.rotAngle != 270)
+        {
+            DBG_DIRECT("Invalid rotation angle.\n");
+            return JPG_RET_INVALID_PARAM;
+        }
+        // mirror direction(0-no mirror, 1-vertical, 2-horizontal, 3-both);
+        jdec_config.mirDir = jdc->mirDir;
+        if (jdec_config.mirDir != 0 && jdec_config.mirDir != 1 && jdec_config.mirDir != 2 &&
+            jdec_config.mirDir != 3)
+        {
+            DBG_DIRECT("Invalid mirror direction.\n");
+            return JPG_RET_INVALID_PARAM;
+        }
+        if (jdec_config.rotAngle != 0 || jdec_config.mirDir != 0)
+        {
+            jdec_config.useRot = 1;
+        }
+    }
+
+    // Number of Images that you want to decode(0: decode continue, -1: loop);
+    jdec_config.outNum = 1;
+
+
+
+    if (jdec_config.usePartialMode && jdec_config.roiEnable)
+    {
+        DBG_DIRECT("Invalid operation mode : partial and ROI mode can not be worked\n");
+        return JPG_RET_INVALID_PARAM;
+    }
+    if (jdec_config.packedFormat && jdec_config.roiEnable)
+    {
+        DBG_DIRECT("Invalid operation mode : packed mode and ROI mode can not be worked\n");
+        return JPG_RET_INVALID_PARAM;
+    }
+    if ((jdec_config.iHorScaleMode || jdec_config.iVerScaleMode) && jdec_config.roiEnable)
+    {
+        DBG_DIRECT("Invalid operation mode : Scaler mode and ROI mode can not be worked\n");
+        return JPG_RET_INVALID_PARAM;
+    }
+    if (jdec_config.useRot && jdec_config.roiEnable)
+    {
+        DBG_DIRECT("Invalid operation mode : Rotator mode and ROI mode can not be worked\n");
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    return JPG_RET_SUCCESS;
+}
+
+
+
 
 uint32_t CODA_Test(uint8_t cmd)
 {
     int ret = 0;
 
-    RCC_MJPEG_Config_Enable();
     switch (cmd)
     {
     case 1:
@@ -808,85 +855,50 @@ uint32_t CODA_Test(uint8_t cmd)
     case 2:
         CODA_Test_write(MJPEG_OP_INFO_REG, 0x02);
         break;
-    case 3: // decode
+    case 3: // decoder
         {
-#ifdef JPEG_DECODER_EN
             DecConfigParam  decConfig;
             memset((void *)&decConfig, 0x00, sizeof(DecConfigParam));
 
-            // decConfig.bitstreamFileName = %s;
-            decConfig.roiEnable = 0;
-            if (decConfig.roiEnable)
-            {
-                // printf("Enter ROI offsetX:");
-                decConfig.roiOffsetX = 0;
-                decConfig.roiOffsetY = 0;
-                decConfig.roiWidth = 100;
-                decConfig.roiHeight = 100;
-            }
-            // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
-            decConfig.packedFormat = 4;
-            // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
-            decConfig.chromaInterleave = 0;
-            decConfig.StreamEndian = JPU_STREAM_ENDIAN;
-            decConfig.FrameEndian = JPU_FRAME_ENDIAN;
 
-            if (!decConfig.roiEnable && !decConfig.packedFormat)
             {
+                decConfig.roiEnable = 0;
+                // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
+                decConfig.packedFormat = 4;
+                // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
+                decConfig.chromaInterleave = 0;
+                decConfig.StreamEndian = JPU_STREAM_ENDIAN;
+                decConfig.FrameEndian = JPU_FRAME_ENDIAN;
+
                 // partial Mode(0: OFF 1: ON);
                 decConfig.usePartialMode = 0;
+                // Num of Frame Buffer[ 2 ~ 4 ] ;
+                // decConfig.partialBufNum = 2;
 
-                if (decConfig.usePartialMode)
-                {
-                    // Num of Frame Buffer[ 2 ~ 4 ] ;
-                    decConfig.partialBufNum = 2;
-                }
-            }
-
-            if (!decConfig.usePartialMode)
-            {
+                //// Can NOT do rotation and mirror, when partial mode used.
                 // rotation angle in degrees(0, 90, 180, 270);
                 decConfig.rotAngle = 0;
-                if (decConfig.rotAngle != 0 && decConfig.rotAngle != 90 && decConfig.rotAngle != 180 &&
-                    decConfig.rotAngle != 270)
-                {
-                    DBG_DIRECT("Invalid rotation angle.\n");
-                    break;
-                }
                 // mirror direction(0-no mirror, 1-vertical, 2-horizontal, 3-both);
                 decConfig.mirDir = 0;
-                if (decConfig.mirDir != 0 && decConfig.mirDir != 1 && decConfig.mirDir != 2 &&
-                    decConfig.mirDir != 3)
-                {
-                    DBG_DIRECT("Invalid mirror direction.\n");
-                    break;
-                }
-                if (decConfig.rotAngle != 0 || decConfig.mirDir != 0)
-                {
-                    decConfig.useRot = 1;
-                }
-            }
-            // Store image?
-//            decConfig.yuvFileName[0] = '\0';
-            // Number of Images that you want to decode(0: decode continue, -1: loop);
-            decConfig.outNum = 1;
-            ret = CODA_Decode_Test(&decConfig);
 
+                // Number of Images that you want to decode(0: decode continue, -1: loop);
+                decConfig.outNum = 1;
+            }
+
+            ret = coda_prepare(&decConfig);
+            if (ret != JPG_RET_SUCCESS)
+            {
+                DBG_DIRECT("\nCODA: Failed to prepare %d\n", ret);
+                break;
+            }
+
+            ret = coda_decode();
             if (!ret)
             {
-                DBG_DIRECT("\nFailed to DecodeTest\n");
+                DBG_DIRECT("\nCODA: Failed to DecodeTest %d\n", ret);
             }
-
-#endif
-        }
-        break;
-
-    case 4: // encoder
-        {
         }
         break;
     }
-
-
     return 0;
 }

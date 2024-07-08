@@ -1279,6 +1279,10 @@ static int wraparound_bistream_data(JpgDecInfo *jpg, int return_type)
     int src_size;
     int dst_size;
 
+    DBG_DIRECT("!!! Fail: return_type 0x%d %d", &return_type, return_type);
+    return return_type;
+
+
     data_size = jpg->streamWrPtr - jpg->streamBufStartAddr;
     data = (BYTE *)jpg_malloc(data_size);
 
@@ -1304,12 +1308,12 @@ static int wraparound_bistream_data(JpgDecInfo *jpg, int return_type)
         jpg_free(src);
         jpg_free(dst);
     }
-
+    DBG_DIRECT("return_type 0x%d %d", &return_type, return_type);
     if (data_size && data)
     {
-        jpg_free(data);
+//        jpg_free(data);
     }
-
+    DBG_DIRECT("return_type 0x%d %d", &return_type, return_type);
     if (return_type == -2)  // header wraparound
     {
         jpg->streamWrPtr = jpg->streamBufStartAddr + dst_size + data_size;
@@ -1322,7 +1326,7 @@ static int wraparound_bistream_data(JpgDecInfo *jpg, int return_type)
         jpg->frameOffset = 0;
         return -1;
     }
-
+    DBG_DIRECT("return_type 0x%d %d", &return_type, return_type);
     return 0;   // error
 }
 

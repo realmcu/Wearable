@@ -21,7 +21,7 @@ void *jpg_malloc(size_t size)
     void *ptr = NULL;
 
     ptr = tlsf_malloc(jpg_tlsf, size);
-    DBG_DIRECT("jpg malloc 0x%x %d", ptr, size);
+    DBG_DIRECT("--->jpg malloc 0x%x %d", ptr, size);
     if (!ptr)
     {
         DBG_DIRECT("jpg_malloc assert!");
@@ -32,6 +32,7 @@ void *jpg_malloc(size_t size)
 
 void jpg_free(void *ptr)
 {
+    DBG_DIRECT("--->jpg_free 0x%x", ptr);
     tlsf_free(jpg_tlsf, ptr);
 }
 

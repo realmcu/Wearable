@@ -380,14 +380,15 @@ int jdi_allocate_dma_memory(jpu_buffer_t *vb)
     // jdb.phys_addr = (unsigned long)jmem_alloc(&s_pjip->vmem, jdb.size, 0);
 
     jdb.phys_addr = (unsigned long)jpg_malloc(jdb.size + 7);
-    DBG_DIRECT("jdi_allocate_dma_memory 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
-               jdb.size);
-    if (cnt == 1)
+    DBG_DIRECT("jdi_allocate_dma_memory get 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
+               jdb.size + 7);
+    // if (cnt == 1)
     {
         if ((uint32_t)jdb.phys_addr % 8)
         {
             jdb.phys_addr = (((uint32_t)jdb.phys_addr + 7) >> 3) << 3;
-            DBG_DIRECT("jdi_allocate_dma_memory 0x%x\n", jdb.phys_addr);
+            DBG_DIRECT("jdi_allocate_dma_memory act 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
+                       jdb.size);
         }
 
     }

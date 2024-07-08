@@ -8,7 +8,6 @@
 #define _JPU_HELPER_H_
 
 #include <stdio.h>
-#include "jpurun.h"
 #include "jpuapi.h"
 
 
@@ -105,7 +104,7 @@ extern "C" {
 int jpgGetHuffTable(char *huffFileName, EncMjpgParam *param);
 int jpgGetQMatrix(char *qMatFileName, EncMjpgParam *param);
 int JpgEncSetupTables(JpgEncOpenParam *pop, int quality);
-int getJpgEncOpenParamDefault(JpgEncOpenParam *pEncOP, EncConfigParam *pEncConfig);
+//int getJpgEncOpenParamDefault(JpgEncOpenParam *pEncOP, EncConfigParam *pEncConfig);
 // int getJpgEncOpenParam(JpgEncOpenParam *pEncOP, EncConfigParam *pEncConfig, char *srcYuvFileName);
 int parseJpgCfgFile(ENC_CFG *pEncCfg, char *FileName);
 

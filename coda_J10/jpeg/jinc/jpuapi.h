@@ -205,7 +205,59 @@ typedef struct
     int frameCycle;
 } JpgDecOutputInfo;
 
+typedef struct
+{
+    unsigned char *buf;
+    int size;
+    int point;
+    int count;
+    int fillendbs;
+} BufInfo;
 
+#define MAX_FILE_PATH   256
+typedef struct
+{
+    char yuvFileName[MAX_FILE_PATH];
+    char bitstreamFileName[MAX_FILE_PATH];
+
+    int outNum;
+    int rotAngle;
+    int mirDir;
+    int useRot;
+
+    int checkeos;
+    int instNum;
+    int StreamEndian;
+    int FrameEndian;
+    int chromaInterleave;
+    int iHorScaleMode;
+    int iVerScaleMode;
+
+    //ROI
+    int roiEnable;
+    int roiWidth;
+    int roiHeight;
+    int roiOffsetX;
+    int roiOffsetY;
+    int roiWidthInMcu;
+    int roiHeightInMcu;
+    int roiOffsetXInMcu;
+    int roiOffsetYInMcu;
+
+    //packed
+    int packedFormat;
+    int picSizeProbing;
+    int picWidth;
+    int picHeight;
+    int picFormat;
+
+    int usePartialMode;
+    int partialBufNum;
+
+    int partialHeight;
+    int filePlay;
+
+} DecConfigParam;
 
 //------------------------------------------------------------------------------
 // encode struct and definition
