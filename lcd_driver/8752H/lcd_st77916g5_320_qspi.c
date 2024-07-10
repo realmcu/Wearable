@@ -6,7 +6,6 @@
 #include "rtl876x_pinmux.h"
 #include "rtl876x_gdma.h"
 #include "rtl876x_nvic.h"
-#include "trace.h"
 #include "lcd_st77916g5_320_qspi.h"
 #include "platform_utils.h"
 #include "qspi_lcd_platform.h"
