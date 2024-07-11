@@ -11,6 +11,18 @@
 *:dfs\*
 *:coda_J10\*
 
+*:system\database\fal-v0.5.0\*
+*:system\database\FlashDB-v1.1.1\*
+*:communicate\tuya-ble-sdk\*
+*:Ecosystem\aliIOT\*
+*:communicate\miwear-sdk_0.2.13\*
+*:audio\music_player\app_playback.c
+*:audio\music_player\mp3_parser.c
+*:display\VGLite\*
+*:port\os\rt-thread\*
+*:system\dfs\*
+*:display\coda_J10\*
+
 
 
 
