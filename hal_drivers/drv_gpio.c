@@ -56,6 +56,8 @@ static void DRV_GPIO_HANDLER(uint32_t pin)
 #include "drv_gpio_8762d.c"
 #elif defined RTL8752H
 #include "drv_gpio_8752h.c"
+#elif defined RTL8762E
+#include "drv_gpio_8752h.c"
 #elif defined RTL87x2G
 #include "drv_gpio_8762g.c"
 #endif
