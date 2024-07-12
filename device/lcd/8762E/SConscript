@@ -11,6 +11,8 @@ src = Split("""
 
 if GetDepend(['CONFIG_REALTEK_ST77989_240_320']):
     src += ['lcd_st7789_240_spi.c']
+if GetDepend(['CONFIG_REALTEK_ST77571_128_128']):
+    src += ['lcd_st7571_128_spi.c']
 
 CPPPATH = [cwd]
 
