@@ -1877,6 +1877,608 @@ DONE_DEC_HEADER:
     return 1;
 }
 
+
+
+JpgRet CheckJpgEncOpenParam(JpgEncOpenParam *pop)
+{
+    int picWidth;
+    int picHeight;
+
+    if (pop == 0)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    picWidth = pop->picWidth;
+    picHeight = pop->picHeight;
+
+    if (pop->bitstreamBuffer % 8)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+    if (pop->bitstreamBufferSize % 1024 ||
+        pop->bitstreamBufferSize < 1024 ||
+        pop->bitstreamBufferSize > 16383 * 1024)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    if (picWidth < 16 || picWidth > MAX_MJPG_PIC_WIDTH)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+    if (picHeight < 16 || picHeight > MAX_MJPG_PIC_HEIGHT)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    return JPG_RET_SUCCESS;
+}
+
+
+JpgRet CheckJpgEncParam(JpgEncHandle handle, JpgEncParam *param)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+    if (param == 0)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    if (pEncInfo->packedFormat != PACKED_FORMAT_NONE)
+    {
+        if (pEncInfo->packedFormat == PACKED_FORMAT_444)
+        {
+            if (param->sourceFrame->stride < pEncInfo->openParam.picWidth * 2)
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+        }
+        if (pEncInfo->packedFormat == PACKED_FORMAT_444)
+        {
+            if (param->sourceFrame->stride < pEncInfo->openParam.picWidth * 3)
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+        }
+    }
+
+
+    return JPG_RET_SUCCESS;
+}
+
+
+
+int JpgEncGenHuffTab(JpgEncInfo *pEncInfo, int tabNum)
+{
+    int p, i, l, lastp, si, maxsymbol;
+    int code;
+    BYTE *bitleng, *huffval;
+    unsigned int *ehufco, *ehufsi;
+
+    bitleng = pEncInfo->pHuffBits[tabNum];
+    huffval = pEncInfo->pHuffVal[tabNum];
+    ehufco  = pEncInfo->huffCode[tabNum];
+    ehufsi  = pEncInfo->huffSize[tabNum];
+
+    memset(pEncInfo->huffSizeTmp, 0x00, sizeof(pEncInfo->huffSizeTmp));
+    memset(pEncInfo->huffCodeTmp, 0x00, sizeof(pEncInfo->huffCodeTmp));
+
+    maxsymbol = tabNum & 1 ? 256 : 16;
+
+    /* Figure C.1: make table of Huffman code length for each symbol */
+
+    p = 0;
+    for (l = 1; l <= 16; l++)
+    {
+        i = bitleng[l - 1];
+        if (i < 0 || p + i > maxsymbol)
+        {
+            return 0;
+        }
+        while (i--)
+        {
+            pEncInfo->huffSizeTmp[p++] = l;
+        }
+    }
+    lastp = p;
+
+    /* Figure C.2: generate the codes themselves */
+    /* We also validate that the counts represent a legal Huffman code tree. */
+
+    code = 0;
+    si = pEncInfo->huffSizeTmp[0];
+    p = 0;
+    while (pEncInfo->huffSizeTmp[p] != 0)
+    {
+        while (pEncInfo->huffSizeTmp[p] == si)
+        {
+            pEncInfo->huffCodeTmp[p++] = code;
+            code++;
+        }
+        if (code >= (1 << si))
+        {
+            return 0;
+        }
+        code <<= 1;
+        si++;
+    }
+
+    /* Figure C.3: generate encoding tables */
+    /* These are code and size indexed by symbol value */
+
+    for (i = 0; i < 256; i++)
+    {
+        ehufsi[i] = 0x00;
+    }
+
+    for (i = 0; i < 256; i++)
+    {
+        ehufco[i] = 0x00;
+    }
+
+    for (p = 0; p < lastp; p++)
+    {
+        i = huffval[p];
+        if (i < 0 || i >= maxsymbol || ehufsi[i])
+        {
+            return 0;
+        }
+        ehufco[i] = pEncInfo->huffCodeTmp[p];
+        ehufsi[i] = pEncInfo->huffSizeTmp[p];
+    }
+
+    return 1;
+}
+
+int JpgEncLoadHuffTab(JpgEncInfo *pEncInfo)
+{
+    int i, j, t;
+    int huffData;
+
+    for (i = 0; i < 4; i++)
+    {
+        JpgEncGenHuffTab(pEncInfo, i);
+    }
+
+    JpuWriteReg(MJPEG_HUFF_CTRL_REG, 0x3);
+
+    for (j = 0; j < 4; j++)
+    {
+
+        t = (j == 0) ? AC_TABLE_INDEX0 : (j == 1) ? AC_TABLE_INDEX1 : (j == 2) ? DC_TABLE_INDEX0 :
+            DC_TABLE_INDEX1;
+
+        for (i = 0; i < 256; i++)
+        {
+            if ((t == DC_TABLE_INDEX0 || t == DC_TABLE_INDEX1) && (i > 15)) // DC
+            {
+                break;
+            }
+
+            if ((pEncInfo->huffSize[t][i] == 0) && (pEncInfo->huffCode[t][i] == 0))
+            {
+                huffData = 0;
+            }
+            else
+            {
+                huffData = (pEncInfo->huffSize[t][i] - 1);                      // Code length (1 ~ 16), 4-bit
+                huffData = (huffData << 16) | (pEncInfo->huffCode[t][i]);       // Code word, 16-bit
+            }
+            JpuWriteReg(MJPEG_HUFF_DATA_REG, huffData);
+        }
+    }
+    JpuWriteReg(MJPEG_HUFF_CTRL_REG, 0x0);
+    return 1;
+}
+
+int JpgEncLoadQMatTab(JpgEncInfo *pEncInfo)
+{
+
+#ifdef WIN32
+    __int64 dividend = 0x80000;
+    __int64 quotient;
+#else
+    long long int dividend = 0x80000;
+    long long int quotient;
+#endif
+    int quantID;
+    int divisor;
+    int comp;
+    int i, t;
+
+    for (comp = 0; comp < 3; comp++)
+    {
+        quantID = pEncInfo->pCInfoTab[comp][3];
+        if (quantID >= 4)
+        {
+            return 0;
+        }
+        t = (comp == 0) ? Q_COMPONENT0 :
+            (comp == 1) ? Q_COMPONENT1 : Q_COMPONENT2;
+        JpuWriteReg(MJPEG_QMAT_CTRL_REG, 0x3 + t);
+        for (i = 0; i < 64; i++)
+        {
+            divisor = pEncInfo->pQMatTab[quantID][i];
+            quotient = dividend / divisor;
+            // enhace bit precision & rounding Q
+            JpuWriteReg(MJPEG_QMAT_DATA_REG, (int)(divisor << 20) | (int)(quotient & 0xFFFFF));
+
+        }
+        JpuWriteReg(MJPEG_QMAT_CTRL_REG, t);
+    }
+
+
+    return 1;
+}
+
+
+
+
+#define PUT_BYTE(_p, _b) \
+    if (tot++ > len) return 0; \
+    *_p++ = (unsigned char)(_b);
+
+
+
+int JpgEncEncodeHeader(JpgEncHandle handle, JpgEncParamSet *para)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    int i;
+    int frameFormat;
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+    if (!para)
+    {
+        return 0;
+    }
+
+
+    // SOI Header
+    JpuWriteReg(MJPEG_GBU_PBIT_16_REG, 0xFFD8);
+
+    if (!para->disableAPPMarker)
+    {
+        JpuWriteReg(MJPEG_GBU_PBIT_32_REG, 0xFFE90004);
+        // APP9 Header
+        JpuWriteReg(MJPEG_GBU_PBIT_16_REG, pEncInfo->frameIdx);
+    }
+
+
+
+    // DRI header
+    if (pEncInfo->rstIntval)
+    {
+        JpuWriteReg(MJPEG_GBU_PBIT_32_REG, 0xFFDD0004);
+        JpuWriteReg(MJPEG_GBU_PBIT_16_REG, pEncInfo->rstIntval);
+    }
+
+    // DQT Header
+    JpuWriteReg(MJPEG_GBU_PBIT_16_REG, 0xFFDB);
+
+    if (para->quantMode == JPG_TBL_NORMAL)
+    {
+        JpuWriteReg(MJPEG_GBU_PBIT_24_REG, 0x004300);
+
+
+        for (i = 0; i < 64; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pQMatTab[0][i    ] << 24 |
+                        pEncInfo->pQMatTab[0][i + 1] << 16 |
+                        pEncInfo->pQMatTab[0][i + 2] << 8 |
+                        pEncInfo->pQMatTab[0][i + 3]);
+        }
+
+        if (pEncInfo->format != FORMAT_400)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG, 0xFFDB0043);
+            JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x01);
+
+            for (i = 0; i < 64; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pQMatTab[1][i    ] << 24 |
+                            pEncInfo->pQMatTab[1][i + 1] << 16 |
+                            pEncInfo->pQMatTab[1][i + 2] << 8 |
+                            pEncInfo->pQMatTab[1][i + 3]);
+            }
+        }
+    }
+    else// if (para->quantMode == JPG_TBL_MERGE)
+    {
+
+        if (pEncInfo->format != FORMAT_400)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_24_REG, 0x008400);
+        }
+        else
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_24_REG, 0x004300);
+        }
+
+        for (i = 0; i < 64; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pQMatTab[0][i    ] << 24 |
+                        pEncInfo->pQMatTab[0][i + 1] << 16 |
+                        pEncInfo->pQMatTab[0][i + 2] << 8 |
+                        pEncInfo->pQMatTab[0][i + 3]);
+        }
+
+        if (pEncInfo->format != FORMAT_400)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x01);
+            for (i = 0; i < 64; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pQMatTab[1][i    ] << 24 |
+                            pEncInfo->pQMatTab[1][i + 1] << 16 |
+                            pEncInfo->pQMatTab[1][i + 2] << 8 |
+                            pEncInfo->pQMatTab[1][i + 3]);
+            }
+        }
+    }
+
+    // DHT Header
+    JpuWriteReg(MJPEG_GBU_PBIT_16_REG, 0xFFC4);
+
+    if (para->huffMode == JPG_TBL_NORMAL)
+    {
+        JpuWriteReg(MJPEG_GBU_PBIT_24_REG, 0x001F00);
+
+
+        for (i = 0; i < 16; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffBits[0][i    ] << 24 |
+                        pEncInfo->pHuffBits[0][i + 1] << 16 |
+                        pEncInfo->pHuffBits[0][i + 2] << 8 |
+                        pEncInfo->pHuffBits[0][i + 3]);
+        }
+
+        for (i = 0; i < 12; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffVal[0][i    ] << 24 |
+                        pEncInfo->pHuffVal[0][i + 1] << 16 |
+                        pEncInfo->pHuffVal[0][i + 2] << 8 |
+                        pEncInfo->pHuffVal[0][i + 3]);
+        }
+
+        JpuWriteReg(MJPEG_GBU_PBIT_32_REG, 0xFFC400B5);
+        JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x10);
+
+        for (i = 0; i < 16; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffBits[1][i    ] << 24 |
+                        pEncInfo->pHuffBits[1][i + 1] << 16 |
+                        pEncInfo->pHuffBits[1][i + 2] << 8 |
+                        pEncInfo->pHuffBits[1][i + 3]);
+        }
+
+        for (i = 0; i < 160; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffVal[1][i    ] << 24 |
+                        pEncInfo->pHuffVal[1][i + 1] << 16 |
+                        pEncInfo->pHuffVal[1][i + 2] << 8 |
+                        pEncInfo->pHuffVal[1][i + 3]);
+        }
+
+        JpuWriteReg(MJPEG_GBU_PBIT_16_REG,
+                    pEncInfo->pHuffVal[1][160] << 8 |
+                    pEncInfo->pHuffVal[1][161]);
+
+        if (pEncInfo->format != FORMAT_400)
+        {
+
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG, 0xFFC4001F);
+            JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x01);
+
+            for (i = 0; i < 16; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffBits[2][i    ] << 24 |
+                            pEncInfo->pHuffBits[2][i + 1] << 16 |
+                            pEncInfo->pHuffBits[2][i + 2] << 8 |
+                            pEncInfo->pHuffBits[2][i + 3]);
+            }
+
+            for (i = 0; i < 12; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffVal[2][i    ] << 24 |
+                            pEncInfo->pHuffVal[2][i + 1] << 16 |
+                            pEncInfo->pHuffVal[2][i + 2] << 8 |
+                            pEncInfo->pHuffVal[2][i + 3]);
+            }
+
+
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG, 0xFFC400B5);
+            JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x11);
+
+            for (i = 0; i < 16; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffBits[3][i    ] << 24 |
+                            pEncInfo->pHuffBits[3][i + 1] << 16 |
+                            pEncInfo->pHuffBits[3][i + 2] << 8 |
+                            pEncInfo->pHuffBits[3][i + 3]);
+            }
+
+
+            for (i = 0; i < 160; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffVal[3][i    ] << 24 |
+                            pEncInfo->pHuffVal[3][i + 1] << 16 |
+                            pEncInfo->pHuffVal[3][i + 2] << 8 |
+                            pEncInfo->pHuffVal[3][i + 3]);
+            }
+
+            JpuWriteReg(MJPEG_GBU_PBIT_16_REG,
+                        pEncInfo->pHuffVal[3][160] << 8 |
+                        pEncInfo->pHuffVal[3][161]);
+
+        }
+    }
+    else// if (para->huffMode == JPG_TBL_MERGE)
+    {
+        if (pEncInfo->format != FORMAT_400)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_24_REG, 0x01A200);
+        }
+        else
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_24_REG, 0x00D200);
+        }
+
+        for (i = 0; i < 16; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffBits[0][i    ] << 24 |
+                        pEncInfo->pHuffBits[0][i + 1] << 16 |
+                        pEncInfo->pHuffBits[0][i + 2] << 8 |
+                        pEncInfo->pHuffBits[0][i + 3]);
+        }
+
+        for (i = 0; i < 12; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffVal[0][i    ] << 24 |
+                        pEncInfo->pHuffVal[0][i + 1] << 16 |
+                        pEncInfo->pHuffVal[0][i + 2] << 8 |
+                        pEncInfo->pHuffVal[0][i + 3]);
+        }
+
+        JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x10);
+
+        for (i = 0; i < 16; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffBits[1][i    ] << 24 |
+                        pEncInfo->pHuffBits[1][i + 1] << 16 |
+                        pEncInfo->pHuffBits[1][i + 2] << 8 |
+                        pEncInfo->pHuffBits[1][i + 3]);
+        }
+
+
+        for (i = 0; i < 160; i += 4)
+        {
+            JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                        pEncInfo->pHuffVal[1][i    ] << 24 |
+                        pEncInfo->pHuffVal[1][i + 1] << 16 |
+                        pEncInfo->pHuffVal[1][i + 2] << 8 |
+                        pEncInfo->pHuffVal[1][i + 3]);
+        }
+
+        JpuWriteReg(MJPEG_GBU_PBIT_16_REG,
+                    pEncInfo->pHuffVal[1][160] << 8 |
+                    pEncInfo->pHuffVal[1][161]);
+
+
+        if (pEncInfo->format != FORMAT_400)
+        {
+
+            JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x01);
+
+            for (i = 0; i < 16; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffBits[2][i    ] << 24 |
+                            pEncInfo->pHuffBits[2][i + 1] << 16 |
+                            pEncInfo->pHuffBits[2][i + 2] << 8 |
+                            pEncInfo->pHuffBits[2][i + 3]);
+            }
+
+            for (i = 0; i < 12; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffVal[2][i    ] << 24 |
+                            pEncInfo->pHuffVal[2][i + 1] << 16 |
+                            pEncInfo->pHuffVal[2][i + 2] << 8 |
+                            pEncInfo->pHuffVal[2][i + 3]);
+            }
+
+            JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x11);
+
+            for (i = 0; i < 16; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffBits[3][i    ] << 24 |
+                            pEncInfo->pHuffBits[3][i + 1] << 16 |
+                            pEncInfo->pHuffBits[3][i + 2] << 8 |
+                            pEncInfo->pHuffBits[3][i + 3]);
+            }
+
+
+            for (i = 0; i < 160; i += 4)
+            {
+                JpuWriteReg(MJPEG_GBU_PBIT_32_REG,
+                            pEncInfo->pHuffVal[3][i    ] << 24 |
+                            pEncInfo->pHuffVal[3][i + 1] << 16 |
+                            pEncInfo->pHuffVal[3][i + 2] << 8 |
+                            pEncInfo->pHuffVal[3][i + 3]);
+            }
+
+            JpuWriteReg(MJPEG_GBU_PBIT_16_REG,
+                        pEncInfo->pHuffVal[3][160] << 8 |
+                        pEncInfo->pHuffVal[3][161]);
+        }
+    }
+
+    // SOF header
+    JpuWriteReg(MJPEG_GBU_PBIT_16_REG, 0xFFC0);
+    JpuWriteReg(MJPEG_GBU_PBIT_16_REG, (8 + (pEncInfo->compNum * 3)));
+    JpuWriteReg(MJPEG_GBU_PBIT_08_REG, 0x08);
+
+    if (pEncInfo->rotationAngle == 90 || pEncInfo->rotationAngle == 270)
+    {
+        JpuWriteReg(MJPEG_GBU_PBIT_32_REG, pEncInfo->picWidth << 16 | pEncInfo->picHeight);
+    }
+    else
+    {
+        JpuWriteReg(MJPEG_GBU_PBIT_32_REG, pEncInfo->picHeight << 16 | pEncInfo->picWidth);
+    }
+
+    JpuWriteReg(MJPEG_GBU_PBIT_08_REG, pEncInfo->compNum);
+
+
+    frameFormat = pEncInfo->format;
+    if (pEncInfo->rotationEnable && (pEncInfo->rotationAngle == 90 || pEncInfo->rotationAngle == 270))
+    {
+        frameFormat = (frameFormat == FORMAT_422) ? FORMAT_224 : (frameFormat == FORMAT_224) ? FORMAT_422 :
+                      frameFormat;
+    }
+
+    pEncInfo->pCInfoTab[0] = sJpuCompInfoTable[frameFormat];
+    pEncInfo->pCInfoTab[1] = pEncInfo->pCInfoTab[0] + 6;
+    pEncInfo->pCInfoTab[2] = pEncInfo->pCInfoTab[1] + 6;
+    pEncInfo->pCInfoTab[3] = pEncInfo->pCInfoTab[2] + 6;
+    for (i = 0; i < pEncInfo->compNum; i++)
+    {
+        JpuWriteReg(MJPEG_GBU_PBIT_08_REG, (i + 1));
+        JpuWriteReg(MJPEG_GBU_PBIT_08_REG,
+                    ((pEncInfo->pCInfoTab[i][1] << 4) & 0xF0) + (pEncInfo->pCInfoTab[i][2] & 0x0F));
+        JpuWriteReg(MJPEG_GBU_PBIT_08_REG, pEncInfo->pCInfoTab[i][3]);
+    }
+
+    pEncInfo->frameIdx++;
+
+    return 1;
+}
+
+
+
 JpgRet JpgEnterLock()
 {
     jdi_lock();

@@ -682,7 +682,7 @@ JpgRet JPU_DecSetRdPtrEx(JpgDecHandle handle, PhysicalAddress addr, int updateWr
 
     return JPG_RET_SUCCESS;
 }
-
+#include "rtl876x_pinmux.h"
 JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
 {
     JpgInst *pJpgInst;
@@ -1034,13 +1034,22 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
     }
 
 
-//    if (pJpgInst->loggingEnable)
-//    {
-//        jdi_log(JDI_LOG_CMD_PICRUN, 1);
-//    }
+    Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_HIGH);
 
     JpuWriteReg(MJPEG_PIC_START_REG, (1 << JPG_START_PIC));
 
+    // while (1)
+    // {
+    //     if(*(volatile unsigned long *)MJPEG_PIC_STATUS_REG)
+    //     {
+    //         // if(reason & (1 << INT_JPU_DONE) ||
+    //         //         reason & (1 << INT_JPU_ERROR))
+    //         {
+    //             Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    //         }
+    //         break;
+    //     }
+    // }
 
     SetJpgPendingInst(pJpgInst);
     return JPG_RET_SUCCESS;
@@ -1399,3 +1408,827 @@ JpgRet JPU_DecGiveCommand(
     }
     return JPG_RET_SUCCESS;
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+JpgRet JPU_EncOpen(JpgEncHandle *pHandle, JpgEncOpenParam *pop)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    JpgRet ret;
+    int i;
+
+    ret = CheckJpgEncOpenParam(pop);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+    JpgEnterLock();
+    ret = GetJpgInstance(&pJpgInst);
+    if (ret == JPG_RET_FAILURE)
+    {
+        *pHandle = 0;
+        JpgLeaveLock();
+        return JPG_RET_FAILURE;
+    }
+
+    *pHandle = pJpgInst;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+    memset(pEncInfo, 0x00, sizeof(JpgEncInfo));
+    pEncInfo->openParam = *pop;
+    pEncInfo->streamRdPtr = pop->bitstreamBuffer;
+    pEncInfo->streamWrPtr = pop->bitstreamBuffer;
+
+    JpuWriteReg(MJPEG_BBC_WR_PTR_REG, pEncInfo->streamWrPtr);
+    pEncInfo->streamBufStartAddr = pop->bitstreamBuffer;
+    pEncInfo->streamBufSize = pop->bitstreamBufferSize;
+    pEncInfo->streamBufEndAddr = pop->bitstreamBuffer + pop->bitstreamBufferSize;
+    pEncInfo->streamEndian = pop->streamEndian;
+    pEncInfo->frameEndian = pop->frameEndian;
+    pEncInfo->chromaInterleave = pop->chromaInterleave;
+
+    pEncInfo->format = pEncInfo->openParam.sourceFormat;
+    pEncInfo->picWidth = pEncInfo->openParam.picWidth;
+    pEncInfo->picHeight = pEncInfo->openParam.picHeight;
+    // Picture size alignment
+    if (pEncInfo->format == FORMAT_420 || pEncInfo->format == FORMAT_422)
+    {
+        pEncInfo->alignedWidth = ((pEncInfo->picWidth + 15) / 16) * 16;
+    }
+    else
+    {
+        pEncInfo->alignedWidth = ((pEncInfo->picWidth + 7) / 8) * 8;
+    }
+
+    if (pEncInfo->format == FORMAT_420 || pEncInfo->format == FORMAT_224)
+    {
+        pEncInfo->alignedHeight = ((pEncInfo->picHeight + 15) / 16) * 16;
+    }
+    else
+    {
+        pEncInfo->alignedHeight = ((pEncInfo->picHeight + 7) / 8) * 8;
+    }
+    pEncInfo->rstIntval = pEncInfo->openParam.restartInterval;
+
+    for (i = 0; i < 4; i++)
+    {
+        pEncInfo->pHuffVal[i] = pEncInfo->openParam.huffVal[i];
+    }
+    for (i = 0; i < 4; i++)
+    {
+        pEncInfo->pHuffBits[i] = pEncInfo->openParam.huffBits[i];
+    }
+    for (i = 0; i < 4; i++)
+    {
+        pEncInfo->pQMatTab[i] = pEncInfo->openParam.qMatTab[i];
+    }
+
+    if (pop->packedFormat == PACKED_FORMAT_444 && pEncInfo->format != FORMAT_444)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+    pEncInfo->packedFormat = pop->packedFormat;
+
+    JpgLeaveLock();
+
+    return JPG_RET_SUCCESS;
+
+}
+
+JpgRet JPU_EncClose(JpgEncHandle handle)
+{
+    JpgInst *pJpgInst;
+    JpgRet ret;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+    JpgEnterLock();
+
+    if (GetJpgPendingInst())
+    {
+        JpgLeaveLock();
+        return JPG_RET_FRAME_NOT_COMPLETE;
+    }
+
+    pJpgInst = handle;
+    JpuWriteReg(MJPEG_BBC_FLUSH_CMD_REG, 0);
+    FreeJpgInstance(pJpgInst);
+    JpgLeaveLock();
+
+    return JPG_RET_SUCCESS;
+}
+
+
+JpgRet JPU_EncGetInitialInfo(JpgEncHandle handle, JpgEncInitialInfo *info)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    JpgRet ret;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+    if (info == 0)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+    if (pEncInfo->initialInfoObtained)
+    {
+        return JPG_RET_CALLED_BEFORE;
+    }
+
+
+    JpgEnterLock();
+
+    if (GetJpgPendingInst())
+    {
+        JpgLeaveLock();
+        return JPG_RET_FRAME_NOT_COMPLETE;
+    }
+
+    if (pEncInfo->format == FORMAT_400)
+    {
+        pEncInfo->compInfo[1] = 0;
+        pEncInfo->compInfo[2] = 0;
+    }
+    else
+    {
+        pEncInfo->compInfo[1] = 5;
+        pEncInfo->compInfo[2] = 5;
+    }
+
+    if (pEncInfo->format == FORMAT_400)
+    {
+        pEncInfo->compNum = 1;
+    }
+    else
+    {
+        pEncInfo->compNum = 3;
+    }
+
+    if (pEncInfo->format == FORMAT_420)
+    {
+        pEncInfo->mcuBlockNum = 6;
+        pEncInfo->compInfo[0] = 10;
+        pEncInfo->busReqNum = 2;
+    }
+    else if (pEncInfo->format == FORMAT_422)
+    {
+        pEncInfo->mcuBlockNum = 4;
+        pEncInfo->busReqNum = 3;
+        pEncInfo->compInfo[0] = 9;
+    }
+    else if (pEncInfo->format == FORMAT_224)
+    {
+        pEncInfo->mcuBlockNum = 4;
+        pEncInfo->busReqNum  = 3;
+        pEncInfo->compInfo[0] = 6;
+    }
+    else if (pEncInfo->format == FORMAT_444)
+    {
+        pEncInfo->mcuBlockNum = 3;
+        pEncInfo->compInfo[0] = 5;
+        pEncInfo->busReqNum = 4;
+    }
+    else if (pEncInfo->format == FORMAT_400)
+    {
+        pEncInfo->mcuBlockNum = 1;
+        pEncInfo->busReqNum = 4;
+        pEncInfo->compInfo[0] = 5;
+    }
+
+    info->minFrameBufferCount = 0;
+    info->colorComponents = pEncInfo->compNum;
+
+    pEncInfo->initialInfo = *info;
+    pEncInfo->initialInfoObtained = 1;
+
+    JpgLeaveLock();
+    return JPG_RET_SUCCESS;
+}
+
+
+
+JpgRet JPU_EncGetBitstreamBuffer(JpgEncHandle handle,
+                                 PhysicalAddress *prdPrt,
+                                 PhysicalAddress *pwrPtr,
+                                 int *size)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    JpgRet ret;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+    if (prdPrt == 0 || pwrPtr == 0 || size == 0)
+    {
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+    JpgSetClockGate(1);
+    *prdPrt = pEncInfo->streamRdPtr;
+
+    if (GetJpgPendingInst() == pJpgInst)
+    {
+        *pwrPtr = JpuReadReg(MJPEG_BBC_WR_PTR_REG);
+    }
+    else
+    {
+        *pwrPtr = pEncInfo->streamWrPtr;
+    }
+    *size = *pwrPtr - *prdPrt;
+    JpgSetClockGate(0);
+
+    return JPG_RET_SUCCESS;
+
+}
+
+JpgRet JPU_EncUpdateBitstreamBuffer(
+    JpgEncHandle handle,
+    int size)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    PhysicalAddress rdPtr;
+    JpgRet ret;
+
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+
+    JpgSetClockGate(1);
+    rdPtr = pEncInfo->streamRdPtr;
+    rdPtr += size;
+
+    if (rdPtr == pEncInfo->streamBufEndAddr)
+    {
+        rdPtr = pEncInfo->streamBufStartAddr;
+    }
+
+    pEncInfo->streamRdPtr = pEncInfo->streamBufStartAddr;
+
+    if (GetJpgPendingInst() == pJpgInst)
+    {
+        pEncInfo->streamWrPtr = JpuReadReg(MJPEG_BBC_WR_PTR_REG);
+        JpuWriteReg(MJPEG_BBC_CUR_POS_REG, 0);
+        JpuWriteReg(MJPEG_BBC_EXT_ADDR_REG, pEncInfo->streamBufStartAddr);
+        JpuWriteReg(MJPEG_BBC_RD_PTR_REG, pEncInfo->streamBufStartAddr);
+        JpuWriteReg(MJPEG_BBC_WR_PTR_REG, pEncInfo->streamBufStartAddr);
+    }
+    JpgSetClockGate(0);
+    return JPG_RET_SUCCESS;
+
+
+}
+JpgRet JPU_EncIssueStop(JpgEncHandle handle)
+{
+    JpgInst *pJpgInst;
+    JpgRet ret;
+
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+    pJpgInst = handle;
+
+    if (pJpgInst != GetJpgPendingInst())
+    {
+        return JPG_RET_WRONG_CALL_SEQUENCE;
+    }
+
+    JpgSetClockGate(1);
+    JpuWriteReg(MJPEG_PIC_START_REG, 1 << JPG_START_STOP);
+    JpgSetClockGate(0);
+    return JPG_RET_SUCCESS;
+
+}
+JpgRet JPU_EncCompleteStop(JpgEncHandle handle)
+{
+    JpgInst *pJpgInst;
+    JpgRet ret;
+    uint32_t val;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+    pJpgInst = handle;
+
+    if (pJpgInst != GetJpgPendingInst())
+    {
+        return JPG_RET_WRONG_CALL_SEQUENCE;
+    }
+
+    JpgSetClockGate(1);
+    val = JpuReadReg(MJPEG_PIC_STATUS_REG);
+
+    if (val & (1 << INT_JPU_BIT_BUF_STOP))
+    {
+        SetJpgPendingInst(0);
+        JpgSetClockGate(0);
+    }
+    else
+    {
+        JpgSetClockGate(0);
+        return JPG_RET_WRONG_CALL_SEQUENCE;
+    }
+
+    return JPG_RET_SUCCESS;
+}
+
+
+JpgRet JPU_EncSetWrPtr(JpgEncHandle handle, PhysicalAddress addr, int updateRdPtr)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    JpgRet ret;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+
+    JpgEnterLock();
+
+    if (GetJpgPendingInst())
+    {
+        JpgLeaveLock();
+        return JPG_RET_FRAME_NOT_COMPLETE;
+    }
+    pEncInfo->streamWrPtr = addr;
+    if (updateRdPtr)
+    {
+        pEncInfo->streamRdPtr = addr;
+    }
+
+    JpuWriteReg(MJPEG_BBC_WR_PTR_REG, pEncInfo->streamWrPtr);
+
+    JpgLeaveLock();
+
+    return JPG_RET_SUCCESS;
+}
+
+JpgRet JPU_EncStartOneFrame(JpgEncHandle handle, JpgEncParam *param)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    FrameBuffer *pBasFrame;
+    uint32_t rotMirEnable;
+    uint32_t rotMirMode;
+    JpgRet ret;
+    uint32_t val;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+
+    ret = CheckJpgEncParam(handle, param);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+
+    pBasFrame = param->sourceFrame;
+    rotMirEnable = 0;
+    rotMirMode = 0;
+    if (pEncInfo->rotationEnable)
+    {
+        rotMirEnable = 0x10; // Enable rotator
+        switch (pEncInfo->rotationAngle)
+        {
+        case 0:
+            rotMirMode |= 0x0;
+            break;
+
+        case 90:
+            rotMirMode |= 0x1;
+            break;
+
+        case 180:
+            rotMirMode |= 0x2;
+            break;
+
+        case 270:
+            rotMirMode |= 0x3;
+            break;
+        }
+    }
+    if (pEncInfo->mirrorEnable)
+    {
+        rotMirEnable = 0x10; // Enable rotator
+
+        switch (pEncInfo->mirrorDirection)
+        {
+        case MIRDIR_NONE :
+            rotMirMode |= 0x0;
+            break;
+
+        case MIRDIR_VER :
+            rotMirMode |= 0x4;
+            break;
+
+        case MIRDIR_HOR :
+            rotMirMode |= 0x8;
+            break;
+
+        case MIRDIR_HOR_VER :
+            rotMirMode |= 0xc;
+            break;
+
+        }
+
+    }
+
+    JpgEnterLock();
+
+    if (GetJpgPendingInst())
+    {
+        JpgLeaveLock();
+        return JPG_RET_FRAME_NOT_COMPLETE;
+    }
+
+    JpuWriteReg(MJPEG_CLP_INFO_REG, 0); //off ROI enable due to not supported feature for encoder.
+
+    JpuWriteReg(MJPEG_BBC_BAS_ADDR_REG, pEncInfo->streamBufStartAddr);
+    JpuWriteReg(MJPEG_BBC_END_ADDR_REG, pEncInfo->streamBufEndAddr);
+    JpuWriteReg(MJPEG_BBC_WR_PTR_REG, pEncInfo->streamWrPtr);
+    JpuWriteReg(MJPEG_BBC_RD_PTR_REG, pEncInfo->streamRdPtr);
+
+    JpuWriteReg(MJPEG_BBC_CUR_POS_REG, 0);
+    JpuWriteReg(MJPEG_BBC_DATA_CNT_REG, 256 / 4);   // 64 * 4 byte == 32 * 8 byte
+    JpuWriteReg(MJPEG_BBC_EXT_ADDR_REG, pEncInfo->streamWrPtr);
+    JpuWriteReg(MJPEG_BBC_INT_ADDR_REG, 0);
+
+    JpuWriteReg(MJPEG_GBU_BT_PTR_REG, 0);
+    JpuWriteReg(MJPEG_GBU_WD_PTR_REG, 0);
+    JpuWriteReg(MJPEG_GBU_BBSR_REG, 0);
+    JpuWriteReg(MJPEG_GBU_CTRL_REG, 0);
+
+    JpuWriteReg(MJPEG_GBU_BBER_REG, ((256 / 4) * 2) - 1);
+    JpuWriteReg(MJPEG_GBU_BBIR_REG, 256 / 4);   // 64 * 4 byte == 32 * 8 byte
+    JpuWriteReg(MJPEG_GBU_BBHR_REG, 256 / 4);   // 64 * 4 byte == 32 * 8 byte
+    JpuWriteReg(MJPEG_PIC_CTRL_REG, 0x18 | pEncInfo->usePartial | (0 << 2));
+    JpuWriteReg(MJPEG_SCL_INFO_REG, 0);
+    if (pEncInfo->packedFormat == PACKED_FORMAT_NONE)
+    {
+        JpuWriteReg(MJPEG_DPB_CONFIG_REG,
+                    (pEncInfo->frameEndian << 6) | (0 << 5) | (0 << 4) | (0 << 2) | ((pEncInfo->chromaInterleave == 0) ?
+                                                                                     0 : (pEncInfo->chromaInterleave == 1) ? 2 : 3));
+    }
+    else if (pEncInfo->packedFormat == PACKED_FORMAT_444)
+    {
+        JpuWriteReg(MJPEG_DPB_CONFIG_REG,
+                    (pEncInfo->frameEndian << 6) | (1 << 5) | (0 << 4) | (0 << 2) | ((pEncInfo->chromaInterleave == 0) ?
+                                                                                     0 : (pEncInfo->chromaInterleave == 1) ? 2 : 3));
+    }
+    else
+    {
+        JpuWriteReg(MJPEG_DPB_CONFIG_REG,
+                    (pEncInfo->frameEndian << 6) | (0 << 5) | (1 << 4) | ((pEncInfo->packedFormat - 1) << 2) | ((
+                                pEncInfo->chromaInterleave == 0) ? 0 : (pEncInfo->chromaInterleave == 1) ? 2 : 3));
+    }
+
+    JpuWriteReg(MJPEG_RST_INTVAL_REG, pEncInfo->rstIntval);
+    JpuWriteReg(MJPEG_BBC_CTRL_REG, (pEncInfo->streamEndian << 1) | 1);
+    JpuWriteReg(MJPEG_OP_INFO_REG,
+                pEncInfo->partiallineNum << 16 | pEncInfo->partialBufNum << 3 | pEncInfo->busReqNum);
+
+    // Load HUFFTab
+    if (!JpgEncLoadHuffTab(pEncInfo))
+    {
+        JpgLeaveLock();
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    JpgEncEncodeHeader(handle, pEncInfo->paraSet);
+
+    // Load QMATTab
+    if (!JpgEncLoadQMatTab(pEncInfo))
+    {
+        JpgLeaveLock();
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    //although rotator is enable, this picture size must not be changed from width to height.
+    JpuWriteReg(MJPEG_PIC_SIZE_REG, pEncInfo->alignedWidth << 16 | pEncInfo->alignedHeight);
+    JpuWriteReg(MJPEG_ROT_INFO_REG, (rotMirEnable | rotMirMode));
+
+    JpuWriteReg(MJPEG_MCU_INFO_REG, pEncInfo->mcuBlockNum << 16 | pEncInfo->compNum << 12
+                | pEncInfo->compInfo[0] << 8 | pEncInfo->compInfo[1] << 4 | pEncInfo->compInfo[2]);
+
+    //JpgEncGbuResetReg
+    JpuWriteReg(MJPEG_GBU_CTRL_REG,
+                pEncInfo->stuffByteEnable << 3);   // stuffing "FF" data where frame end
+
+    if (pEncInfo->usePartial)
+    {
+        int i;
+        for (i = 0; i < pEncInfo->partialBufNum; i++)
+        {
+            JpuWriteReg(MJPEG_DPB_BASE00_REG + (i * 12), pBasFrame[i].bufY);
+            JpuWriteReg(MJPEG_DPB_BASE01_REG + (i * 12), pBasFrame[i].bufCb);
+            JpuWriteReg(MJPEG_DPB_BASE02_REG + (i * 12), pBasFrame[i].bufCr);
+        }
+
+    }
+    else
+    {
+        JpuWriteReg(MJPEG_DPB_BASE00_REG, pBasFrame->bufY);
+        JpuWriteReg(MJPEG_DPB_BASE01_REG, pBasFrame->bufCb);
+        JpuWriteReg(MJPEG_DPB_BASE02_REG, pBasFrame->bufCr);
+
+    }
+
+    JpuWriteReg(MJPEG_DPB_YSTRIDE_REG, pBasFrame->stride);
+
+    val = (pEncInfo->format == FORMAT_420 || pEncInfo->format == FORMAT_422 ||
+           pEncInfo->format == FORMAT_400) ? 2 : 1;
+
+    if (pEncInfo->chromaInterleave)
+    {
+        JpuWriteReg(MJPEG_DPB_CSTRIDE_REG, (pBasFrame->stride / (int)val) * 2);
+    }
+    else
+    {
+        JpuWriteReg(MJPEG_DPB_CSTRIDE_REG, pBasFrame->stride / (int)val);
+    }
+
+
+    // if (pJpgInst->loggingEnable)
+    //  jdi_log(JDI_LOG_CMD_PICRUN, 1);
+
+    JpuWriteReg(MJPEG_PIC_STATUS_REG, JpuReadReg(MJPEG_PIC_STATUS_REG));
+    if (pEncInfo->usePartial)
+    {
+        JpuWriteReg(MJPEG_PIC_START_REG, (1 << JPG_START_PIC) | (1 << JPG_START_PARTIAL));
+    }
+    else
+    {
+        JpuWriteReg(MJPEG_PIC_START_REG, (1 << JPG_START_PIC));
+    }
+
+    SetJpgPendingInst(pJpgInst);
+    return JPG_RET_SUCCESS;
+}
+
+JpgRet JPU_EncGetOutputInfo(
+    JpgEncHandle handle,
+    JpgEncOutputInfo *info
+)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    uint32_t val;
+    JpgRet ret;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        SetJpgPendingInst(0);
+        JpgLeaveLock();
+        return ret;
+    }
+
+    if (info == 0)
+    {
+        SetJpgPendingInst(0);
+        JpgLeaveLock();
+        return JPG_RET_INVALID_PARAM;
+    }
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+
+    // if (pJpgInst->loggingEnable)
+    //  jdi_log(JDI_LOG_CMD_PICRUN, 0);
+
+    if (pJpgInst != GetJpgPendingInst())
+    {
+        SetJpgPendingInst(0);
+        JpgLeaveLock();
+        return JPG_RET_WRONG_CALL_SEQUENCE;
+    }
+
+
+    val = JpuReadReg(MJPEG_PIC_STATUS_REG);
+
+    if ((val & 0x4) >> 2)
+    {
+        SetJpgPendingInst(0);
+        JpgLeaveLock();
+        return JPG_RET_WRONG_CALL_SEQUENCE;
+    }
+
+    if (val != 0)
+    {
+        JpuWriteReg(MJPEG_PIC_STATUS_REG, val);
+    }
+
+    info->bitstreamBuffer = pEncInfo->streamBufStartAddr;
+    info->bitstreamSize = JpuReadReg(MJPEG_BBC_WR_PTR_REG) - pEncInfo->streamBufStartAddr;
+    pEncInfo->streamWrPtr = JpuReadReg(MJPEG_BBC_WR_PTR_REG);
+
+    JpuWriteReg(MJPEG_BBC_FLUSH_CMD_REG, 0);
+
+
+    SetJpgPendingInst(0);
+    JpgLeaveLock();
+    return JPG_RET_SUCCESS;
+
+}
+
+
+JpgRet JPU_EncGiveCommand(
+    JpgEncHandle handle,
+    JpgCommand cmd,
+    void *param)
+{
+    JpgInst *pJpgInst;
+    JpgEncInfo *pEncInfo;
+    JpgRet ret;
+
+    ret = CheckJpgInstValidity(handle);
+    if (ret != JPG_RET_SUCCESS)
+    {
+        return ret;
+    }
+
+
+    pJpgInst = handle;
+    pEncInfo = &pJpgInst->JpgInfo.encInfo;
+    switch (cmd)
+    {
+    case ENABLE_JPG_ROTATION :
+        {
+            pEncInfo->rotationEnable = 1;
+        }
+        break;
+    case DISABLE_JPG_ROTATION :
+        {
+            pEncInfo->rotationEnable = 0;
+        }
+        break;
+    case ENABLE_JPG_MIRRORING :
+        {
+            pEncInfo->mirrorEnable = 1;
+        }
+        break;
+    case DISABLE_JPG_MIRRORING :
+        {
+            pEncInfo->mirrorEnable = 0;
+        }
+        break;
+    case SET_JPG_MIRROR_DIRECTION :
+        {
+            JpgMirrorDirection mirDir;
+
+            if (param == 0)
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+            mirDir = *(JpgMirrorDirection *)param;
+            if (!(MIRDIR_NONE <= mirDir && mirDir <= MIRDIR_HOR_VER))
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+            pEncInfo->mirrorDirection = mirDir;
+        }
+        break;
+    case SET_JPG_ROTATION_ANGLE :
+        {
+            int angle;
+
+            if (param == 0)
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+            angle = *(int *)param;
+            if (angle != 0 && angle != 90 &&
+                angle != 180 && angle != 270)
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+            if (pEncInfo->initialInfoObtained && (angle == 90 || angle == 270))
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+            pEncInfo->rotationAngle = angle;
+        }
+        break;
+    case ENC_JPG_GET_HEADER:
+        {
+            if (param == 0)
+            {
+                return JPG_RET_INVALID_PARAM;
+            }
+
+            pEncInfo->paraSet = (JpgEncParamSet *)param;
+            break;
+        }
+    case SET_JPG_USE_PARTIAL_MODE:
+        {
+            int enable;
+            enable = *(int *)param;
+            pEncInfo->usePartial = enable;
+
+            break;
+        }
+    case SET_JPG_PARTIAL_FRAME_NUM:
+        {
+            int frame;
+            frame = *(int *)param;
+            pEncInfo->partialBufNum = frame;
+
+            break;
+        }
+    case SET_JPG_PARTIAL_LINE_NUM:
+        {
+            int line;
+            line = *(int *)param;
+            pEncInfo->partiallineNum = line;
+
+            break;
+        }
+    case SET_JPG_ENCODE_NEXT_LINE:
+        {
+            JpuWriteReg(MJPEG_PIC_START_REG, (1 << JPG_START_PARTIAL));
+            break;
+        }
+
+
+    case SET_JPG_USE_STUFFING_BYTE_FF:
+        {
+            int enable;
+            enable = *(int *)param;
+            pEncInfo->stuffByteEnable = enable;
+            break;
+        }
+    case ENABLE_LOGGING:
+        {
+            pJpgInst->loggingEnable = 1;
+        }
+        break;
+    case DISABLE_LOGGING:
+        {
+            pJpgInst->loggingEnable = 0;
+        }
+        break;
+
+    default:
+        return JPG_RET_INVALID_COMMAND;
+    }
+    return JPG_RET_SUCCESS;
+}
+

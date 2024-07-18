@@ -119,8 +119,22 @@
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
+          <Key>DLGUARM</Key>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>DLGTARM</Key>
+          <Name>(6010=-1,-1,-1,-1,0)(6018=-1,-1,-1,-1,0)(6019=-1,-1,-1,-1,0)(6008=-1,-1,-1,-1,0)(6009=-1,-1,-1,-1,0)(6014=-1,-1,-1,-1,0)(6015=-1,-1,-1,-1,0)(6003=-1,-1,-1,-1,0)(6000=-1,-1,-1,-1,0)</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>ARMDBGFLAGS</Key>
+          <Name></Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
           <Key>JL2CM3</Key>
-          <Name>-U -O78 -S2 -ZTIFSpeedSel5000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO7 -FD100000 -FC4000 -FN1 -FF0RTL876x_FPGA_ROM -FS00 -FL0200000</Name>
+          <Name>-U-O78 -O78 -S2 -ZTIFSpeedSel5000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -N00("ARM CoreSight SW-DP") -D00(0BE12477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO7 -FD100000 -FC4000 -FN1 -FF0RTL876x_FPGA_ROM -FS00 -FL0200000</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -128,7 +142,160 @@
           <Name>UL2V8M(-S0 -C0 -P0 -FD20000000 -FC1000)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>75</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>75762</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_encoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\app\../../../jpeg/jsrc/jpeg_encoder.c\75</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>976</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>55272</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_decoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\app\../../../jpeg/jsrc/jpeg_decoder.c\976</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>1053</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>55508</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_decoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\app\../../../jpeg/jsrc/jpeg_decoder.c\1053</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>1007</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>63294</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpuapifunc_rt.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\app\../../../jpeg/jsrc/jpuapifunc_rt.c\1007</Expression>
+        </Bp>
+        <Bp>
+          <Number>4</Number>
+          <Type>0</Type>
+          <LineNumber>464</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>77072</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_encoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\app\../../../jpeg/jsrc/jpeg_encoder.c\464</Expression>
+        </Bp>
+        <Bp>
+          <Number>5</Number>
+          <Type>0</Type>
+          <LineNumber>347</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>76728</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_encoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\app\../../../jpeg/jsrc/jpeg_encoder.c\347</Expression>
+        </Bp>
+        <Bp>
+          <Number>6</Number>
+          <Type>0</Type>
+          <LineNumber>347</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>76728</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_encoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\app\../../../jpeg/jsrc/jpeg_encoder.c\347</Expression>
+        </Bp>
+        <Bp>
+          <Number>7</Number>
+          <Type>0</Type>
+          <LineNumber>182</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_encoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>8</Number>
+          <Type>0</Type>
+          <LineNumber>183</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\jpeg\jsrc\jpeg_encoder.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
+      <MemoryWindow1>
+        <Mm>
+          <WinNumber>1</WinNumber>
+          <SubType>0</SubType>
+          <ItemText>0x1015b0</ItemText>
+          <AccSizeX>0</AccSizeX>
+        </Mm>
+      </MemoryWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
@@ -140,7 +307,7 @@
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
         <aPa>0</aPa>
-        <viewmode>0</viewmode>
+        <viewmode>1</viewmode>
         <vrSel>0</vrSel>
         <aSym>0</aSym>
         <aTbox>0</aTbox>
@@ -632,7 +799,7 @@
 
   <Group>
     <GroupName>log function</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1136,7 +1303,7 @@
 
   <Group>
     <GroupName>io_demo</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1319,8 +1486,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\jsrc\mixer.c</PathWithFileName>
-      <FilenameWithoutPath>mixer.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\jpeg\jsrc\jdi.c</PathWithFileName>
+      <FilenameWithoutPath>jdi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1331,8 +1498,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\jsrc\jpuhelper_rt.c</PathWithFileName>
-      <FilenameWithoutPath>jpuhelper_rt.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\jpeg\jsrc\jpeg_decoder.c</PathWithFileName>
+      <FilenameWithoutPath>jpeg_decoder.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1343,8 +1510,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\jsrc\jpuapifunc_rt.c</PathWithFileName>
-      <FilenameWithoutPath>jpuapifunc_rt.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\jpeg\jsrc\jpuapi.c</PathWithFileName>
+      <FilenameWithoutPath>jpuapi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1355,8 +1522,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\jsrc\jpuapi.c</PathWithFileName>
-      <FilenameWithoutPath>jpuapi.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\jpeg\jsrc\jpuapifunc_rt.c</PathWithFileName>
+      <FilenameWithoutPath>jpuapifunc_rt.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1367,8 +1534,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\jsrc\jpeg_decoder.c</PathWithFileName>
-      <FilenameWithoutPath>jpeg_decoder.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\jpeg\jsrc\jpuhelper_rt.c</PathWithFileName>
+      <FilenameWithoutPath>jpuhelper_rt.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1379,8 +1546,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\jsrc\jdi.c</PathWithFileName>
-      <FilenameWithoutPath>jdi.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\jpeg\jsrc\mixer.c</PathWithFileName>
+      <FilenameWithoutPath>mixer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1391,7 +1558,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\tlsf\tlsf.c</PathWithFileName>
+      <PathWithFileName>..\..\..\jpeg\tlsf\tlsf.c</PathWithFileName>
       <FilenameWithoutPath>tlsf.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1403,8 +1570,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\jpeg\tlsf\jpeg_heap.c</PathWithFileName>
+      <PathWithFileName>..\..\..\jpeg\tlsf\jpeg_heap.c</PathWithFileName>
       <FilenameWithoutPath>jpeg_heap.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>82</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\jpeg\jsrc\jpeg_encoder.c</PathWithFileName>
+      <FilenameWithoutPath>jpeg_encoder.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

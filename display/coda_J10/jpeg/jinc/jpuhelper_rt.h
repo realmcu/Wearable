@@ -16,6 +16,96 @@ extern "C" {
 #endif
 
 
+typedef struct
+{
+    char SrcFileName[256];
+    int NumFrame;
+    int PicX;
+    int PicY;
+    int FrameRate;
+
+    // MPEG4 ONLY
+    int VerId;
+    int DataPartEn;
+    int RevVlcEn;
+    int ShortVideoHeader;
+    int AnnexI;
+    int AnnexJ;
+    int AnnexK;
+    int AnnexT;
+    int IntraDcVlcThr;
+    int VopQuant;
+
+    // H.264 ONLY
+    int ConstIntraPredFlag;
+    int DisableDeblk;
+    int DeblkOffsetA;
+    int DeblkOffsetB;
+    int ChromaQpOffset;
+    int PicQpY;
+
+    // MJPEG ONLY
+    char HuffTabName[256];
+    char QMatTabName[256];
+    int VersionID;
+    int FrmFormat;
+    int SrcFormat;
+    int RstIntval;
+    int ThumbEnable;
+    int ThumbSizeX;
+    int ThumbSizeY;
+
+    // COMMON
+    int GopPicNum;
+    int SliceMode;
+    int SliceSizeMode;
+    int SliceSizeNum;
+
+    int IntraRefreshNum;
+
+    int ConstantIntraQPEnable;
+    int RCIntraQP;
+    int MaxQpSetEnable;
+    int MaxQp;
+    int GammaSetEnable;
+    int Gamma;
+    int HecEnable;
+
+    // RC
+    int RcEnable;
+    int RcBitRate;
+    int RcInitDelay;
+    int RcBufSize;
+
+
+    // NEW RC Scheme
+    int RcIntervalMode;
+    int RcMBInterval;
+    int IntraCostWeight;
+    int SearchRange;
+    int MeUseZeroPmv;
+    int MeBlkModeEnable;
+
+} ENC_CFG;
+
+
+typedef struct
+{
+    int sourceFormat;
+    int restartInterval;
+    BYTE huffVal[4][162];
+    BYTE huffBits[4][256];
+    BYTE qMatTab[4][64];
+} EncMjpgParam;
+
+
+int jpgGetHuffTable(char *huffFileName, EncMjpgParam *param);
+int jpgGetQMatrix(char *qMatFileName, EncMjpgParam *param);
+int JpgEncSetupTables(JpgEncOpenParam *pop, int quality);
+int getJpgEncOpenParamDefault(JpgEncOpenParam *pEncOP, EncConfigParam *pEncConfig);
+int getJpgEncOpenParam(JpgEncOpenParam *pEncOP, EncConfigParam *pEncConfig, char *srcYuvFileName);
+int parseJpgCfgFile(ENC_CFG *pEncCfg, char *FileName);
+
 JpgRet WriteJpgBsBufHelper(JpgDecHandle handle,
                            BufInfo *pBufInfo,
                            PhysicalAddress paBsBufStart,
@@ -31,6 +121,17 @@ int WriteBsBufFromBufHelper(JpgDecHandle handle,
                             int chunkSize,
                             int endian);
 
+JpgRet SyncJpgBsBufHelper(JpgDecHandle handle, BufInfo *pBufInfo, PhysicalAddress paBsBufStart,
+                          PhysicalAddress paBsBufEnd, int defaultsize, int checkeos, int *pstreameos, int endian);
+
+
+JpgRet ReadJpgBsBufHelper(JpgEncHandle handle,
+                          FILE *bsFp,
+                          PhysicalAddress paBsBufStart,
+                          PhysicalAddress paBsBufEnd,
+                          int encHeaderSize,
+                          int endian);
+
 
 int LoadYuvImageHelperFormat(uint8_t *pic_yuv,
                              uint8_t *pYuv,
@@ -45,6 +146,22 @@ int LoadYuvImageHelperFormat(uint8_t *pic_yuv,
                              int endian,
                              int packed);
 
+
+int LoadYuvPartialImageHelperFormat(FILE *yuvFp,
+                                    uint8_t *pYuv,
+                                    PhysicalAddress addrY,
+                                    PhysicalAddress addrCb,
+                                    PhysicalAddress addrCr,
+                                    int picWidth,
+                                    int picHeight,
+                                    int picHeightPartial,
+                                    int stride,
+                                    int interleave,
+                                    int format,
+                                    int endian,
+                                    int partPosIdx,
+                                    int frameIdx,
+                                    int packed);
 
 
 int SaveYuvImageHelperFormat(void *yuvFp,

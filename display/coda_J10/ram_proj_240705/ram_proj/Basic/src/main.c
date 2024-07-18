@@ -12,7 +12,7 @@
 #include "app_task.h"
 #include "vector_table.h"
 
-#include "jpeg_decoder.h"
+#include "jpeg_coda.h"
 #include "jpeg_heap.h"
 void _system_init_(void)
 {
@@ -34,6 +34,11 @@ void irq_init()
 //    NVIC_Init(&NVIC_InitStruct);
 }
 
+void mydelay()
+{
+    for (uint32_t i = 0; i < 9999; i++)
+    {}
+}
 
 int main(void)
 {
@@ -46,17 +51,34 @@ int main(void)
 
     DBG_DIRECT("Hello");
 
+    Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_HIGH);
     jpg_tlsf_init();
     coda_init();
 
-    DBG_DIRECT("Hello");
-    // MJPEG_Test();
-    CODA_Test(3);
+
+    Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    // CODA_Test(3);
+    CODA_Test(4);
+    DBG_DIRECT("Done");
 
 //    task_init();
 //    sw_timer_init();
 
 //    vTaskStartScheduler();
+
+
+    // {
+    //     DBG_DIRECT(" *gpio_demo start");
+    //     while(1)
+    //     {
+    //          Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    //          mydelay();
+    //  Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    //          mydelay();
+    //     }
+    // }
+
+
 
 
     while (1)

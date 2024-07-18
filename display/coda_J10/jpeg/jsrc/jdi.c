@@ -237,7 +237,8 @@ void jdi_write_register(unsigned int addr, unsigned int data)
         return ;
     }
 
-    reg_addr = (unsigned long *)(addr + (unsigned long)s_jdb_register.virt_addr);
+    // reg_addr = (unsigned long *)(addr + (unsigned long)s_jdb_register.virt_addr);
+    reg_addr = (unsigned long *)(addr);
     *(volatile unsigned long *)reg_addr = data;
 
 }
@@ -246,7 +247,8 @@ unsigned int jdi_read_register(unsigned int addr)
 {
     unsigned long *reg_addr;
 
-    reg_addr = (unsigned long *)(addr + (unsigned long)s_jdb_register.virt_addr);
+    // reg_addr = (unsigned long *)(addr + (unsigned long)s_jdb_register.virt_addr);
+    reg_addr = (unsigned long *)(addr);
     return *(volatile unsigned long *)reg_addr;
 }
 
@@ -283,12 +285,13 @@ int jdi_write_memory(unsigned int addr, unsigned char *data, int len, int endian
         return -1;
     }
 
-    offset = addr - (unsigned long)jdb.phys_addr;
+    // offset = addr - (unsigned long)jdb.phys_addr;
 
 
     jpu_swap_endian(data, len, endian);
 
-    memcpy((void *)((unsigned long)jdb.virt_addr + offset), data, len);
+    // memcpy((void *)((unsigned long)jdb.virt_addr + offset), data, len);
+    memcpy((void *)((unsigned long)jdb.phys_addr), data, len);
 
     return len;
 }
@@ -322,15 +325,15 @@ int jdi_read_memory(unsigned int addr, unsigned char *data, int len, int endian)
     }
 
 
-    offset = addr - (unsigned long)jdb.phys_addr;
+    // offset = addr - (unsigned long)jdb.phys_addr;
 
 
-    DBG_DIRECT("mem read: 0x%x 0x%x %d", data, jdb.virt_addr + offset, len);
-    memcpy(data, (const void *)((unsigned long)jdb.virt_addr + offset), len);
-    // if(endian != JDI_SYSTEM_ENDIAN)
-    // {
+    DBG_DIRECT("mem read: 0x%x 0x%x %d", data, jdb.virt_addr, len);
+    // memcpy(data, (const void *)((unsigned long)jdb.virt_addr + offset), len);
+    memcpy(data, (const void *)((unsigned long)jdb.virt_addr), len);
+
     jpu_swap_endian(data, len,  endian);
-    // }
+
 
     return len;
 }
@@ -379,6 +382,46 @@ int jdi_allocate_dma_memory(jpu_buffer_t *vb)
             s_jpu_buffer_pool_count++;
             s_jpu_buffer_pool[i].inuse = 1;
             DBG_DIRECT("jdi_allocate_dma_memory i %d 0x%x 0x%x sz %d\n", i, &(s_jpu_buffer_pool[i].jdb),
+                       s_jpu_buffer_pool[i].jdb.phys_addr, s_jpu_buffer_pool[i].jdb.size);
+            break;
+        }
+    }
+
+    return 0;
+}
+
+
+int jdi_register_extern_memory(jpu_buffer_t *vb, void *addr, size_t sz)
+{
+    int i;
+    int ret = 0;
+    unsigned long offset;
+    jpudrv_buffer_t jdb = {0, };
+
+    jdb.size = sz;
+    // jdb.phys_addr = (unsigned long)jmem_alloc(&s_pjip->vmem, jdb.size, 0);
+
+    jdb.phys_addr = (unsigned long)addr;
+    DBG_DIRECT("jdi_register_extern_memory get 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
+               jdb.size);
+
+    offset = (unsigned long)(jdb.phys_addr - s_jdb_video_memory.phys_addr);
+    jdb.base = (unsigned long)s_jdb_video_memory.base + offset;
+    jdb.virt_addr = jdb.phys_addr;
+
+    vb->phys_addr = (unsigned long)jdb.phys_addr;
+    vb->base = (unsigned long)jdb.base;
+    vb->virt_addr = (unsigned long)jdb.phys_addr;
+
+
+    for (i = 0; i < MAX_JPU_BUFFER_POOL; i++)
+    {
+        if (s_jpu_buffer_pool[i].inuse == 0)
+        {
+            s_jpu_buffer_pool[i].jdb = jdb;
+            s_jpu_buffer_pool_count++;
+            s_jpu_buffer_pool[i].inuse = 1;
+            DBG_DIRECT("jdi_register_extern_memory i %d 0x%x 0x%x sz %d\n", i, &(s_jpu_buffer_pool[i].jdb),
                        s_jpu_buffer_pool[i].jdb.phys_addr, s_jpu_buffer_pool[i].jdb.size);
             break;
         }

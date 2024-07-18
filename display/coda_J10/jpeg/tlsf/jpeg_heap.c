@@ -3,7 +3,12 @@
 #include "jpeg_heap.h"
 #include "trace.h"
 
+
+
+#define TLSF_BUFF_NUM_MAX  (16)
+
 static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE];
+
 static tlsf_t jpg_tlsf = NULL;
 
 

@@ -6,7 +6,7 @@
 #include "rtl876x_rcc.h"
 #include "string.h"
 
-
+#include "jpeg_coda.h"
 #include "regdefine.h"
 #include "jpuconfig.h"
 #include "jpuapi.h"
@@ -16,11 +16,18 @@
 #include "jpeg_heap.h"
 
 // #include "pic_hex.txt"
-// #include "pic_hex_122144.txt"
+// #include "pic_hex_112_144.txt"  // 420
 // #include "pic_hex_16_32.txt"
-#include "pic_hex_184_96.txt"
+// #include "pic_hex_184_96.txt"    // 444
+// #include "pic_hex_400_184_96.txt"   // 400
+// #include "pic_hex_422_192_96.txt"  // 422
+// #include "pic_hex_444_184_96.txt"  // 444
+
+// #include "pic_hex_420_192_96.txt"  // 420
 
 
+// #include "pic_hex_444_184x96_95.txt"  // 444 95
+#include "pic_hex_440_192x96_95.txt"   // 440 95
 
 
 //PCC config functin
@@ -54,7 +61,7 @@ uint32_t CODA_Test_read(uint32_t addr)
     reg_addr = (uint32_t *)(addr);
     // data = *(uint32_t *)reg_addr;
     data = jdi_read_register(addr);
-    DBG_DIRECT("JPEG rd 0x%03x: 0x%08x\n", addr & 0XFFF, data);
+    DBG_DIRECT("JPEG rd 0x%03x: 0x%08x %d\n", addr & 0XFFF, data, data);
     return data;
 }
 uint32_t CODA_Test_write(uint32_t addr, uint32_t val)
@@ -683,13 +690,11 @@ static int coda_decode(void)
     BufInfo bufInfo     = {0};
     FRAME_BUF *pFrame[NUM_FRAME_BUF];
     FRAME_BUF *pDispFrame = NULL;
-    uint32_t bsSize = 0, framebufSize = 0, framebufWidth = 0, framebufHeight = 0, framebufStride = 0,
+    uint32_t framebufSize = 0, framebufWidth = 0, framebufHeight = 0, framebufStride = 0,
              framebufFormat = FORMAT_420;
     int dispWidth = 0, dispHeight = 0;
-    int i = 0, ppIdx = 0, saveIdx = 0, totalNumofErrMbs = 0, streameos = 0, dispImage = 0;
+    int i = 0, ppIdx = 0, streameos = 0;
     int suc = 1;
-    uint8_t *pYuv  =  NULL;
-    void *fpYuv  =  NULL;
     int needFrameBufCount = 0, regFrameBufCount = 0;
     int rotEnable = 0;
     int int_reason = 0;
@@ -697,7 +702,6 @@ static int coda_decode(void)
     int partPosIdx = 0;
     int partBufIdx = 0;
     int partMaxIdx = 0;
-    int partialHeight = 0;
 
     memset(&pFrame, 0x00, sizeof(FRAME_BUF *)*NUM_FRAME_BUF);
     memset(&frameBuf, 0x00, sizeof(FrameBuffer)*NUM_FRAME_BUF);
@@ -705,10 +709,16 @@ static int coda_decode(void)
     instIdx = jdec_config.instNum;
 
     // source image buffer
-    bsSize = sizeof(pic) / sizeof(pic[0]);
     bufInfo.buf = pic;
-    bufInfo.size = bsSize;
-    bufInfo.point = 0;
+    bufInfo.size = sizeof(pic) / sizeof(pic[0]);
+
+    if (jdec_config.loc_src == JPG_SRC_FLASH)
+    {
+        uint8_t *tmp = (uint8_t *)jpg_malloc_align(bufInfo.size, 8);
+        memcpy(tmp, pic, bufInfo.size);
+        bufInfo.buf = tmp;
+    }
+
 
     ret = JPU_Init();
     if (ret != JPG_RET_SUCCESS &&
@@ -721,15 +731,23 @@ static int coda_decode(void)
     DBG_DIRECT("JPU_Init Done\n");
 
     // Open an instance and get initial information for decoding.
-    vbStream.size = ((bsSize + 1023) >> 10 << 10);
+    vbStream.size = ((bufInfo.size + 1023) >> 10 << 10);
 
     // vbStream.size = STREAM_BUF_SIZE;
-    if (jdi_allocate_dma_memory(&vbStream) < 0)
+    if (jdec_config.loc_src == JPG_SRC_FLASH)
     {
-        DBG_DIRECT("fail to allocate bitstream buffer\n");
-        goto ERR_DEC_INIT;
+        jdi_register_extern_memory(&vbStream, bufInfo.buf, bufInfo.size);
+        DBG_DIRECT("jdi_register_extern_memory Done\n");
     }
-    DBG_DIRECT("jdi_allocate_dma_memory Done\n");
+    else
+    {
+        if (jdi_allocate_dma_memory(&vbStream) < 0)
+        {
+            DBG_DIRECT("fail to allocate bitstream buffer\n");
+            goto ERR_DEC_INIT;
+        }
+        DBG_DIRECT("jdi_allocate_dma_memory Done\n");
+    }
 
     decOP.streamEndian = jdec_config.StreamEndian;
     decOP.frameEndian = jdec_config.FrameEndian;
@@ -753,15 +771,31 @@ static int coda_decode(void)
     }
     DBG_DIRECT("JPU_DecOpen Done\n");
 
-    ret = WriteJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
-                              decOP.bitstreamBuffer + decOP.bitstreamBufferSize, 0, 0, &streameos, decOP.streamEndian);
-    if (ret != JPG_RET_SUCCESS)
+    if (jdec_config.loc_src == JPG_SRC_FLASH)
     {
-        DBG_DIRECT("WriteBsBufHelper failed Error code is 0x%x \n", ret);
-        goto ERR_DEC_OPEN;
+        ret = SyncJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
+                                 decOP.bitstreamBuffer + decOP.bitstreamBufferSize, 0, 0, &streameos, decOP.streamEndian);
+        if (ret != JPG_RET_SUCCESS)
+        {
+            DBG_DIRECT("SyncJpgBsBufHelper failed Error code is 0x%x \n", ret);
+            goto ERR_DEC_OPEN;
+        }
+        DBG_DIRECT("WriteJpgBsBufHelper Done\n");
+        DBG_DIRECT("No need to load src\n");
     }
-    DBG_DIRECT("WriteJpgBsBufHelper Done\n");
+    else
+    {
+        ret = WriteJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
+                                  decOP.bitstreamBuffer + decOP.bitstreamBufferSize, 0, 0, &streameos, decOP.streamEndian);
+        if (ret != JPG_RET_SUCCESS)
+        {
+            DBG_DIRECT("WriteBsBufHelper failed Error code is 0x%x \n", ret);
+            goto ERR_DEC_OPEN;
+        }
+        DBG_DIRECT("WriteJpgBsBufHelper Done\n");
+    }
 
+    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
     ret = JPU_DecGetInitialInfo(handle, &initialInfo);
     if (ret != JPG_RET_SUCCESS)
     {
@@ -842,6 +876,7 @@ static int coda_decode(void)
         framebufStride = ((framebufStride + 15) / 16) * 16;
     }
 
+    DBG_DIRECT(" initialInfo.sourceFormat %d", initialInfo.sourceFormat);
     framebufFormat = initialInfo.sourceFormat;
     if (decOP.packedFormat >= PACKED_FORMAT_422_YUYV && decOP.packedFormat <= PACKED_FORMAT_422_VYUY)
     {
@@ -861,7 +896,8 @@ static int coda_decode(void)
         framebufFormat = FORMAT_444;
     }
 
-    DBG_DIRECT("framebufFormat %d", framebufFormat);
+    DBG_DIRECT("framebufFormat %d initialInfo.sourceFormat %d", framebufFormat,
+               initialInfo.sourceFormat);
     framebufSize = GetFrameBufSize(framebufFormat, initialInfo.picWidth, initialInfo.picHeight);
     DBG_DIRECT("framebufSize %d frame width: %d, stride : %d, height = %d\n", framebufSize,
                framebufWidth, framebufStride, framebufHeight);
@@ -908,6 +944,15 @@ static int coda_decode(void)
     }
     ppIdx = 0;
 
+    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
+
+    {
+        // wrapper
+        CODA_Test_write(MJPEG_WRAPPER_ENABLE_REG, jdec_config.useWrapper ? 0x01 : 0x00);
+        CODA_Test_write(MJPEG_WRAPPER_RGB_FORMAT_REG, jdec_config.rgbType);
+    }
+
+    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
     while (1)
     {
         if (jdec_config.useRot)
@@ -925,7 +970,10 @@ static int coda_decode(void)
         JPU_DecGiveCommand(handle, SET_JPG_SCALE_VER,  &(jdec_config.iVerScaleMode));
 
         // Start decoding a frame.
-        DBG_DIRECT("S\n");
+        {
+            CODA_Test_read(MJPEG_APB_CYCLE_CNT_REG);
+            DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
+        }
         ret = JPU_DecStartOneFrame(handle, &decParam);
         if (ret != JPG_RET_SUCCESS && ret != JPG_RET_EOS)
         {
@@ -963,8 +1011,11 @@ static int coda_decode(void)
             if (int_reason & (1 << INT_JPU_DONE) ||
                 int_reason & (1 << INT_JPU_ERROR)) // Must catch PIC_DONE interrupt before catching EMPTY interrupt
             {
-                DBG_DIRECT("D\n");
                 // Do no clear INT_JPU_DONE and INT_JPU_ERROR interrupt. these will be cleared in JPU_DecGetOutputInfo.
+                Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
+                {
+                    CODA_Test_read(MJPEG_APB_CYCLE_CNT_REG);
+                }
                 break;
             }
 
@@ -1008,7 +1059,16 @@ JPU_END_OF_STREAM:
         }
         if ((outputInfo.decodingSuccess == 0) || (outputInfo.indexFrameDisplay == -1))
         {
-            DBG_DIRECT("JPU_DecGetOutputInfo decode fail\n");
+            DBG_DIRECT("JPU_DecGetOutputInfo decode fail %d %d\n", outputInfo.decodingSuccess,
+                       outputInfo.indexFrameDisplay);
+            if (outputInfo.numOfErrMBs)
+            {
+                int errRstIdx, errPosX, errPosY;
+                errRstIdx = (outputInfo.numOfErrMBs & 0x0F000000) >> 24;
+                errPosX = (outputInfo.numOfErrMBs & 0x00FFF000) >> 12;
+                errPosY = (outputInfo.numOfErrMBs & 0x00000FFF);
+                DBG_DIRECT("Error restart Idx : %d, MCU x:%d, y:%d\n", errRstIdx, errPosX, errPosY);
+            }
             break;
         }
 
@@ -1095,9 +1155,19 @@ JpgRet coda_prepare(DecConfigParam *jdc)
         }
     }
 
+    jdec_config.iHorScaleMode = jdc->iHorScaleMode;
+    jdec_config.iVerScaleMode = jdc->iVerScaleMode;
+
+
     // Number of Images that you want to decode(0: decode continue, -1: loop);
     jdec_config.outNum = 1;
 
+    jdec_config.loc_src =  jdc->loc_src;
+
+    // Wrapper enable: 0-OFF, 1-ON
+    jdec_config.useWrapper = jdc->useWrapper;
+    //  0-JPG_ARGB8888, 1-JPG_RGB888, 2-JPG_RGB565
+    jdec_config.rgbType = jdc->rgbType;
 
 
     if (jdec_config.usePartialMode && jdec_config.roiEnable)
@@ -1118,6 +1188,12 @@ JpgRet coda_prepare(DecConfigParam *jdc)
     if (jdec_config.useRot && jdec_config.roiEnable)
     {
         DBG_DIRECT("Invalid operation mode : Rotator mode and ROI mode can not be worked\n");
+        return JPG_RET_INVALID_PARAM;
+    }
+    if ((jdec_config.iHorScaleMode || jdec_config.iVerScaleMode) && (jdec_config.rotAngle ||
+                                                                     jdec_config.mirDir))
+    {
+        DBG_DIRECT("Invalid operation mode : Scaler mode and Rotator mode can not be worked\n");
         return JPG_RET_INVALID_PARAM;
     }
 
@@ -1148,7 +1224,7 @@ uint32_t CODA_Test(uint8_t cmd)
             {
                 decConfig.roiEnable = 0;
                 // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
-                decConfig.packedFormat = 4;
+                decConfig.packedFormat = 1;
                 // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
                 decConfig.chromaInterleave = 0;
                 decConfig.StreamEndian = JPU_STREAM_ENDIAN;
@@ -1164,9 +1240,20 @@ uint32_t CODA_Test(uint8_t cmd)
                 decConfig.rotAngle = 0;
                 // mirror direction(0-no mirror, 1-vertical, 2-horizontal, 3-both);
                 decConfig.mirDir = 0;
+                // scalerMode: 0-no scaler, 1-1/2, 2-1/4, 3-1/8
+                decConfig.iHorScaleMode = 0;
+                decConfig.iVerScaleMode = 0;
 
                 // Number of Images that you want to decode(0: decode continue, -1: loop);
                 decConfig.outNum = 1;
+
+                // jpg data location: 0-JPG_SRC_RAM, 1-JPG_SRC_FLASH, 2-JPG_SRC_PSRAM
+                decConfig.loc_src = 0;
+
+                // Wrapper enable: 0-OFF, 1-ON
+                decConfig.useWrapper = 0;
+                //  0-JPG_ARGB8888, 1-JPG_RGB888, 2-JPG_RGB565
+                decConfig.rgbType = 1;
             }
 
             ret = coda_prepare(&decConfig);
@@ -1183,6 +1270,9 @@ uint32_t CODA_Test(uint8_t cmd)
             }
             DBG_DIRECT("\nCODA: Decode Done \n");
         }
+        break;
+    case 4: // encoder
+        CODA_encoder_Test(4);
         break;
     }
     return 0;

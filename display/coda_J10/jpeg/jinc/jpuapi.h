@@ -14,6 +14,18 @@
 // common struct and definition
 //------------------------------------------------------------------------------
 
+typedef enum
+{
+    JPG_SRC_RAM   = 0,
+    JPG_SRC_FLASH = 1,
+    JPG_SRC_PSRAM = 2
+} JpgSrc;
+typedef enum
+{
+    JPG_ARGB8888   = 0,
+    JPG_RGB888     = 1,
+    JPG_RGB565     = 2
+} JpgRgb;
 
 typedef enum
 {
@@ -215,6 +227,9 @@ typedef struct
 
 typedef struct
 {
+    int useWrapper;
+    int rgbType;
+    int loc_src;
     int outNum;
     int rotAngle;
     int mirDir;
@@ -253,6 +268,108 @@ typedef struct
     int filePlay;
 
 } DecConfigParam;
+
+
+//------------------------------------------------------------------------------
+// encode struct and definition
+//------------------------------------------------------------------------------
+typedef struct JpgInst JpgEncInst;
+typedef JpgEncInst *JpgEncHandle;
+
+typedef struct
+{
+    PhysicalAddress bitstreamBuffer;
+    uint32_t bitstreamBufferSize;
+    int picWidth;
+    int picHeight;
+    int sourceFormat;
+    int restartInterval;
+    int streamEndian;
+    int frameEndian;
+    CbCrInterLeave chromaInterleave;
+    BYTE huffVal[4][162];
+    BYTE huffBits[4][256];
+    BYTE qMatTab[4][64];
+    PackedOutputFormat packedFormat;
+} JpgEncOpenParam;
+
+typedef struct
+{
+    int minFrameBufferCount;
+    int colorComponents;
+} JpgEncInitialInfo;
+
+typedef struct
+{
+    FrameBuffer *sourceFrame;
+} JpgEncParam;
+
+
+typedef struct
+{
+    PhysicalAddress bitstreamBuffer;
+    uint32_t bitstreamSize;
+} JpgEncOutputInfo;
+
+typedef struct
+{
+    PhysicalAddress paraSet;
+    BYTE *pParaSet;
+    int size;
+    int headerMode;
+    int quantMode;
+    int huffMode;
+    int disableAPPMarker;
+} JpgEncParamSet;
+
+
+#define MAX_FILE_PATH 2
+typedef struct
+{
+    char yuvFileName[MAX_FILE_PATH];
+    char bitstreamFileName[MAX_FILE_PATH];
+    char huffFileName[MAX_FILE_PATH];
+    char qMatFileName[MAX_FILE_PATH];
+    char qpFileName[MAX_FILE_PATH];
+    char cfgFileName[MAX_FILE_PATH];
+    int picWidth;
+    int picHeight;
+    int rotAngle;
+    int mirDir;
+    int useRot;
+    int mjpgChromaFormat;
+    int outNum;
+    int instNum;
+
+    int StreamEndian;
+    int FrameEndian;
+    int chromaInterleave;
+    int bEnStuffByte;
+
+    // altek requirement
+    int encHeaderMode;
+
+
+    char strStmDir[MAX_FILE_PATH];
+    char strCfgDir[MAX_FILE_PATH];
+    int usePartialMode;
+    int partialBufNum;
+    int partialHeight;
+    int packedFormat;
+    int RandRotMode;
+    int encQualityPercentage;
+} EncConfigParam;
+
+
+
+
+
+
+
+
+
+
+
 
 
 #ifdef __cplusplus
@@ -317,6 +434,46 @@ JpgRet JPU_DecGiveCommand(
     JpgDecHandle handle,
     JpgCommand cmd,
     void *parameter);
+
+
+
+
+
+
+// function for encode
+JpgRet JPU_EncSetWrPtr(
+    JpgEncHandle handle,
+    PhysicalAddress addr,
+    int updateRdPtr);
+JpgRet JPU_EncOpen(JpgEncHandle *, JpgEncOpenParam *);
+JpgRet JPU_EncClose(JpgEncHandle);
+JpgRet JPU_EncGetInitialInfo(JpgEncHandle, JpgEncInitialInfo *);
+JpgRet JPU_EncGetBitstreamBuffer(
+    JpgEncHandle handle,
+    PhysicalAddress *prdPrt,
+    PhysicalAddress *pwrPtr,
+    int *size);
+JpgRet JPU_EncUpdateBitstreamBuffer(
+    JpgEncHandle handle,
+    int size);
+JpgRet JPU_EncStartOneFrame(
+    JpgEncHandle handle,
+    JpgEncParam *param);
+JpgRet JPU_EncGetOutputInfo(
+    JpgEncHandle handle,
+    JpgEncOutputInfo *info);
+JpgRet JPU_EncIssueStop(
+    JpgDecHandle handle);
+JpgRet JPU_EncCompleteStop(
+    JpgDecHandle handle);
+JpgRet JPU_EncGiveCommand(
+    JpgEncHandle handle,
+    JpgCommand cmd,
+    void *parameter);
+void JPU_EncSetHostParaAddr(
+    PhysicalAddress baseAddr,
+    PhysicalAddress paraAddr);
+
 
 #ifdef __cplusplus
 }

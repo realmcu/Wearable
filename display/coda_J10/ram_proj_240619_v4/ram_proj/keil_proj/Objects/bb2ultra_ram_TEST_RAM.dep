@@ -1,1090 +1,0 @@
-Dependencies for Project 'bb2ultra_ram', Target 'TEST_RAM': (DO NOT MODIFY !)
-CompilerVersion: 6220000::V6.22::.\ARMCLANGv622
-F (..\Basic\inc\hwtest_config.h)(0x66441E83)()
-F (..\lib\hal_utils.lib)(0x00000000)()
-F (..\src\system_init\src\bb2plus_platform.c)(0x66441E84)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/bb2plus_platform.o -MD)
-I (..\Basic\inc\hwtest_config.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_platform.h)(0x6667B989)
-I (..\Basic\inc\REG_BASE.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\system_init\inc\bblite_address_map.h)(0x66441E84)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-F (..\src\system_init\src\system_bb2plus.c)(0x66441E84)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/system_bb2plus.o -MD)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\system_init\inc\bblite_platform.h)(0x6667B989)
-I (..\Basic\inc\REG_BASE.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_address_map.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\src\peripheral\system_rtl876x.h)(0x66680FAB)
-F (..\src\system_init\vector_table.c)(0x666A69B2)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/vector_table.o -MD)
-I (..\src\peripheral\system_rtl876x.h)(0x66680FAB)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (..\src\peripheral\mem_cfg_int.h)(0x666AC71E)
-F (..\src\system_init\startup_bb2plus.s)(0x66441E84)()
-F (..\os\freertos\croutine.c)(0x66441E83)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/croutine.o -MD)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\croutine.h)(0x66441E83)
-F (..\os\freertos\event_groups.c)(0x66441E83)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/event_groups.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\timers.h)(0x66441E83)
-I (..\os\freertos\include\event_groups.h)(0x66441E83)
-F (..\os\freertos\list.c)(0x66441E83)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/list.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-F (..\os\freertos\queue.c)(0x66441E83)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/queue.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\queue.h)(0x66441E83)
-F (..\os\freertos\tasks.c)(0x6667B989)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/tasks.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\timers.h)(0x66441E83)
-I (..\os\freertos\include\StackMacros.h)(0x66441E83)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-F (..\os\freertos\timers.c)(0x6667B989)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/timers.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\queue.h)(0x66441E83)
-I (..\os\freertos\include\timers.h)(0x66441E83)
-F (..\os\freertos\portable\MemMang\heap_4.c)(0x66441E83)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/heap_4.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-F (..\os\freertos_test.c)(0x667158FF)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/freertos_test.o -MD)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\queue.h)(0x66441E83)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-F (..\os\freertos\portable\GCC\ARM_CM33_NTZ\port.c)(0x6667B989)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/port.o -MD)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\src\peripheral\platform_utils_int.h)(0x66441E84)
-I (..\src\peripheral\indirect_access.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_aon_reg.h)(0x6668136C)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portasm.h)(0x6667B989)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-F (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portasm.c)(0x6667B989)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/portasm.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portasm.h)(0x6667B989)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-F (..\Basic\src\SystemTick.c)(0x66441E83)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/systemtick.o -MD)
-I (..\Basic\inc\hwtest_config.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_platform.h)(0x6667B989)
-I (..\Basic\inc\REG_BASE.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\system_init\inc\bblite_address_map.h)(0x66441E84)
-I (..\Basic\inc\SystemTick.h)(0x66441E83)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-F (..\Basic\src\time_adapter.c)(0x666A6C5E)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/time_adapter.o -MD)
-I (..\Basic\inc\time_adapter.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\Basic\inc\hwtest_config.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_platform.h)(0x6667B989)
-I (..\Basic\inc\REG_BASE.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\system_init\inc\bblite_address_map.h)(0x66441E84)
-I (..\src\system_init\inc\bblite_timer.h)(0x66441E84)
-F (..\src\system_init\src\bb2plus_timer.c)(0x66441E84)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/bb2plus_timer.o -MD)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\Basic\inc\hwtest_config.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_platform.h)(0x6667B989)
-I (..\Basic\inc\REG_BASE.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_address_map.h)(0x66441E84)
-I (..\src\system_init\inc\bblite_timer.h)(0x66441E84)
-F (..\Basic\src\log_adapter.c)(0x667158FF)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/log_adapter.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\Basic\inc\hwtest_config.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_platform.h)(0x6667B989)
-I (..\Basic\inc\REG_BASE.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\system_init\inc\bblite_address_map.h)(0x66441E84)
-I (..\Basic\inc\log_adapter.h)(0x6668198E)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-F (..\src\system_init\src\bb2plus_uart.c)(0x66441E84)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/bb2plus_uart.o -MD)
-I (..\Basic\inc\hwtest_config.h)(0x66441E83)
-I (..\src\system_init\inc\bblite_platform.h)(0x6667B989)
-I (..\Basic\inc\REG_BASE.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\system_init\inc\bblite_address_map.h)(0x66441E84)
-I (..\src\system_init\inc\bblite_uart.h)(0x66441E84)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-F (..\src\peripheral\patch_iodriver.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/patch_iodriver.o -MD)
-I (..\src\peripheral\patch.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-F (..\src\peripheral\rtl876x_gdma.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_gdma.o -MD)
-I (..\src\peripheral\rtl876x_gdma.h)(0x666FAE97)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x_gdma_def.h)(0x666FAE97)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-F (..\src\peripheral\rtl876x_gpio.c)(0x667158FF)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_gpio.o -MD)
-I (..\src\peripheral\rtl876x_gpio.h)(0x667158FF)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_gpio_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-F (..\src\peripheral\rtl876x_nvic.c)(0x6668136C)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_nvic.o -MD)
-I (..\src\peripheral\rtl876x_nvic.h)(0x66441E84)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-F (..\src\peripheral\rtl876x_rcc.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_rcc.o -MD)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\platform_utils.h)(0x66441E84)
-F (..\src\peripheral\rtl876x_tim.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_tim.o -MD)
-I (..\src\peripheral\rtl876x_tim.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_tim_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-I (..\src\peripheral\boot_rom_func_ptr.h)(0x667158FF)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_nvic.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_gdma.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_gdma_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_gpio.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_gpio_def.h)(0x667158FF)
-F (..\src\peripheral\rtl876x_uart.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_uart.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-I (..\src\peripheral\platform_utils.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-F (..\src\peripheral\spic_basic.c)(0x666A69D6)()
-F (..\src\peripheral\rtl876x_pinmux.c)(0x666AC734)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_pinmux.o -MD)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-I (..\src\peripheral\rtl876x_aon_reg.h)(0x6668136C)
-I (..\src\peripheral\indirect_access.h)(0x66441E84)
-F (..\src\peripheral\indirect_access.c)(0x6668136C)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/indirect_access.o -MD)
-I (..\src\peripheral\indirect_access.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\src\peripheral\platform_rtc.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_rtc.h)(0x66441E8D)
-F (..\src\peripheral\platform_rtc.c)(0x66441E84)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/platform_rtc.o -MD)
-I (..\src\peripheral\platform_rtc.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\indirect_access.h)(0x66441E84)
-F (..\src\peripheral\boot_rom_func_ptr.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/boot_rom_func_ptr.o -MD)
-I (..\src\peripheral\boot_rom_func_ptr.h)(0x667158FF)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_nvic.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_gdma.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_gdma_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_gpio.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_gpio_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_tim.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_tim_def.h)(0x666FAE97)
-F (..\src\peripheral\utils.c)(0x666805CC)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/utils.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\utils.h)(0x66680456)
-I (..\src\peripheral\patch.h)(0x66441E84)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (..\src\peripheral\mem_cfg_int.h)(0x666AC71E)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_aon_reg.h)(0x6668136C)
-I (..\src\peripheral\indirect_access.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_tim.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_tim_def.h)(0x666FAE97)
-F (..\src\peripheral\log.c)(0x66441E84)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/log.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (..\src\peripheral\utils.h)(0x66680456)
-I (..\src\peripheral\patch.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-F (..\src\peripheral\rtl876x_uart_int.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_uart_int.o -MD)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-I (..\src\peripheral\platform_utils.h)(0x66441E84)
-F (..\src\peripheral\rtl876x_gdma_int.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_gdma_int.o -MD)
-I (..\src\peripheral\rtl876x_gdma.h)(0x666FAE97)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x_gdma_def.h)(0x666FAE97)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-F (..\src\peripheral\rtl876x_tim_int.c)(0x666FAE97)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_tim_int.o -MD)
-I (..\src\peripheral\rtl876x_tim.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_tim_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\boot_rom_func_ptr.h)(0x667158FF)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-I (..\src\peripheral\rtl876x_uart.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_uart_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_nvic.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_gdma.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_gdma_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_gpio.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_gpio_def.h)(0x667158FF)
-F (..\src\peripheral\rtl876x_i2c.c)(0x666FFE5B)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_i2c.o -MD)
-I (..\src\peripheral\rtl876x_i2c.h)(0x666FFE5B)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_i2c_def.h)(0x666FFE5B)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-F (..\src\peripheral\rtl876x_i2c_int.c)(0x666FFE5B)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_i2c_int.o -MD)
-I (..\src\peripheral\rtl876x_i2c.h)(0x666FFE5B)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_i2c_def.h)(0x666FFE5B)
-I (..\src\peripheral\platform_utils.h)(0x66441E84)
-F (..\src\peripheral\rtl876x_spi.c)(0x667158FF)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_spi.o -MD)
-I (..\src\peripheral\rtl876x_spi.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_spi_master_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_spi_master_jdi_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_spi_slave_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-F (..\src\peripheral\rtl876x_spi_int.c)(0x667158FF)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_spi_int.o -MD)
-I (..\src\peripheral\rtl876x_spi.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_spi_master_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_spi_master_jdi_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_spi_slave_def.h)(0x667158FF)
-I (..\src\peripheral\platform_utils.h)(0x66441E84)
-F (..\src\peripheral\rtl876x_sleep_led.c)(0x667158FF)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_sleep_led.o -MD)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_sleep_led.h)(0x667158FF)
-F (..\src\peripheral\rtl876x_gpio_int.c)(0x66725291)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_gpio_int.o -MD)
-I (..\src\peripheral\rtl876x_gpio.h)(0x667158FF)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_gpio_def.h)(0x667158FF)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-I (..\src\peripheral\platform_utils.h)(0x66441E84)
-F (..\src\peripheral\rtl876x_iso7816.c)(0x66725299)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/rtl876x_iso7816.o -MD)
-I (..\src\peripheral\rtl876x_iso7816.h)(0x66725299)
-I (..\src\peripheral\rtl876x_iso7816_def.h)(0x66725299)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-F (..\Basic\src\main.c)(0x667A993E)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/main.o -MD)
-I (..\Basic\inc\time_adapter.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x_gdma.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x_gdma_def.h)(0x666FAE97)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-I (..\src\peripheral\rtl876x_aon.h)(0x66441E84)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\timers.h)(0x66441E83)
-I (..\os\freertos\include\queue.h)(0x66441E83)
-I (..\Basic\src\app_task.h)(0x66441E83)
-I (..\src\jpeg\test\mjpeg_test.h)(0x66796082)
-I (..\src\jpeg\jpeg_decoder.h)(0x6679692B)
-F (..\Basic\src\app_task.c)(0x66441E83)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/app_task.o -MD)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOS.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stddef.h)(0x65F0855A)
-I (..\os\freertos\include\FreeRTOSConfig.h)(0x6667B989)
-I (..\os\freertos\include\projdefs.h)(0x66441E83)
-I (..\os\freertos\include\portable.h)(0x6667B989)
-I (..\os\freertos\include\deprecated_definitions.h)(0x66441E83)
-I (..\os\freertos\portable\GCC\ARM_CM33_NTZ\portmacro.h)(0x6667B989)
-I (..\os\freertos\include\mpu_wrappers.h)(0x66441E83)
-I (..\os\freertos\include\task.h)(0x66441E83)
-I (..\os\freertos\include\list.h)(0x66441E83)
-I (..\os\freertos\include\timers.h)(0x66441E83)
-I (..\os\freertos\include\queue.h)(0x66441E83)
-I (..\Basic\src\app_task.h)(0x66441E83)
-F (..\src\io_demo\gpio\output\gpio_output_demo.c)(0x66441E83)()
-F (..\src\hal_io_src\common\hal_gpio.c)(0x6667B989)()
-F (..\src\hal_io_src\rtl87x3e\hal_gpio_int.c)(0x66715456)()
-F (..\src\io_demo\sdio\sdcard\sdio_demo.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_public\sd.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_lib\mmc.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_lib\sd_if.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_lib\sd_os.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_lib\sdcard.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_lib\sdh_int.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_lib\sdh_prop.c)(0x6667B989)()
-F (..\src\sd_mgr\sd_lib\sdh_pwr.c)(0x66441E84)()
-F (..\src\sd_mgr\sd_lib\rtl876x_sdio.c)(0x66441E84)()
-F (..\src\jpeg\jpeg_decoder.c)(0x667CD930)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/jpeg_decoder.o -MD)
-I (..\Basic\inc\time_adapter.h)(0x66441E83)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\peripheral\rtl876x.h)(0x6668136C)
-I (..\src\peripheral\cpu_setting.h)(0x6668136C)
-I (..\Basic\inc\cm33_setting.h)(0x6667B989)
-I (..\src\system_init\inc\vector_table.h)(0x6668136C)
-I (..\Basic\inc\cmsis_compiler.h)(0x6667B989)
-I (..\Basic\inc\cmsis_armclang.h)(0x6667B989)
-I (..\Basic\inc\core_cm33.h)(0x666800B2)
-I (..\Basic\inc\cmsis_version.h)(0x6667B989)
-I (..\Basic\inc\mpu_armv8.h)(0x6667B989)
-I (..\src\peripheral\pcc_reg.h)(0x667158FF)
-I (..\src\peripheral\platform_reg.h)(0x6668136C)
-I (..\src\peripheral\address_map.h)(0x6668136C)
-I (..\src\peripheral\io.h)(0x6668136C)
-I (..\src\peripheral\bitops.h)(0x6668136C)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\peripheral\pin_def.h)(0x66725291)
-I (..\src\peripheral\rtl876x_pinmux.h)(0x666AD055)
-I (..\src\peripheral\rtl876x_aon.h)(0x66441E84)
-I (..\src\peripheral\rtl876x_rcc.h)(0x667158FF)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\src\jpeg\jpurun.h)(0x667A3782)
-I (..\src\jpeg\jpuapi\regdefine.h)(0x667A34C2)
-I (..\src\jpeg\jpuapi\jpuconfig.h)(0x667BCECF)
-I (..\src\jpeg\jpuapi\jputypes.h)(0x59392C4E)
-I (..\src\jpeg\jpuapi\jpuapi.h)(0x667A5DE6)
-I (..\src\jpeg\jdi\jdi.h)(0x667B7CE2)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\src\jpeg\jdi\mm.h)(0x59392C4E)
-I (..\src\jpeg\include\mixer.h)(0x59392C4C)
-I (..\src\jpeg\pic_hex.txt)(0x667A71F9)
-I (..\src\jpeg\jpuhelper.h)(0x59392C4C)
-I (..\src\jpeg\jpuapi\..\jpuapi\jpuapi.h)(0x667A5DE6)
-I (..\src\jpeg\jpuapi\jpuapifunc.h)(0x59392C4E)
-F (..\src\jpeg\jpuapi\jpuapi.c)(0x667A9562)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/jpuapi.o -MD)
-I (..\src\jpeg\jpuapi\jpuapifunc.h)(0x59392C4E)
-I (..\src\jpeg\jpuapi\jpuapi.h)(0x667A5DE6)
-I (..\src\jpeg\jpuapi\jpuconfig.h)(0x667BCECF)
-I (..\src\jpeg\jpuapi\jputypes.h)(0x59392C4E)
-I (..\src\jpeg\jdi\jdi.h)(0x667B7CE2)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\regdefine.h)(0x667A34C2)
-I (..\src\jpeg\jdi\mm.h)(0x59392C4E)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\..\include\jpulog.h)(0x667A7F1D)
-F (..\src\jpeg\jpuapi\jpuapifunc.c)(0x667A9562)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/jpuapifunc.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\jpuapifunc.h)(0x59392C4E)
-I (..\src\jpeg\jpuapi\jpuapi.h)(0x667A5DE6)
-I (..\src\jpeg\jpuapi\jpuconfig.h)(0x667BCECF)
-I (..\src\jpeg\jpuapi\jputypes.h)(0x59392C4E)
-I (..\src\jpeg\jdi\jdi.h)(0x667B7CE2)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\regdefine.h)(0x667A34C2)
-I (..\src\jpeg\jdi\mm.h)(0x59392C4E)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\..\include\jpulog.h)(0x667A7F1D)
-F (..\src\jpeg\jdi\jdi.c)(0x667C1FE1)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/jdi.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\jpeg\jdi\jdi.h)(0x667B7CE2)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\jpuconfig.h)(0x667BCECF)
-I (..\src\jpeg\jpuapi\jputypes.h)(0x59392C4E)
-I (..\src\jpeg\jpuapi\regdefine.h)(0x667A34C2)
-I (..\src\jpeg\jdi\mm.h)(0x59392C4E)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\jpeg\jdi\..\include\jpulog.h)(0x667A7F1D)
-F (..\src\jpeg\jdi\mm.c)(0x667BF98F)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/mm.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (..\src\jpeg\jdi\mm.h)(0x59392C4E)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-F (..\src\jpeg\src\jpulog.c)(0x667A7ED7)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/jpulog.o -MD)
-I (..\src\jpeg\src\..\jpuapi\jpuconfig.h)(0x667AAD68)
-I (..\src\jpeg\src\..\jpuapi\jputypes.h)(0x59392C4E)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\src\jpeg\src\..\include\jpulog.h)(0x667A7F1D)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-F (..\src\jpeg\src\jpuhelper.c)(0x667BFC79)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/jpuhelper.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\src\jpeg\src\..\jpuapi\regdefine.h)(0x667A34C2)
-I (..\src\jpeg\src\..\jpuapi\jpuapi.h)(0x667A5DE6)
-I (..\src\jpeg\src\..\jpuapi\jpuconfig.h)(0x667BCECF)
-I (..\src\jpeg\src\..\jpuapi\jputypes.h)(0x59392C4E)
-I (..\src\jpeg\jdi\jdi.h)(0x667B7CE2)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\jpuconfig.h)(0x667BCECF)
-I (..\src\jpeg\jpuapi\regdefine.h)(0x667A34C2)
-I (..\src\jpeg\jdi\mm.h)(0x59392C4E)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\jpeg\src\..\jpuapi\jpuapifunc.h)(0x59392C4E)
-I (..\src\jpeg\src\..\jpuapi\jputable.h)(0x59392C4E)
-I (..\src\jpeg\src\..\include\jpulog.h)(0x667A7F1D)
-I (..\src\jpeg\src\..\jpuhelper.h)(0x59392C4C)
-I (..\src\jpeg\src\..\jpurun.h)(0x667A3782)
-I (..\src\jpeg\jpuapi\..\jpuapi\jpuapi.h)(0x667A5DE6)
-F (..\src\jpeg\src\mixer.c)(0x667C1291)(-xc -std=gnu99 --target=arm-arm-none-eabi -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-mlittle-endian -gdwarf-4 -Oz -fno-function-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ./ -I ../src/system_init/inc -I ../Basic/inc -I ../os/freertos/include -I ../os/freertos/portable/GCC/ARM_CM33_NTZ -I ../src/peripheral -I ../autotest -I ../manual_test -I ../src/BB2_IO_driver/inc -I ../src/hal_io -I ../src/sd_mgr/config -I ../src/sd_mgr/sd_lib -I ../src/jpeg -I ../src/jpeg/jpuapi -I ../src/jpeg/jdi -I ../src/jpeg/test -gdwarf-3 -mfpu=fpv5-sp-d16-ID:/App/MDK/Pack/ARM/CMSIS/5.9.0/Device/ARM/ARMCM33/Include-D__UVISION_VERSION="538" -DARMCM33_DSP_FP -DIC_TYPE_BB2-o ./objects/mixer.o -MD)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdio.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdlib.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\string.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\jpuapi.h)(0x667A5DE6)
-I (..\src\jpeg\jpuapi\jpuconfig.h)(0x667BCECF)
-I (..\src\jpeg\jpuapi\jputypes.h)(0x59392C4E)
-I (..\src\jpeg\jdi\jdi.h)(0x667B7CE2)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdarg.h)(0x65F0855A)
-I (..\src\jpeg\jpuapi\regdefine.h)(0x667A34C2)
-I (..\src\jpeg\jdi\mm.h)(0x59392C4E)
-I (..\src\peripheral\trace.h)(0x66441E84)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdint.h)(0x65F0855A)
-I (D:\App\MDK\ARM\ARMCLANGv622\include\stdbool.h)(0x65F0855A)
-I (..\src\jpeg\jpulog.h)(0x667A7F1D)
-I (..\src\jpeg\jpuhelper.h)(0x59392C4C)
-I (..\src\jpeg\jpurun.h)(0x667A3782)
-I (..\src\jpeg\jpuapi\..\jpuapi\jpuapi.h)(0x667A5DE6)
-I (..\src\jpeg\mixer.h)(0x59392C4C)

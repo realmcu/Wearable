@@ -91,6 +91,7 @@ int jdi_init();
 int jdi_release();  //this function may be called only at system off.
 jpu_instance_pool_t *jdi_get_instance_pool();
 int jdi_allocate_dma_memory(jpu_buffer_t *vb);
+int jdi_register_extern_memory(jpu_buffer_t *vb, void *addr, size_t sz);
 void jdi_free_dma_memory(jpu_buffer_t *vb);
 
 int jdi_wait_interrupt(int timeout);
