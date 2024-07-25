@@ -87,7 +87,7 @@ void DRV_GPIO_A3_Handler(void) {DRV_GPIO_HANDLER(P0_3);}
 void DRV_GPIO_A4_Handler(void) {DRV_GPIO_HANDLER(P0_4);}
 void DRV_GPIO_A5_Handler(void) {DRV_GPIO_HANDLER(P0_5);}
 void DRV_GPIO_A6_Handler(void) {DRV_GPIO_HANDLER(P0_6);}
-void DRV_GPIO_A7_Handler(void) {DRV_GPIO_HANDLER(P1_7);}
+void DRV_GPIO_A7_Handler(void) {DRV_GPIO_HANDLER(P0_7);}
 void DRV_GPIO_A8_Handler(void) {DRV_GPIO_HANDLER(P1_0);}
 void DRV_GPIO_A9_Handler(void) {DRV_GPIO_HANDLER(P1_1);}
 void DRV_GPIO_A10_Handler(void) {DRV_GPIO_HANDLER(P1_2);}
