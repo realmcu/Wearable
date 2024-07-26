@@ -10,9 +10,9 @@ extern "C" {
 
 
 #define TE_VALID                            0
-#define SH8601A_LCD_WIDTH                   390
-#define SH8601A_LCD_HEIGHT                  450
-#define SH8601A_DRV_PIXEL_BITS              16
+#define C05300_LCD_WIDTH                   390
+#define C05300_LCD_HEIGHT                  450
+#define C05300_DRV_PIXEL_BITS              16
 #define INPUT_PIXEL_BYTES                   2
 #if INPUT_PIXEL_BYTES == 3
 #error "LCDC DMA doesn't allow 3 bytes input"

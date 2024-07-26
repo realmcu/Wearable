@@ -1,0 +1,18 @@
+
+
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+""")
+
+
+src += ['lcd_c05300_390_450_qspi.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('lcd_low_driver', src, depend = ['CONFIG_REALTEK_8773E_DEVICE'], CPPPATH = CPPPATH)
+
+Return('group')

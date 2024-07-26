@@ -11,7 +11,6 @@
 #include "rtl876x_nvic.h"
 #include "rtl876x_gpio.h"
 #include "vector_table.h"
-#include "module_lcd_te.h"
 
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
@@ -233,20 +232,22 @@ void rtk_lcd_hal_init(void)
     DBIC_IMR_t dbic_reg_0x2c = {.d32 = DBIC->IMR};
     dbic_reg_0x2c.b.dreim = 1;
     DBIC->IMR = dbic_reg_0x2c.d32;
+
+    rtk_lcd_hal_clear_screen(0x00FF0000);
 }
 
 uint32_t rtk_lcd_hal_get_width(void)
 {
-    return SH8601A_LCD_WIDTH;
+    return C05300_LCD_WIDTH;
 }
 uint32_t rtk_lcd_hal_get_height(void)
 {
-    return SH8601A_LCD_HEIGHT;
+    return C05300_LCD_HEIGHT;
 }
 
 uint32_t rtk_lcd_hal_get_pixel_bits(void)
 {
-    return SH8601A_DRV_PIXEL_BITS;
+    return C05300_DRV_PIXEL_BITS;
 }
 
 
@@ -358,7 +359,7 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
 
 void rtk_lcd_hal_clear_screen(uint32_t ARGB_color)
 {
-    rtk_lcd_hal_set_window(0, 0, SH8601A_LCD_WIDTH, SH8601A_LCD_HEIGHT);
+    rtk_lcd_hal_set_window(0, 0, C05300_LCD_WIDTH, C05300_LCD_HEIGHT);
     uint8_t *RGB_transfer = (uint8_t *)&ARGB_color;
     uint32_t clear_buf[64] = {0};
 #if INPUT_PIXEL_BYTES == 4
@@ -405,7 +406,7 @@ void rtk_lcd_hal_clear_screen(uint32_t ARGB_color)
     LCDC_SwitchMode(LCDC_AUTO_MODE);
     LCDC_SwitchDirect(LCDC_TX_MODE);
 
-    LCDC_SetTxPixelLen(SH8601A_LCD_WIDTH * SH8601A_LCD_HEIGHT);
+    LCDC_SetTxPixelLen(C05300_LCD_WIDTH * C05300_LCD_HEIGHT);
 
     LCDC_Cmd(ENABLE);
 
