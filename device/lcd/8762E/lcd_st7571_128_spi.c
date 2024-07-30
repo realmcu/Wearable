@@ -40,77 +40,6 @@ void st7571_write_data(uint8_t data)
     while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY)); //Howie todo, remove later
 }
 
-void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t xEnd,
-                            uint16_t yEnd)  //todo luke
-{
-    /*this is a bug here if lcd size bigger than uint8_t*/
-
-    st7571_write_cmd(0x2A); //Set Column Address
-    while (!(LCD_SPI_BUS->SR & BIT(1)));
-    LCD_SPI_BUS->DR[0] = xStart >> 8;
-    while (!(LCD_SPI_BUS->SR & BIT(1)));
-    LCD_SPI_BUS->DR[0] = xStart;
-    while (!(LCD_SPI_BUS->SR & BIT(1)));
-    LCD_SPI_BUS->DR[0] = xEnd >> 8;
-    while (!(LCD_SPI_BUS->SR & BIT(1)));
-    LCD_SPI_BUS->DR[0] = xEnd;
-
-    st7571_write_cmd(0x2B); //Set Page Address
-
-    LCD_SPI_BUS->DR[0] = yStart >> 8;
-    while (!(LCD_SPI_BUS->SR & BIT(1)));
-    LCD_SPI_BUS->DR[0] = yStart;
-    while (!(LCD_SPI_BUS->SR & BIT(1)));
-    LCD_SPI_BUS->DR[0] = yEnd >> 8;
-    while (!(LCD_SPI_BUS->SR & BIT(1)));
-    LCD_SPI_BUS->DR[0] = yEnd;
-
-    st7571_write_cmd(0x2C);
-}
-
-void lcd_st7571_init(void)
-{
-    st7571_write_cmd(0xAE);// Display OFF
-    st7571_write_cmd(0x38);// MODE SET
-    st7571_write_cmd(0xB8);// FR = 1011 => 85Hz   BE[1:0]=1,0 => booster efficiency Level-3
-
-    st7571_write_cmd(0xA1);// ADC select, ADC=1 => reverse direction
-    st7571_write_cmd(0xC8);// SHL select, SHL=1 => reverse direction
-    st7571_write_cmd(0x44);// Set initial COM0 register
-    st7571_write_cmd(0x00);
-    st7571_write_cmd(0x40);// Set initial display line register
-    st7571_write_cmd(0x00);
-
-    st7571_write_cmd(0xAB);// OSC ON
-    st7571_write_cmd(0x67);// DC-DC step up, 8 times boosting circuit
-    st7571_write_cmd(0x25);// Select regulator register(1+(Ra+Rb))
-    st7571_write_cmd(0x81);// Set Reference Voltage
-    st7571_write_cmd(0x18);// EV=35 => Vop =10.556V
-    st7571_write_cmd(0x54);// Set LCD Bias=1/9 V0
-    st7571_write_cmd(0xF3);// Release Bias Power Save Mode
-    st7571_write_cmd(0x04);
-
-    st7571_write_cmd(0x11);    // 2bit mode
-    // st7571_write_cmd(0x10);    // 1bit mode
-
-    st7571_write_cmd(0xA6);    // 00 white
-    // st7571_write_cmd(0xA7);    // 00 black
-
-    st7571_write_cmd(0xC0);    //Set COM Scan Direction
-    st7571_write_cmd(0xA0);    //Set SEG Scan Direction
-
-    st7571_write_cmd(0x93);//Set FRC and PWM mode (4FRC & 15PWM)
-
-    st7571_write_cmd(0x2C);//Power Control, VC: ON VR: OFF VF: OFF
-    platform_delay_ms(100);
-    st7571_write_cmd(0x2E);//Power Control, VC: ON VR: ON VF: OFF
-    platform_delay_ms(100);
-    st7571_write_cmd(0x2F);//Power Control, VC: ON VR: ON VF: ON
-    platform_delay_ms(10);
-    // st7571_write_cmd(0xAF);//Display ON
-    // platform_delay_ms(10);
-}
-
 void lcd_pad_init(void)
 {
     Pinmux_Config(LCD_SPI_CLK, LCD_SPI_FUNC_CLK);
@@ -268,62 +197,139 @@ void rtk_lcd_hal_transfer_done(void)
 
 static void lcd_address(uint8_t page, uint8_t column)
 {
+    DBG_DIRECT("lcd_address page : %d, column %d", page, column);
     st7571_write_cmd(0xB0 + page);
     st7571_write_cmd(((column >> 4) & 0x0f) + 0x10);
     st7571_write_cmd(column & 0x0f);
 }
-static void clean_Screen(uint8_t color)
-{
-    uint8_t i, j;
-    uint8_t color_bit2 = color & 0b11;
-    uint8_t color_bit8 = color_bit2;
-    color_bit8 += color_bit2 << 2;
-    color_bit8 += color_bit2 << 4;
-    color_bit8 += color_bit2 << 6;
 
-    for (j = 0; j < 16; j++)
+// Function to clear a specific page and fill it with the given color
+static void fill_page(uint8_t page, uint8_t color)
+{
+    if (page >= ST7571_PAGE_COUNT)
     {
-        lcd_address(j, 0);
-        for (i = 0; i < 128; i++)
-        {
-            st7571_write_data(color_bit8);
-            st7571_write_data(color_bit8);
-        }
+        return; // Return if the page address is invalid
+    }
+
+    color &= 0x03; // Ensure the color is within the 0-3 range
+
+    uint8_t high_byte = 0, low_byte = 0;
+
+    // Determine high_byte and low_byte based on the color value
+    switch (color)
+    {
+    case 0: // White
+        high_byte = 0b00000000;
+        low_byte = 0b00000000;
+        break;
+    case 1: // Light Gray
+        high_byte = 0b00000000;
+        low_byte = 0b11111111;
+        break;
+    case 2: // Dark Gray
+        high_byte = 0b11111111;
+        low_byte = 0b00000000;
+        break;
+    case 3: // Black
+        high_byte = 0b11111111;
+        low_byte = 0b11111111;
+        break;
+    default:
+        return; // This should not happen due to bitwise operation
+    }
+
+    // Set the address of the page to be cleared
+    lcd_address(page, 0);
+
+    // Loop through the columns to write the color data
+    for (uint8_t i = 0; i < ST7571_LCD_WIDTH; i++)
+    {
+        st7571_write_data(high_byte); // Write high byte
+        st7571_write_data(low_byte); // Write low byte
     }
 }
-static void clean_page(uint8_t page, uint8_t color)
+
+// Function to clear the entire screen and fill it with the given color
+static void fill_screen(uint8_t color)
 {
-    uint8_t color_bit2 = color & 0b11;
-    uint8_t color_bit8 = color_bit2;
-    color_bit8 += color_bit2 << 2;
-    color_bit8 += color_bit2 << 4;
-    color_bit8 += color_bit2 << 6;
-    lcd_address(page, 0);
-    // DBG_DIRECT("clean_page page %d , color %d",page,color_bit8);
-    for (int i = 0; i < 128; i++)
+    for (uint8_t j = 0; j < ST7571_PAGE_COUNT; j++)
     {
-        st7571_write_data(color_bit8);
-        st7571_write_data(color_bit8);
+        fill_page(j, color);
+    }
+}
+
+// Function to clear a specific rectangle and fill it with the given color
+static void clear_rect(uint8_t start_page, uint8_t start_column, uint8_t width, uint8_t height,
+                       uint8_t color)
+{
+    // Ensure start_page and start_column are within valid ranges
+    if (start_page >= ST7571_PAGE_COUNT || start_column >= ST7571_LCD_WIDTH)
+    {
+        return;
+    }
+
+    // Ensure the end positions are within valid ranges
+    uint8_t end_page = start_page + height;
+    uint8_t end_column = start_column + width;
+
+    if (end_page > ST7571_PAGE_COUNT) { end_page = ST7571_PAGE_COUNT; }
+    if (end_column > ST7571_LCD_WIDTH) { end_column = ST7571_LCD_WIDTH; }
+
+    color &= 0x03; // Ensure the color is within the 0-3 range
+
+    uint8_t high_byte = 0, low_byte = 0;
+
+    // Determine high_byte and low_byte based on the color value
+    switch (color)
+    {
+    case 0: // White
+        high_byte = 0b00000000;
+        low_byte = 0b00000000;
+        break;
+    case 1: // Light Gray
+        high_byte = 0b00000000;
+        low_byte = 0b11111111;
+        break;
+    case 2: // Dark Gray
+        high_byte = 0b11111111;
+        low_byte = 0b00000000;
+        break;
+    case 3: // Black
+        high_byte = 0b11111111;
+        low_byte = 0b11111111;
+        break;
+    default:
+        return; // This should not happen due to bitwise operation
+    }
+
+    // Loop through each page and column within the specified rectangle and write the color data
+    for (uint8_t page = start_page; page < end_page; page++)
+    {
+        lcd_address(page, start_column); // Set the start address for the current page
+        for (uint8_t col = start_column; col < end_column; col++)
+        {
+            st7571_write_data(high_byte); // Write high byte
+            st7571_write_data(low_byte); // Write low byte
+        }
     }
 }
 
 void rtl_gui_lcd_clear(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd,
-                       uint32_t color) //todo luke
+                       uint32_t color)
 {
 #if 1
-    rtk_lcd_hal_set_window(xStart, yStart, xEnd, yEnd);
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
-    for (uint16_t i = xStart; i <= xEnd; i++)
-    {
-        for (uint16_t j = yStart; j <= yEnd; j++)
-        {
-            while (!(LCD_SPI_BUS->SR & BIT(1)));
-            LCD_SPI_BUS->DR[0] = color >> 8;
-            while (!(LCD_SPI_BUS->SR & BIT(1)));
-            LCD_SPI_BUS->DR[0] = color;
-        }
-    }
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
+    // Convert pixel coordinates to page and column coordinates
+    uint8_t start_page = yStart / ST7571_PAGE_HEIGHT;
+    uint8_t end_page = (yEnd + ST7571_PAGE_HEIGHT - 1) / ST7571_PAGE_HEIGHT;
+    uint8_t start_column = xStart;
+    uint8_t end_column = xEnd;
+
+    // Calculate width and height in terms of pages and columns
+    uint8_t width = end_column - start_column;
+    uint8_t height = end_page - start_page;
+
+    // Call clear_rect with converted coordinates and appropriate color
+    clear_rect(start_page, start_column, width, height, (uint8_t)color);
 #else
     static uint32_t color_buf = 0;
     color_buf = (color >> 8) | (color << 8);
@@ -374,8 +380,30 @@ void rtl_gui_lcd_clear(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t
 #endif
 }
 
+void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd)
+{
+    lcd_address(yStart / 8, xStart);
+}
+
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len) //todo luke
 {
+    DBG_DIRECT("rtk_lcd_hal_start_transfer buf : %p, len %d", buf, len);
+    lcd_address(0, 0);
+#if 1
+    for (int j = 0; j < len; j++)
+    {
+        st7571_write_data(*buf++);
+    }
+#else
+    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
+    for (int j = 0; j < len; j++)
+    {
+        while (!(LCD_SPI_BUS->SR & BIT(1)));
+        LCD_SPI_BUS->DR[0] = *buf++;
+    }
+    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
+#endif
+    return;
 #if 1
     GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len);
     GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(LCD_SPI_BUS->DR));
@@ -430,7 +458,13 @@ uint32_t rtk_lcd_hal_get_pixel_bits(void)
 
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
-
+    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
+    for (int j = 0; j < len; j++)
+    {
+        while (!(LCD_SPI_BUS->SR & BIT(1)));
+        LCD_SPI_BUS->DR[0] = *buf++;
+    }
+    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
 }
 
 uint32_t rtk_lcd_hal_power_on(void)
@@ -460,6 +494,56 @@ void lcd_set_reset(bool reset)
     }
 }
 
+static void lcd_st7571_init(void)
+{
+    st7571_write_cmd(0xAE);// Display OFF
+    st7571_write_cmd(0x38);// MODE SET
+    st7571_write_cmd(0xB8);// FR = 1011 => 85Hz   BE[1:0]=1,0 => booster efficiency Level-3
+
+    st7571_write_cmd(0xA1);// ADC select, ADC=1 => reverse direction
+    st7571_write_cmd(0xC8);// SHL select, SHL=1 => reverse direction
+    st7571_write_cmd(0x44);// Set initial COM0 register
+    st7571_write_cmd(0x00);
+    st7571_write_cmd(0x40);// Set initial display line register
+    st7571_write_cmd(0x00);
+
+    st7571_write_cmd(0xAB);// OSC ON
+    st7571_write_cmd(0x67);// DC-DC step up, 8 times boosting circuit
+    st7571_write_cmd(0x25);// Select regulator register(1+(Ra+Rb))
+    st7571_write_cmd(0x81);// Set Reference Voltage
+    st7571_write_cmd(0x15);// EV=35 => Vop =10.556V
+    st7571_write_cmd(0x54);// Set LCD Bias=1/9 V0
+    st7571_write_cmd(0xF3);// Release Bias Power Save Mode
+    st7571_write_cmd(0x04);
+
+    st7571_write_cmd(0x7B);    // command set 3
+#if ST7571_PIXEL_BITS == 2
+    st7571_write_cmd(0x10);    // 2bit mode
+#endif
+#if ST7571_PIXEL_BITS == 1
+    st7571_write_cmd(0x11);    // 1bit mode
+#endif
+    st7571_write_cmd(0x00);    // exit command set 3
+
+    st7571_write_cmd(0xA6);    // 00 white
+    // st7571_write_cmd(0xA7);    // 00 black
+
+    st7571_write_cmd(0xC8);    //Set COM Scan Direction   C0 / C8
+    st7571_write_cmd(0xA0);    //Set SEG Scan Direction   A0 / A1
+
+    st7571_write_cmd(0x93);//Set FRC and PWM mode (4FRC & 15PWM)
+
+    st7571_write_cmd(0x2C);//Power Control, VC: ON VR: OFF VF: OFF
+    platform_delay_ms(100);
+    st7571_write_cmd(0x2E);//Power Control, VC: ON VR: ON VF: OFF
+    platform_delay_ms(100);
+    st7571_write_cmd(0x2F);//Power Control, VC: ON VR: ON VF: ON
+    platform_delay_ms(100);
+    // st7571_write_cmd(0xAF);//Display ON
+    // platform_delay_ms(10);
+}
+
+uint8_t frame_buffer[128 * 128 / 4];
 void rtk_lcd_hal_init(void)
 {
     lcd_device_init();
@@ -469,13 +553,13 @@ void rtk_lcd_hal_init(void)
     platform_delay_ms(50);
     lcd_st7571_init();
 
-    clean_Screen(0x00);
-    st7571_write_cmd(0xAF);//Display ON
 
-    for (int i = 0; i < 16; i++)
-    {
-        clean_page(i, i / 4);
-    }
+    fill_screen(0x0);
+    st7571_write_cmd(0xAF); //Display ON
+
+    // for (int i = 0; i < 16; i++)
+    //     fill_page(i, i / 4);
+
     DBG_DIRECT("rtk_lcd_hal_init DONE");
 }
 

@@ -9,14 +9,14 @@ extern "C" {
 
 #define ST7571_LCD_WIDTH                  128
 #define ST7571_LCD_HEIGHT                 128
+#define ST7571_PAGE_COUNT                 16
 #define ST7571_SEC_HEIGHT                 10
+#define ST7571_PAGE_HEIGHT                8
 
 #define TOTAL_SECTION_COUNT              (ST7571_LCD_HEIGHT / ST7571_SEC_HEIGHT + ((ST7571_LCD_HEIGHT % ST7571_SEC_HEIGHT)?1:0))
 
-#define ST7571_DRV_PIXEL_BITS             16
-
-#define INPUT_PIXEL_BYTES                  2
-#define OUTPUT_PIXEL_BYTES                 2
+#define ST7571_DRV_PIXEL_BITS             ST7571_PIXEL_BITS
+#define ST7571_PIXEL_BITS                 2
 
 
 void rtk_lcd_hal_init(void);
