@@ -5,7 +5,7 @@
 #include "platform_utils.h"
 #include "rtl876x_i2c.h"
 
-#define DBP_TOUCH(...)   DBG_DIRECT(__VA_ARGS__)
+#define DBP_TOUCH(...)   //DBG_DIRECT(__VA_ARGS__)
 
 #define TP_ID_ADDR                 (0xA7)
 #define TP_DATA_ADDR               (0x00)
@@ -116,10 +116,10 @@ void touch_driver_init(void)
     Pad_Config(TOUCH_RST, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
     platform_delay_ms(50);
 
-    GPIOx_MaskINTConfig(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT), ENABLE);
-    GPIOx_INTConfig(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT), ENABLE);
-    GPIOx_ClearINTPendingBit(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT));
-    GPIOx_MaskINTConfig(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT), DISABLE);
+//    GPIOx_MaskINTConfig(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT), ENABLE);
+//    GPIOx_INTConfig(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT), ENABLE);
+//    GPIOx_ClearINTPendingBit(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT));
+//    GPIOx_MaskINTConfig(TOUCH_INT_GROUP, GPIO_GetPin(TOUCH_INT), DISABLE);
 
     uint8_t chip_id;
     touch_get_chip_id(&chip_id);
