@@ -1,0 +1,16 @@
+Import('TOOL_ROOT')
+
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Split("""
+""")
+
+src += ['touch_lw.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('touch_driver', src, depend = ['CONFIG_REALTEK_8773E_DEVICE'], CPPPATH = CPPPATH)
+
+Return('group')
