@@ -23,7 +23,7 @@
 #define JPU_FRAME_ENDIAN            0
 #define JPU_STREAM_ENDIAN           0
 // #endif
-#define JPU_CHROMA_INTERLEAVE           1       // 0 (chroma separate mode), 1 (cbcr interleave mode), 2 (crcb interleave mode)  
+#define JPU_CHROMA_INTERLEAVE           0       // 0 (chroma separate mode), 1 (cbcr interleave mode), 2 (crcb interleave mode)  
 
 
 #define JPU_INTERRUPT_TIMEOUT_MS    5000
@@ -36,7 +36,7 @@
 #define MAX_MJPG_PIC_HEIGHT  32768
 
 
-#define MAX_FRAME               (4*MAX_NUM_INSTANCE) // For AVC decoder, 16(reference) + 2(current) + 1(rotator)
+#define MAX_FRAME               (1*MAX_NUM_INSTANCE) // For AVC decoder, 16(reference) + 2(current) + 1(rotator)
 
 // #define STREAM_FILL_SIZE        0x10000
 #define STREAM_FILL_SIZE        (40 * 1024)

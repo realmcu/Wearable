@@ -144,7 +144,9 @@ int LoadYuvImageHelperFormat(uint8_t *pic_yuv,
                              int interleave,
                              int format,
                              int endian,
-                             int packed);
+                             int packed,
+                             int wrappered,
+                             int rgbType);
 
 
 int LoadYuvPartialImageHelperFormat(FILE *yuvFp,
@@ -161,7 +163,9 @@ int LoadYuvPartialImageHelperFormat(FILE *yuvFp,
                                     int endian,
                                     int partPosIdx,
                                     int frameIdx,
-                                    int packed);
+                                    int packed,
+                                    int wrappered,
+                                    int rgbType);
 
 
 int SaveYuvImageHelperFormat(void *yuvFp,

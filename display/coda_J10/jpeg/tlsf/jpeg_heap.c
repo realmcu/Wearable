@@ -21,6 +21,7 @@ uint8_t *jpeg_heap_get_mem()
 
 void jpg_tlsf_init(void)
 {
+    DBG_DIRECT("jpg_tlsf_init mem_array 0x%x\n", mem_array);
     jpg_tlsf = tlsf_create_with_pool(mem_array, TLSF_MEM_SIZE);
 }
 

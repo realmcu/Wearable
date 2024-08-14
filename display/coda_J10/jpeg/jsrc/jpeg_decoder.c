@@ -21,13 +21,13 @@
 // #include "pic_hex_184_96.txt"    // 444
 // #include "pic_hex_400_184_96.txt"   // 400
 // #include "pic_hex_422_192_96.txt"  // 422
-// #include "pic_hex_444_184_96.txt"  // 444
+#include "pic_hex_444_184_96.txt"  // 444
 
 // #include "pic_hex_420_192_96.txt"  // 420
 
 
 // #include "pic_hex_444_184x96_95.txt"  // 444 95
-#include "pic_hex_440_192x96_95.txt"   // 440 95
+// #include "pic_hex_440_192x96_95.txt"   // 440 95
 
 
 //PCC config functin
@@ -693,7 +693,7 @@ static int coda_decode(void)
     uint32_t framebufSize = 0, framebufWidth = 0, framebufHeight = 0, framebufStride = 0,
              framebufFormat = FORMAT_420;
     int dispWidth = 0, dispHeight = 0;
-    int i = 0, ppIdx = 0, streameos = 0;
+    int i = 0, frameIdx = 0, ppIdx = 0, saveIdx = 0, streameos = 0;
     int suc = 1;
     int needFrameBufCount = 0, regFrameBufCount = 0;
     int rotEnable = 0;
@@ -702,6 +702,8 @@ static int coda_decode(void)
     int partPosIdx = 0;
     int partBufIdx = 0;
     int partMaxIdx = 0;
+    int partialHeight = 0;
+    uint8_t *pYuv  =  NULL;
 
     memset(&pFrame, 0x00, sizeof(FRAME_BUF *)*NUM_FRAME_BUF);
     memset(&frameBuf, 0x00, sizeof(FrameBuffer)*NUM_FRAME_BUF);
@@ -804,6 +806,26 @@ static int coda_decode(void)
     }
     DBG_DIRECT("JPU_DecGetInitialInfo Done\n");
 
+    if (jdec_config.usePartialMode)
+    {
+        // disable Rotator, Scaler
+        rotEnable = 0;
+        jdec_config.iHorScaleMode = 0;
+        jdec_config.iVerScaleMode = 0;
+        partialHeight = (initialInfo.sourceFormat == FORMAT_420 ||
+                         initialInfo.sourceFormat == FORMAT_224) ? 16 : 8;
+
+        partMaxIdx  = ((initialInfo.picHeight + 15) & ~15) / partialHeight;
+        if (partMaxIdx < jdec_config.partialBufNum)
+        {
+            jdec_config.partialBufNum = partMaxIdx;
+        }
+        DBG_DIRECT("Num of Buffer for Partial : %d\n ", jdec_config.partialBufNum);
+        DBG_DIRECT("Num of Line for Partial   : %d\n ", partialHeight);
+    }
+
+
+
     // roi
     if (jdec_config.roiEnable)
     {
@@ -880,8 +902,30 @@ static int coda_decode(void)
     framebufFormat = initialInfo.sourceFormat;
     if (decOP.packedFormat >= PACKED_FORMAT_422_YUYV && decOP.packedFormat <= PACKED_FORMAT_422_VYUY)
     {
-        framebufWidth = framebufWidth * 2;
-        framebufStride = framebufStride * 2;
+        if (jdec_config.useWrapper)
+        {
+            if (jdec_config.rgbType == JPG_RGB888)
+            {
+                framebufWidth = framebufWidth * 3;
+                framebufStride = framebufStride * 3;
+            }
+            else if (jdec_config.rgbType == JPG_ARGB8888)
+            {
+                framebufWidth = framebufWidth * 4;
+                framebufStride = framebufStride * 4;
+            }
+            else if (jdec_config.rgbType == JPG_RGB565)
+            {
+                framebufWidth = framebufWidth * 2;
+                framebufStride = framebufStride * 2;
+            }
+        }
+        else
+        {
+            framebufWidth = framebufWidth * 2;
+            framebufStride = framebufStride * 2;
+        }
+
         framebufFormat = FORMAT_422;
         if (jdec_config.rotAngle == 90 || jdec_config.rotAngle == 270)
         {
@@ -891,8 +935,29 @@ static int coda_decode(void)
     }
     else if (decOP.packedFormat == PACKED_FORMAT_444)
     {
-        framebufWidth = framebufWidth * 3;
-        framebufStride = framebufStride * 3;
+        if (jdec_config.useWrapper)
+        {
+            if (jdec_config.rgbType == JPG_RGB888)
+            {
+                framebufWidth = framebufWidth * 3;
+                framebufStride = framebufStride * 3;
+            }
+            else if (jdec_config.rgbType == JPG_ARGB8888)
+            {
+                framebufWidth = framebufWidth * 4;
+                framebufStride = framebufStride * 4;
+            }
+            else if (jdec_config.rgbType == JPG_RGB565)
+            {
+                framebufWidth = framebufWidth * 2;
+                framebufStride = framebufStride * 2;
+            }
+        }
+        else
+        {
+            framebufWidth = framebufWidth * 3;
+            framebufStride = framebufStride * 3;
+        }
         framebufFormat = FORMAT_444;
     }
 
@@ -905,6 +970,10 @@ static int coda_decode(void)
 
     //Allocate frame buffer
     regFrameBufCount = initialInfo.minFrameBufferCount + EXTRA_FRAME_BUFFER_NUM;
+    if (jdec_config.usePartialMode)
+    {
+        regFrameBufCount *= jdec_config.partialBufNum;
+    }
     needFrameBufCount = regFrameBufCount;
 
     if (AllocateFrameBuffer(instIdx, framebufFormat, framebufStride, framebufHeight, needFrameBufCount,
@@ -928,6 +997,7 @@ static int coda_decode(void)
     }
     JpgLeaveLock();
 
+    // pYuv = jpg_malloc(framebufSize);
     ret = JPU_DecGiveCommand(handle, SET_JPG_USE_PARTIAL_MODE,  &(jdec_config.usePartialMode));
     if (ret != JPG_RET_SUCCESS)
     {
@@ -935,6 +1005,18 @@ static int coda_decode(void)
         goto ERR_DEC_OPEN;
     }
 
+    ret = JPU_DecGiveCommand(handle, SET_JPG_PARTIAL_FRAME_NUM, &(jdec_config.partialBufNum));
+    if (ret != JPG_RET_SUCCESS)
+    {
+        DBG_DIRECT("JPU_DecGiveCommand[SET_JPG_PARTIAL_FRAME_NUM] failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_OPEN;
+    }
+    ret = JPU_DecGiveCommand(handle, SET_JPG_PARTIAL_LINE_NUM,  &(partialHeight));
+    if (ret != JPG_RET_SUCCESS)
+    {
+        DBG_DIRECT("JPU_DecGiveCommand[SET_JPG_PARTIAL_LINE_NUM] failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_OPEN;
+    }
     // Register frame buffers requested by the decoder.
     ret = JPU_DecRegisterFrameBuffer(handle, frameBuf, regFrameBufCount, framebufStride);
     if (ret != JPG_RET_SUCCESS)
@@ -944,15 +1026,15 @@ static int coda_decode(void)
     }
     ppIdx = 0;
 
-    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
 
     {
         // wrapper
         CODA_Test_write(MJPEG_WRAPPER_ENABLE_REG, jdec_config.useWrapper ? 0x01 : 0x00);
+        // CODA_Test_write(MJPEG_WRAPPER_ENABLE_REG, 0x00);
         CODA_Test_write(MJPEG_WRAPPER_RGB_FORMAT_REG, jdec_config.rgbType);
     }
 
-    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
+//    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
     while (1)
     {
         if (jdec_config.useRot)
@@ -969,10 +1051,12 @@ static int coda_decode(void)
         JPU_DecGiveCommand(handle, SET_JPG_SCALE_HOR,  &(jdec_config.iHorScaleMode));
         JPU_DecGiveCommand(handle, SET_JPG_SCALE_VER,  &(jdec_config.iVerScaleMode));
 
-        // Start decoding a frame.
+        if (jdec_config.usePartialMode)
         {
-            CODA_Test_read(MJPEG_APB_CYCLE_CNT_REG);
-            DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
+            partPosIdx = 0;
+            partBufIdx = 0;
+            outputInfo.decodingSuccess = 0;
+            JPU_SWReset();
         }
         ret = JPU_DecStartOneFrame(handle, &decParam);
         if (ret != JPG_RET_SUCCESS && ret != JPG_RET_EOS)
@@ -1008,11 +1092,53 @@ static int coda_decode(void)
                 break;
             }
 
+
+            if (jdec_config.usePartialMode && (int_reason & 0xf0))
+            {
+                partBufIdx = ((partPosIdx) % jdec_config.partialBufNum);
+
+                if ((1 << partBufIdx) & ((int_reason & 0xf0) >> 4))
+                {
+                    DBG_DIRECT("DECODED : PARTIAL BUFFER IDX %d / POS %d / MAX POS %d / INT_REASON=0x%x\n", partBufIdx,
+                               partPosIdx + 1, partMaxIdx, int_reason);
+
+                    // if (dispImage)
+                    // {
+                    //     pDispFrame = FindFrameBuffer(instIdx, frameBuf[partBufIdx].bufY);
+                    // }
+                    // else
+                    {
+                        saveIdx = partBufIdx;
+                        // if (!SaveYuvPartialImageHelperFormat(NULL, pYuv,
+                        //                                      frameBuf[saveIdx].bufY, frameBuf[saveIdx].bufCb, frameBuf[saveIdx].bufCr,
+                        //                                      dispWidth, dispHeight, partialHeight, framebufStride, jdec_config.chromaInterleave, framebufFormat,
+                        //                                      decOP.frameEndian, partPosIdx, frameIdx,
+                        //                                      decOP.packedFormat))
+                        // {
+                        //     goto ERR_DEC_OPEN;
+                        // }
+
+                        // sw_mixer_draw(instIdx, 0, 0, dispWidth, partialHeight, framebufFormat, decOP.packedFormat, decOP.chromaInterleave, pYuv);
+                    }
+
+                    partPosIdx++;
+                    JPU_ClrStatus((1 << (INT_JPU_PARIAL_BUF0_EMPTY + partBufIdx)));
+                    // next part frame
+                    continue;
+                }
+                else
+                {
+                    DBG_DIRECT("Invalid partial interrupt : expected reason =0x%x, actual reason=0x%x \n",
+                               (1 << partBufIdx), ((int_reason & 0xF0) >> 4));
+                    goto ERR_DEC_OPEN;
+                }
+            }
+
             if (int_reason & (1 << INT_JPU_DONE) ||
                 int_reason & (1 << INT_JPU_ERROR)) // Must catch PIC_DONE interrupt before catching EMPTY interrupt
             {
                 // Do no clear INT_JPU_DONE and INT_JPU_ERROR interrupt. these will be cleared in JPU_DecGetOutputInfo.
-                Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
+                // Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
                 {
                     CODA_Test_read(MJPEG_APB_CYCLE_CNT_REG);
                 }
@@ -1045,6 +1171,12 @@ static int coda_decode(void)
                 JPU_ClrStatus((1 << INT_JPU_BIT_BUF_STOP));
                 break;
             }
+
+            if (int_reason & (1 << INT_JPU_PARIAL_OVERFLOW))
+            {
+                DBG_DIRECT("INT_JPU_PARIAL_OVERFLOW \n");
+                JPU_ClrStatus((1 << INT_JPU_PARIAL_OVERFLOW));
+            }
         }
 
 JPU_END_OF_STREAM:
@@ -1075,21 +1207,32 @@ JPU_END_OF_STREAM:
         // indexFrameDisplay points to the frame buffer, among ones registered, which holds
         // the output of the decoder.
         // YUV2RGB here
-
+        int_reason = JPU_GetStatus();
+        if (jdec_config.usePartialMode && !(int_reason & 0xF0))
+        {
+            goto SKIP_BUF_DUMP;
+        }
 SKIP_BUF_DUMP:
+        frameIdx++;
+        if (jdec_config.outNum && (frameIdx == jdec_config.outNum))
+        {
+            break;
+        }
         break;
     }
 
 ERR_DEC_OPEN:
     // Now that we are done with decoding, close the open instance.
-    DBG_DIRECT("\nEnter Dec End. \n");
+    // DBG_DIRECT("\nEnter Dec End. \n");
     ret = JPU_DecClose(handle);
 
 ERR_DEC_INIT:
-    DBG_DIRECT("\nEnter ERR_DEC_INIT. \n");
+    // DBG_DIRECT("\nEnter ERR_DEC_INIT. \n");
 
-    // FreeFrameBuffer(instIdx);
-    // jdi_free_dma_memory(&vbStream);
+    // yuv/RGB buffer
+    FreeFrameBuffer(instIdx);
+    // jpg buffer
+    jdi_free_dma_memory(&vbStream);
 
     //sw_mixer_close(instIdx);
     JPU_DeInit();
@@ -1128,6 +1271,10 @@ JpgRet coda_prepare(DecConfigParam *jdc)
         {
             // Num of Frame Buffer[ 2 ~ 4 ] ;
             jdec_config.partialBufNum = jdc->partialBufNum;
+            if (jdec_config.partialBufNum > 4)
+            {
+                jdec_config.partialBufNum = 4;
+            }
         }
     }
 
@@ -1224,14 +1371,14 @@ uint32_t CODA_Test(uint8_t cmd)
             {
                 decConfig.roiEnable = 0;
                 // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
-                decConfig.packedFormat = 1;
+                decConfig.packedFormat = 5;
                 // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
                 decConfig.chromaInterleave = 0;
                 decConfig.StreamEndian = JPU_STREAM_ENDIAN;
                 decConfig.FrameEndian = JPU_FRAME_ENDIAN;
 
                 // partial Mode(0: OFF 1: ON);
-                decConfig.usePartialMode = 1;
+                decConfig.usePartialMode = 0;
                 // Num of Frame Buffer[ 2 ~ 4 ] ;
                 decConfig.partialBufNum = 4;
 
@@ -1251,9 +1398,9 @@ uint32_t CODA_Test(uint8_t cmd)
                 decConfig.loc_src = 0;
 
                 // Wrapper enable: 0-OFF, 1-ON
-                decConfig.useWrapper = 0;
+                decConfig.useWrapper = 1;
                 //  0-JPG_ARGB8888, 1-JPG_RGB888, 2-JPG_RGB565
-                decConfig.rgbType = 1;
+                decConfig.rgbType = 0;
             }
 
             ret = coda_prepare(&decConfig);

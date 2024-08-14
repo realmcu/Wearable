@@ -266,7 +266,7 @@ int jdi_write_memory(unsigned int addr, unsigned char *data, int len, int endian
 
     for (i = 0; i < MAX_JPU_BUFFER_POOL; i++)
     {
-        DBG_DIRECT("addr 0x%x -- jdi_write_memory i %d 0x%x inuse %d address 0x%x %d\n", addr, i,
+        DBG_DIRECT("addr 0x%x %d-- jdi_write_memory i %d 0x%x inuse %d address 0x%x %d\n", addr, len, i,
                    &(s_jpu_buffer_pool[i].jdb), s_jpu_buffer_pool[i].inuse, \
                    s_jpu_buffer_pool[i].jdb.phys_addr, s_jpu_buffer_pool[i].jdb.size);
         if (s_jpu_buffer_pool[i].inuse == 1)
@@ -291,7 +291,9 @@ int jdi_write_memory(unsigned int addr, unsigned char *data, int len, int endian
     jpu_swap_endian(data, len, endian);
 
     // memcpy((void *)((unsigned long)jdb.virt_addr + offset), data, len);
-    memcpy((void *)((unsigned long)jdb.phys_addr), data, len);
+    DBG_DIRECT("WR cp 0x%x -> 0x%x 0x%x(%d)", data, (void *)((unsigned long)jdb.phys_addr), addr, len);
+    // memcpy((void *)((unsigned long)jdb.phys_addr), data, len);
+    memcpy((void *)addr, data, len);
 
     return len;
 }
@@ -321,6 +323,7 @@ int jdi_read_memory(unsigned int addr, unsigned char *data, int len, int endian)
 
     if (!jdb.size)
     {
+        DBG_DIRECT("address 0x%08x is not mapped address!!!\n", addr);
         return -1;
     }
 
@@ -328,7 +331,8 @@ int jdi_read_memory(unsigned int addr, unsigned char *data, int len, int endian)
     // offset = addr - (unsigned long)jdb.phys_addr;
 
 
-    DBG_DIRECT("mem read: 0x%x 0x%x %d", data, jdb.virt_addr, len);
+    DBG_DIRECT("RD: cp 0x%x 0x%x -> 0x%x (%d)", (const void *)((unsigned long)jdb.virt_addr), addr,
+               data, len);
     // memcpy(data, (const void *)((unsigned long)jdb.virt_addr + offset), len);
     memcpy(data, (const void *)((unsigned long)jdb.virt_addr), len);
 

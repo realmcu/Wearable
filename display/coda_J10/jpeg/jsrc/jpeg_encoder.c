@@ -16,10 +16,24 @@
 #include "jpeg_heap.h"
 
 
-// #include "pic_yuv_112144.txt"   //
-#include "pic_yuyv_112_144.txt"
+// yuv
+// #include "pic_p400_184_96.txt"
+// #include "pic_p420_192_96.txt"
+// #include "pic_p422_192_96.txt"
+// #include "pic_p444_184_96.txt"
+// #include "pic_yuv_184_96.txt"
+// #include "pic_yuyv_112_144.txt"
+// #include "pic_yuyv_192_96_test.txt"
 
 
+// rgb
+// #include "pic_rgb565_184_96.txt"
+// #include "pic_rgb888_184_96.txt"
+// #include "pic_rgb888_192_96.txt"
+// #include "pic_argb8888_184_96.txt"
+// #include "pic_argb8888_192_96.txt"
+// #include "pic_argb8888_184_48.txt"
+#include "pic_argb8888_192_48.txt"
 
 #define NUM_FRAME_BUF           MAX_FRAME
 #define ENC_SRC_BUF_NUM         1
@@ -77,23 +91,24 @@ int CODA_Encode_Test(EncConfigParam *param)
         goto ERR_ENC_INIT;
     }
     // vbStream.size = STREAM_BUF_SIZE;
-    vbStream.size = 12 * 1024;  // jpg size
+    vbStream.size = 15 * 1024;  // encode output jpg size(bitstream buffer)
     if (jdi_allocate_dma_memory(&vbStream) < 0)
     {
         DBG_DIRECT("fail to allocate bitstream buffer\n");
         goto ERR_ENC_INIT;
     }
 
+    // hfm table config
     ret = getJpgEncOpenParamDefault(&encOP, &encConfig);
 
     if (ret == 0)
     {
         goto ERR_ENC_INIT;
     }
-    if (encConfig.encQualityPercentage > 0)
-    {
-        JpgEncSetupTables(&encOP, encConfig.encQualityPercentage);
-    }
+
+    // quality set quant table
+    JpgEncSetupTables(&encOP, encConfig.encQualityPercentage);
+
     encOP.streamEndian = encConfig.StreamEndian;
     encOP.frameEndian = encConfig.FrameEndian;
     encOP.chromaInterleave = (CbCrInterLeave)encConfig.chromaInterleave;
@@ -102,29 +117,13 @@ int CODA_Encode_Test(EncConfigParam *param)
     encOP.packedFormat = (PackedOutputFormat)encConfig.packedFormat;
     if (encOP.packedFormat)
     {
-        if (encOP.sourceFormat == FORMAT_420 || encOP.sourceFormat == FORMAT_400)
+        if (encOP.sourceFormat == FORMAT_420 || encOP.sourceFormat == FORMAT_400) // mjpgChromaFormat
         {
             DBG_DIRECT("Invalid operation mode : In case of using packed mode. sourceFormat must be FORMAT_444\n");
             goto ERR_ENC_INIT;
         }
 
     }
-
-    {
-//      fpYuv = fopen(encConfig.yuvFileName, "rb");
-        // if( !fpYuv )
-        // {
-        //  DBG_DIRECT("Can't open yuv file %s \n", encConfig.yuvFileName );
-        //  goto ERR_ENC_INIT;
-        // }
-    }
-
-//  fpSrcYuv = fopen("src.yuv", "wb");
-    // if (!fpSrcYuv)
-    // {
-    //  DBG_DIRECT("Can't open  yuv file for source image for debug purpose\n");
-    //  goto ERR_ENC_INIT;
-    // }
 
     srcFrameFormat = encOP.sourceFormat;
 
@@ -139,7 +138,7 @@ int CODA_Encode_Test(EncConfigParam *param)
     }
 
     // srcFrameFormat means that it is original source image format.
-    // framebufFormat means that is is converted image format.
+    // framebufFormat means that it is converted image format.
 
     if (encConfig.usePartialMode)
     {
@@ -160,6 +159,7 @@ int CODA_Encode_Test(EncConfigParam *param)
 
     }
 
+    DBG_DIRECT("pic_w: %d pic_h: %d \n", encOP.picWidth, encOP.picHeight);
     if (framebufFormat == FORMAT_420 || framebufFormat == FORMAT_422)
     {
         framebufWidth = (((encOP.picWidth + 15) / 16) * 16);
@@ -182,7 +182,26 @@ int CODA_Encode_Test(EncConfigParam *param)
 
     if (encOP.packedFormat >= PACKED_FORMAT_422_YUYV && encOP.packedFormat <= PACKED_FORMAT_422_VYUY)
     {
-        framebufStride = framebufStride * 2;
+        if (encConfig.useWrapper)
+        {
+            if (encConfig.rgbType == JPG_RGB888)
+            {
+                framebufStride = framebufStride * 3;
+            }
+            else if (encConfig.rgbType == JPG_ARGB8888)
+            {
+                framebufStride = framebufStride * 4;
+            }
+            else if (encConfig.rgbType == JPG_RGB565)
+            {
+                framebufStride = framebufStride * 2;
+            }
+        }
+        else
+        {
+            framebufStride = framebufStride * 3;
+        }
+
         framebufFormat = FORMAT_422;
         if (encConfig.rotAngle == 90 || encConfig.rotAngle == 270)
         {
@@ -191,17 +210,27 @@ int CODA_Encode_Test(EncConfigParam *param)
     }
     else if (encOP.packedFormat == PACKED_FORMAT_444)
     {
-        framebufStride = framebufStride * 3;
+        if (encConfig.useWrapper)
+        {
+            if (encConfig.rgbType == JPG_RGB888)
+            {
+                framebufStride = framebufStride * 3;
+            }
+            else if (encConfig.rgbType == JPG_ARGB8888)
+            {
+                framebufStride = framebufStride * 4;
+            }
+            else if (encConfig.rgbType == JPG_RGB565)
+            {
+                framebufStride = framebufStride * 3;
+            }
+        }
+        else
+        {
+            framebufStride = framebufStride * 3;
+        }
         framebufFormat = FORMAT_444;
     }
-
-    // pYuv = jpg_malloc(framebufStride*framebufHeight*3);
-    // pYuv = jpg_malloc(framebufStride*framebufHeight);
-    // if (!pYuv)
-    // {
-    //  DBG_DIRECT("malloc() failed \n" );
-    //  goto ERR_ENC_INIT;
-    // }
 
     // Open an instance and get initial information for encoding.
     ret = JPU_EncOpen(&handle, &encOP);
@@ -211,7 +240,6 @@ int CODA_Encode_Test(EncConfigParam *param)
         goto ERR_ENC_INIT;
     }
 
-    //JPU_EncGiveCommand(handle, ENABLE_LOGGING, NULL);
     if (encConfig.useRot)
     {
         JPU_EncGiveCommand(handle, ENABLE_JPG_ROTATION, 0);
@@ -234,6 +262,9 @@ int CODA_Encode_Test(EncConfigParam *param)
         goto ERR_ENC_OPEN;
     }
 
+
+    DBG_DIRECT("pic_w: %d stride: %d h: %d, srcFrameFormat %d \n", framebufWidth, framebufStride,
+               framebufHeight, srcFrameFormat);
     if (encConfig.usePartialMode)
     {
         needFrameBufCount  = encConfig.partialBufNum;
@@ -277,10 +308,6 @@ int CODA_Encode_Test(EncConfigParam *param)
                framebufHeight);
     DBG_DIRECT("framebuffer format = %d, srcFrameFormat : %d, packed format = %d, Interleave = %d\n",
                framebufFormat, srcFrameFormat, encOP.packedFormat, encOP.chromaInterleave);
-
-
-    // DBG_DIRECT("Enc Start : Press enter key to show menu.\n" );
-    // DBG_DIRECT("          : Press space key to stop.\n" );
 
     while (1)
     {
@@ -328,17 +355,6 @@ int CODA_Encode_Test(EncConfigParam *param)
         }
         else
         {
-
-            // Get a yuv frame
-            // if( !LoadYuvImageHelperFormat( fpYuv, pYuv,
-            //  frameBuf[srcFrameIdx].bufY,
-            //  frameBuf[srcFrameIdx].bufCb,
-            //  frameBuf[srcFrameIdx].bufCr,
-            //  encOP.picWidth,
-            //  encOP.picHeight,
-            //  framebufStride, encOP.chromaInterleave, srcFrameFormat, encOP.frameEndian, encConfig.packedFormat) )
-            //  break;  // must break to read last bit-stream buffer
-
             // if( !LoadYuvImageHelperFormat( pic_yuv, pYuv,
             //  frameBuf[srcFrameIdx].bufY,
             //  frameBuf[srcFrameIdx].bufCb,
@@ -348,13 +364,16 @@ int CODA_Encode_Test(EncConfigParam *param)
             //  framebufStride, encOP.chromaInterleave, srcFrameFormat, encOP.frameEndian, encConfig.packedFormat) )
             //  break;  // must break to read last bit-stream buffer
 
-            if (!LoadYuvImageHelperFormat(pic_yuv, pic_yuv,
+            // Load source one picture image to encode to SDRAM frame buffer.
+            if (!LoadYuvImageHelperFormat(NULL, pic_yuv,
                                           frameBuf[srcFrameIdx].bufY,
                                           frameBuf[srcFrameIdx].bufCb,
                                           frameBuf[srcFrameIdx].bufCr,
                                           encOP.picWidth,
                                           encOP.picHeight,
-                                          framebufStride, encOP.chromaInterleave, srcFrameFormat, encOP.frameEndian, encConfig.packedFormat))
+                                          framebufStride, encOP.chromaInterleave, srcFrameFormat, encOP.frameEndian, encConfig.packedFormat, \
+                                          encConfig.useWrapper,
+                                          encConfig.rgbType))
             {
                 break;    // must break to read last bit-stream buffer
             }
@@ -372,6 +391,12 @@ int CODA_Encode_Test(EncConfigParam *param)
         }
 
         {
+            {
+                // wrapper
+                CODA_Test_write(MJPEG_WRAPPER_ENABLE_REG, encConfig.useWrapper ? 0x03 : 0x02);
+                // CODA_Test_write(MJPEG_WRAPPER_ENABLE_REG, 0x00);
+                CODA_Test_write(MJPEG_WRAPPER_RGB_FORMAT_REG, encConfig.rgbType);
+            }
             CODA_Test_read(MJPEG_APB_CYCLE_CNT_REG);
         }
         // Start encoding a frame.
@@ -419,7 +444,9 @@ int CODA_Encode_Test(EncConfigParam *param)
                                                     encOP.picHeight,
                                                     encConfig.partialHeight,
                                                     framebufStride, encOP.chromaInterleave, srcFrameFormat, encOP.frameEndian, partPosIdx, frameIdx,
-                                                    encConfig.packedFormat);
+                                                    encConfig.packedFormat, \
+                                                    encConfig.useWrapper,
+                                                    encConfig.rgbType);
 
                     JPU_EncGiveCommand(handle, SET_JPG_ENCODE_NEXT_LINE, NULL);
 
@@ -482,10 +509,11 @@ int CODA_Encode_Test(EncConfigParam *param)
         }
 
 
-        ReadJpgBsBufHelper(handle, fpBitstrm, encOP.bitstreamBuffer,
-                           encOP.bitstreamBuffer + encOP.bitstreamBufferSize, encHeaderParam.size, encOP.streamEndian);
+        // ReadJpgBsBufHelper(handle, fpBitstrm, encOP.bitstreamBuffer,
+        //                    encOP.bitstreamBuffer + encOP.bitstreamBufferSize, encHeaderParam.size, encOP.streamEndian);
 
-        DBG_DIRECT("Enc: %d:%d, rdPtr=0x%x, wrPtr=0x%x\n", instIdx, frameIdx, outputInfo.bitstreamBuffer,
+        DBG_DIRECT("Enc: %d:%d, rdPtr=0x%x, size %d, wrPtr=0x%x\n", instIdx, frameIdx,
+                   outputInfo.bitstreamBuffer, outputInfo.bitstreamSize,
                    outputInfo.bitstreamBuffer + outputInfo.bitstreamSize);
 
 
@@ -651,16 +679,24 @@ uint32_t CODA_encoder_Test(uint8_t cmd)
 
             encConfig.StreamEndian = JPU_STREAM_ENDIAN;
             encConfig.FrameEndian = JPU_FRAME_ENDIAN;
+            // packed format and interleace is mutually exclusive
             encConfig.chromaInterleave = JPU_CHROMA_INTERLEAVE;
 
             encConfig.bEnStuffByte = JPU_STUFFING_BYTE_FF;
             // Enter ENC CFG file name [0 if manual]: ";
             // encConfig.cfgFileName[0] = 0;
 
+            // // picture width
+            // encConfig.picWidth = 112;
+            // // picture height
+            // encConfig.picHeight = 144;
+
             // picture width
-            encConfig.picWidth = 112;
+            encConfig.picWidth = 192;
+            // encConfig.picWidth = 184;
             // picture height
-            encConfig.picHeight = 144;
+            // encConfig.picHeight = 96;
+            encConfig.picHeight = 48;
 
             // bitstream file name
             // encConfig.bitstreamFileName[0] = 0;
@@ -676,11 +712,18 @@ uint32_t CODA_encoder_Test(uint8_t cmd)
                 // encConfig.qMatFileName[0] = 0;
             }
 
+            // packed 422/444 only
             // Frame Format [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
             encConfig.packedFormat = 1;
 
             // Source Chroma Format 0 (4:2:0) / 1 (4:2:2) / 2 (2:2:4 4:2:2 rotated) / 3 (4:4:4) / 4 (4:0:0)
             encConfig.mjpgChromaFormat = 1;
+
+            // Wrapper enable: 0-OFF, 1-ON
+            encConfig.useWrapper = 1;
+            //  0-JPG_ARGB8888, 1-JPG_RGB888, 2-JPG_RGB565
+            encConfig.rgbType = 0;
+
 
 
             // Number of Images that you want to encode(0: encode continue);
@@ -722,6 +765,7 @@ uint32_t CODA_encoder_Test(uint8_t cmd)
             {
                 encConfig.useRot = 1;
             }
+
 
 RUN_LAST_ENC_CMD:
 

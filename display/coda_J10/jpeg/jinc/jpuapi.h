@@ -332,6 +332,11 @@ typedef struct
     char qMatFileName[MAX_FILE_PATH];
     char qpFileName[MAX_FILE_PATH];
     char cfgFileName[MAX_FILE_PATH];
+
+    // wrapper
+    int useWrapper;
+    int rgbType;
+
     int picWidth;
     int picHeight;
     int rotAngle;
@@ -357,7 +362,7 @@ typedef struct
     int partialHeight;
     int packedFormat;
     int RandRotMode;
-    int encQualityPercentage;
+    uint32_t encQualityPercentage;
 } EncConfigParam;
 
 

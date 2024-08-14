@@ -1269,7 +1269,8 @@ int JpgEncSetupTables(JpgEncOpenParam *pop, int quality)
 
 
 int LoadYuvImageBurstFormat(uint8_t *src, int picWidth, int picHeight,
-                            int addrY, int addrCb, int addrCr, int stride, int interLeave, int format, int endian, int packed)
+                            int addrY, int addrCb, int addrCr, int stride, int interLeave, int format, int endian, int packed,
+                            int wrappered, int rgbType)
 {
     int y, nY, nCb, nCr;
     int addr;
@@ -1322,13 +1323,31 @@ int LoadYuvImageBurstFormat(uint8_t *src, int picWidth, int picHeight,
 
     if (packed)
     {
-        if (packed == PACKED_FORMAT_444)
+        if (wrappered)
         {
-            picWidth *= 3;
+            if (rgbType == JPG_ARGB8888)
+            {
+                picWidth *= 4;
+            }
+            else if (rgbType == JPG_RGB888)
+            {
+                picWidth *= 3;
+            }
+            else if (rgbType == JPG_RGB565)
+            {
+                picWidth *= 2;
+            }
         }
         else
         {
-            picWidth *= 2;
+            if (packed == PACKED_FORMAT_444)
+            {
+                picWidth *= 3;
+            }
+            else
+            {
+                picWidth *= 2;
+            }
         }
 
         chromaSize = 0;
@@ -1545,7 +1564,9 @@ int LoadYuvPartialImageHelperFormat(FILE *yuvFp,
                                     int endian,
                                     int partPosIdx,
                                     int frameIdx,
-                                    int packed)
+                                    int packed,
+                                    int wrappered,
+                                    int rgbType)
 {
 
     int LumaPicSize;
@@ -1647,7 +1668,9 @@ int LoadYuvPartialImageHelperFormat(FILE *yuvFp,
                             interleave,
                             format,
                             endian,
-                            packed);
+                            packed,
+                            wrappered,
+                            rgbType);
 
     return 1;
 }
@@ -1667,50 +1690,50 @@ int LoadYuvImageHelperFormat(uint8_t *pic_yuv,
                              int interleave,
                              int format,
                              int endian,
-                             int packed)
+                             int packed,
+                             int wrappered,
+                             int rgbType
+                            )
 {
-    int frameSize;
+    // int frameSize;
 
-    switch (format)
-    {
-    case FORMAT_420:
-        frameSize = picWidth * picHeight * 3 / 2;
-        break;
-    case FORMAT_224:
-        frameSize = picWidth * picHeight * 4 / 2;
-        break;
-    case FORMAT_422:
-        frameSize = picWidth * picHeight * 4 / 2;
-        break;
-    case FORMAT_444:
-        frameSize = picWidth * picHeight * 6 / 2;
-        break;
-    case FORMAT_400:
-        frameSize = picWidth * picHeight;
-        break;
-    }
-
-    if (packed == PACKED_FORMAT_NONE)
-    {
-        frameSize = frameSize;
-    }
-    else if (packed == PACKED_FORMAT_444)
-    {
-        frameSize = picWidth * 3 * picHeight ;
-    }
-    else// PACKED_FORMAT_422_XXXX
-    {
-        frameSize = picWidth * 2 * picHeight ;
-    }
-    // Load source one picture image to encode to SDRAM frame buffer.
-    // memcpy(pYuv, pic_yuv, frameSize);
-    // if (!fread(pYuv, 1, frameSize, yuvFp))
+    // switch (format)
     // {
-    //  if( !feof( yuvFp ) )
-    //      DBG_DIRECT( "Yuv Data fread failed file handle is 0x%x \n", yuvFp );
-    //  return 0;
+    // case FORMAT_420:
+    //     frameSize = picWidth * picHeight * 3 / 2;
+    //     break;
+    // case FORMAT_224:
+    //     frameSize = picWidth * picHeight * 4 / 2;
+    //     break;
+    // case FORMAT_422:
+    //     frameSize = picWidth * picHeight * 4 / 2;
+    //     break;
+    // case FORMAT_444:
+    //     frameSize = picWidth * picHeight * 6 / 2;
+    //     break;
+    // case FORMAT_400:
+    //     frameSize = picWidth * picHeight;
+    //     break;
     // }
 
+    // if (packed == PACKED_FORMAT_NONE)
+    // {
+    //     frameSize = frameSize;
+    // }
+    // else if (packed == PACKED_FORMAT_444)
+    // {
+    //     frameSize = picWidth * 3 * picHeight ;
+    // }
+    // else// PACKED_FORMAT_422_XXXX
+    // {
+    //     frameSize = picWidth * 2 * picHeight ;
+    // }
+
+    // if(pic_yuv && pYuv)
+    // {
+    //     // Load source one picture image to encode to SDRAM frame buffer.
+    //     memcpy(pYuv, pic_yuv, frameSize);
+    // }
 
     LoadYuvImageBurstFormat(pYuv,
                             picWidth,
@@ -1721,8 +1744,10 @@ int LoadYuvImageHelperFormat(uint8_t *pic_yuv,
                             stride,
                             interleave,
                             format,
-                            endian
-                            , packed);
+                            endian,
+                            packed,
+                            wrappered,
+                            rgbType);
 
     return 1;
 }

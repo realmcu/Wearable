@@ -5,7 +5,7 @@
 #include "tlsf.h"
 #include "jputypes.h"
 
-#define TLSF_MEM_SIZE (80 * 1024)
+#define TLSF_MEM_SIZE (89 * 1024)
 
 // typedef unsigned char  uint8_t;
 
