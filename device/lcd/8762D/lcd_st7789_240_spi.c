@@ -1,6 +1,5 @@
 #include "board.h"
 #include "app_section.h"
-#include "wristband_gui.h"
 #include "rtl876x_spi.h"
 #include "trace.h"
 #include "lcd_st7789_240_spi.h"
@@ -13,26 +12,13 @@
 #include "rtl876x_nvic.h"
 #include "flash_device.h"
 #include "trace.h"
-static bool te_ready;
-void rtl_gui_lcd_sectionconfig(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd);
 
-GDMA_LLIDef *GDMA_LLIStruct = NULL;
-const T_RTK_GENERAL_GUI_CONFIG rtk_gui_config =
-{
-    .lcd_width = LCD_WIDTH,
-    .lcd_hight = LCD_HIGHT,
-    .lcd_section_height = LCD_SECTION_HEIGHT,
-    .pixel_format = PIXEL_FORMAT,
-    .pixel_bytes = PIXEL_BYTES,
-    .lcd_section_byte_len = LCD_SECTION_BYTE_LEN,
-    .max_section_count = MAX_SECTION_COUNT,
-    .total_section_count = TOTAL_SECTION_COUNT,
-};
+bool te_ready;
+bool allowed_lcd_backlight_enter_dlps;
 
 void lcd_set_backlight(uint32_t percent)
 {
     Pad_Config(LCD_SPI_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    extern bool allowed_lcd_backlight_enter_dlps;
     if (percent != 0)
     {
         TIM_Cmd(BL_PWM_TIM, DISABLE);
@@ -76,15 +62,11 @@ void st7789_write_data(uint8_t data)
     while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY)); //Howie todo, remove later
 }
 
-void lcd_st7789_set_window(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd)
+void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd)
 {
     /*this is a bug here if lcd size bigger than uint8_t*/
-    st7789_write_cmd(0x2A); //Set Column Address
 
-//    xStart = xStart + 0x1A;
-//    xEnd = xEnd + 0x1A;
-    yStart = yStart + 80;
-    yEnd = yEnd + 80;
+    st7789_write_cmd(0x2A); //Set Column Address
     while (!(LCD_SPI_BUS->SR & BIT(1)));
     LCD_SPI_BUS->DR[0] = xStart >> 8;
     while (!(LCD_SPI_BUS->SR & BIT(1)));
@@ -204,7 +186,7 @@ void lcd_st7789_init(void)
     st7789_write_data(0x00);
     st7789_write_data(0x11);
 
-    st7789_write_cmd(0x21);
+//    st7789_write_cmd(0x21);
 
     st7789_write_cmd(0x11);
     platform_delay_ms(120);
@@ -297,7 +279,7 @@ void lcd_pad_init(void)
 
     /*BL AND RESET ARE NOT FIX*/
     Pad_Config(LCD_SPI_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
-    Pinmux_Config(LCD_SPI_BL, timer_pwm4);
+//    Pinmux_Config(LCD_SPI_BL, BL_PWM_TIM);
 
 }
 void lcd_enter_dlps(void)
@@ -378,53 +360,8 @@ void lcd_device_init(void)
     GPIO_Init(&GPIO_InitStruct);
     GPIO_SetBits(GPIO_GetPin(LCD_SPI_BL));
 }
+
 void rtl_gui_dma_single_block_init(uint32_t dir_type)
-{
-
-}
-
-
-void lcd_dma_single_block_start(uint32_t destination_addr, uint32_t source_addr, uint32_t len)
-{
-    GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len);
-    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)source_addr);
-    GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
-    SPI_GDMACmd(LCD_SPI_BUS, SPI_GDMAReq_Tx, ENABLE);
-}
-
-void lcd_wait_dma_transfer(void)
-{
-    while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET);
-    GDMA_ClearINTPendingBit(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_TFE) == false);
-}
-
-void lcd_wait_lcd_control_transfer(uint32_t count)
-{
-    while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET);
-    GDMA_ClearINTPendingBit(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_TFE) == false);
-}
-
-void rtl_gui_lcd_clear(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd,
-                       uint32_t color)
-{
-    rtl_gui_lcd_sectionconfig(xStart, yStart, xEnd, yEnd);
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
-    for (uint16_t i = xStart; i <= xEnd; i++)
-    {
-        for (uint16_t j = yStart; j <= yEnd; j++)
-        {
-            while (!(LCD_SPI_BUS->SR & BIT(1)));
-            LCD_SPI_BUS->DR[0] = color >> 8;
-            while (!(LCD_SPI_BUS->SR & BIT(1)));
-            LCD_SPI_BUS->DR[0] = color;
-        }
-    }
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
-}
-
-void rtl_gui_dma_single_block_start(uint32_t destination_addr, uint32_t source_addr, uint32_t len)
 {
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     NVIC_InitTypeDef NVIC_InitStruct;
@@ -436,8 +373,148 @@ void rtl_gui_dma_single_block_start(uint32_t destination_addr, uint32_t source_a
     GDMA_InitTypeDef GDMA_InitStruct;
     GDMA_StructInit(&GDMA_InitStruct);
     GDMA_InitStruct.GDMA_ChannelNum          = LCD_DMA_CHANNEL_NUM;
+
+    GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_HalfWord;
+    GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Byte;
+
+
+    if (dir_type == GDMA_DIR_MemoryToMemory)
+    {
+        GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_1;
+        GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_1;
+        GDMA_InitStruct.GDMA_DIR                 = dir_type;
+        GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
+        GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Inc;
+    }
+    else if (dir_type == GDMA_DIR_MemoryToPeripheral)
+    {
+        GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_4;
+        GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_4;
+        GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_SPI0_TX;
+        GDMA_InitStruct.GDMA_DIR                 = dir_type;
+        GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
+        GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
+    }
+
+    GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
+    GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
+
+}
+
+void lcd_dma_single_block_start(uint32_t destination_addr, uint32_t source_addr, uint32_t len)
+{
+    GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len);
+    GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(LCD_SPI_BUS->DR));
+    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)source_addr);
+    GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
+    SPI_GDMACmd(LCD_SPI_BUS, SPI_GDMAReq_Tx, ENABLE);
+}
+
+void lcd_wait_lcd_control_transfer(uint32_t count)
+{
+    while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET)
+    {
+        platform_delay_us(10);
+    }
+    GDMA_ClearINTPendingBit(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
+}
+
+void rtk_lcd_hal_transfer_done(void)
+{
+    while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET);
+    GDMA_ClearINTPendingBit(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
+    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_TFE) == false);
+}
+
+void rtl_gui_lcd_clear(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd,
+                       uint32_t color)
+{
+#if 0
+    rtk_lcd_hal_set_window(xStart, yStart, xEnd - 1, yEnd - 1);
+    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
+    for (uint16_t i = xStart; i < xEnd; i++)
+    {
+        for (uint16_t j = yStart; j < yEnd; j++)
+        {
+            while (!(LCD_SPI_BUS->SR & BIT(1)));
+            LCD_SPI_BUS->DR[0] = color >> 8;
+            while (!(LCD_SPI_BUS->SR & BIT(1)));
+            LCD_SPI_BUS->DR[0] = color;
+        }
+    }
+    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
+#else
+    static uint32_t color_buf = 0;
+    color_buf = (color >> 8) | (color << 8);
+    color_buf = color_buf | color_buf << 16;
+
+    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
+
+    NVIC_InitTypeDef NVIC_InitStruct;
+    NVIC_InitStruct.NVIC_IRQChannel = LCD_DMA_CHANNEL_IRQ;
+    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+    NVIC_Init(&NVIC_InitStruct);
+
+    /* Initialize GDMA peripheral */
+    GDMA_InitTypeDef GDMA_InitStruct;
+    GDMA_StructInit(&GDMA_InitStruct);
+    GDMA_InitStruct.GDMA_ChannelNum          = LCD_DMA_CHANNEL_NUM;
+    GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_HalfWord;
+    GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Byte;
+    GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_4;
+    GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_4;
     GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToPeripheral;
-    GDMA_InitStruct.GDMA_BufferSize          = LCD_WIDTH * LCD_SECTION_HEIGHT * PIXEL_BYTES;
+    GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Fix;
+    GDMA_InitStruct.GDMA_DestinationInc      = DMA_SourceInc_Fix;
+    GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_SPI0_TX;
+
+    GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
+    GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
+
+    rtk_lcd_hal_set_window(xStart, yStart, xEnd - 1, yEnd - 1);
+    for (uint16_t i = 0; i < TOTAL_SECTION_COUNT - 1; i++)
+    {
+        lcd_dma_single_block_start(NULL, (uint32_t)&color_buf, ST7789_LCD_WIDTH * ST7789_SEC_HEIGHT);
+        rtk_lcd_hal_transfer_done();
+    }
+    uint32_t last_len = 0;
+    if (ST7789_LCD_HEIGHT % ST7789_SEC_HEIGHT == 0)
+    {
+        last_len = ST7789_SEC_HEIGHT * ST7789_LCD_WIDTH;
+    }
+    else
+    {
+        last_len = (ST7789_LCD_HEIGHT % ST7789_SEC_HEIGHT) * ST7789_LCD_WIDTH;
+    }
+    lcd_dma_single_block_start(NULL, (uint32_t)&color_buf, last_len);
+    lcd_wait_lcd_control_transfer(ST7789_LCD_WIDTH * ST7789_LCD_HEIGHT * INPUT_PIXEL_BYTES);
+
+#endif
+}
+void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
+{
+#if 1
+    GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len);
+    GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(LCD_SPI_BUS->DR));
+    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)buf);
+    GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
+    SPI_GDMACmd(LCD_SPI_BUS, SPI_GDMAReq_Tx, ENABLE);
+#else
+    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
+    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
+    NVIC_InitTypeDef NVIC_InitStruct;
+    NVIC_InitStruct.NVIC_IRQChannel = LCD_DMA_CHANNEL_IRQ;
+    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+    NVIC_Init(&NVIC_InitStruct);
+    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
+    /* Initialize GDMA peripheral */
+    GDMA_InitTypeDef GDMA_InitStruct;
+    GDMA_StructInit(&GDMA_InitStruct);
+    GDMA_InitStruct.GDMA_ChannelNum          = LCD_DMA_CHANNEL_NUM;
+    GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToPeripheral;
+    GDMA_InitStruct.GDMA_BufferSize          = ST7789_LCD_WIDTH * ST7789_SEC_HEIGHT * INPUT_PIXEL_BYTES;
     GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
     GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
     GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Byte;
@@ -447,75 +524,49 @@ void rtl_gui_dma_single_block_start(uint32_t destination_addr, uint32_t source_a
     GDMA_InitStruct.GDMA_SourceAddr          = 0;
     GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(LCD_SPI_BUS->DR);
     GDMA_InitStruct.GDMA_DestHandshake       = LCD_SPI_DMA_TX_HANDSHAKE;
+    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
 
     GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
     GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
+    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
+
+#endif
 }
 
-void rtl_gui_wait_dma_transfer(void)
+uint32_t rtk_lcd_hal_get_width(void)
 {
-    lcd_wait_dma_transfer();
+    return ST7789_LCD_WIDTH;
 }
-
-void rtl_gui_wait_lcd_control_transfer(uint32_t count)
+uint32_t rtk_lcd_hal_get_height(void)
 {
-    lcd_wait_lcd_control_transfer(count);
+    return ST7789_LCD_HEIGHT;
 }
-
-
-void rtl_gui_lcd_sectionconfig(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd)
+uint32_t rtk_lcd_hal_get_pixel_bits(void)
 {
-    lcd_st7789_set_window(xStart, yStart, xEnd, yEnd);
+    return ST7789_DRV_PIXEL_BITS;
 }
 
-DATA_RAM_FUNCTION
-void rtl_gui_refresh_by_dma_internal(uint8_t *readbuf, uint32_t count_for_section)
+
+void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
-    uint32_t length = rtk_gui_config.lcd_width * rtk_gui_config.lcd_section_height *
-                      rtk_gui_config.pixel_bytes;
-
-    if (count_for_section == 0)
-    {
-        rtl_gui_dma_single_block_init(0x00000001);
-        rtl_gui_lcd_sectionconfig(0, 0, rtk_gui_config.lcd_width - 1, rtk_gui_config.lcd_hight - 1);
-        rtl_gui_dma_single_block_start(NULL, (uint32_t)readbuf, length);
-    }
-    else if (count_for_section == rtk_gui_config.total_section_count - 1)
-    {
-        rtl_gui_wait_dma_transfer();
-
-        if ((rtk_gui_config.lcd_hight - count_for_section * rtk_gui_config.lcd_section_height) %
-            rtk_gui_config.lcd_section_height)
-        {
-            length = ((rtk_gui_config.lcd_hight - count_for_section * rtk_gui_config.lcd_section_height) %
-                      rtk_gui_config.lcd_section_height) *
-                     rtk_gui_config.lcd_width * rtk_gui_config.pixel_bytes;
-        }
-        rtl_gui_dma_single_block_start(NULL, (uint32_t)readbuf, length);
-        rtl_gui_wait_lcd_control_transfer(rtk_gui_config.lcd_hight * rtk_gui_config.lcd_width *
-                                          rtk_gui_config.pixel_bytes);
-    }
-    else
-    {
-        rtl_gui_wait_dma_transfer();
-        rtl_gui_dma_single_block_start(NULL, (uint32_t)readbuf, length);
-    }
 
 }
 
-void rtl_gui_lcd_power_on(void)
+uint32_t rtk_lcd_hal_power_on(void)
 {
     st7789_write_cmd(0x11);
     st7789_write_cmd(0x29);
     lcd_set_backlight(100);
+    return 0;
 }
 
-void rtl_gui_lcd_power_off(void)
+uint32_t rtk_lcd_hal_power_off(void)
 {
     st7789_write_cmd(0x28);
     st7789_write_cmd(0x10);
     platform_delay_ms(150);
     lcd_set_backlight(0);
+    return 0;
 }
 
 
@@ -531,7 +582,7 @@ void lcd_set_reset(bool reset)
     }
 }
 
-void lcd_driver_init(void)
+void rtk_lcd_hal_init(void)
 {
     lcd_device_init();
     lcd_set_reset(true);
@@ -540,7 +591,9 @@ void lcd_driver_init(void)
     platform_delay_ms(50);
     lcd_te_device_init();
     lcd_st7789_init();
-
+    DBG_DIRECT("rtk_lcd_hal_init DONE");
+    rtk_lcd_hal_power_on();
+    rtl_gui_lcd_clear(0, 0, 240, 320, 0x00000000);
 }
 
 
