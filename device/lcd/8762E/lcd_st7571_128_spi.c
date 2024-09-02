@@ -18,9 +18,6 @@ void st7571_write_cmd(uint8_t command)
     while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
     /* switch to CS0 signal */
     SPI_SetCSNumber(LCD_SPI_BUS, 0);
-    SPI_Cmd(LCD_SPI_BUS, DISABLE);
-    SPI_Change_CLK(LCD_SPI_BUS, 2);
-    SPI_Cmd(LCD_SPI_BUS, ENABLE);
     GPIO_ResetBits(LCD_SPI_DC_PIN);
     while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_TFE) == false);
     SPI_SendData(LCD_SPI_BUS, command);
@@ -110,7 +107,7 @@ void lcd_device_init(void)
     SPI_InitStructure.SPI_DataSize    = SPI_DataSize_8b;
     SPI_InitStructure.SPI_CPOL        = SPI_CPOL_High;
     SPI_InitStructure.SPI_CPHA        = SPI_CPHA_2Edge;
-    SPI_InitStructure.SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_2;
+    SPI_InitStructure.SPI_BaudRatePrescaler  = 4;
     SPI_InitStructure.SPI_FrameFormat = SPI_Frame_Motorola;
     SPI_InitStructure.SPI_NDF         = 0;
     SPI_InitStructure.SPI_TxWaterlevel = 30;
@@ -128,64 +125,6 @@ void lcd_device_init(void)
     GPIO_InitStruct.GPIO_ITCmd = DISABLE;
     GPIO_Init(&GPIO_InitStruct);
     GPIO_SetBits(GPIO_GetPin(LCD_SPI_BL));
-}
-
-void rtl_gui_dma_single_block_init(uint32_t dir_type)
-{
-    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = LCD_DMA_CHANNEL_IRQ;
-    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
-    NVIC_Init(&NVIC_InitStruct);
-    /* Initialize GDMA peripheral */
-    GDMA_InitTypeDef GDMA_InitStruct;
-    GDMA_StructInit(&GDMA_InitStruct);
-    GDMA_InitStruct.GDMA_ChannelNum          = LCD_DMA_CHANNEL_NUM;
-
-    GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Byte;
-    GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Byte;
-
-
-    if (dir_type == GDMA_DIR_MemoryToMemory)
-    {
-        GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_1;
-        GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_1;
-        GDMA_InitStruct.GDMA_DIR                 = dir_type;
-        GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
-        GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Inc;
-    }
-    else if (dir_type == GDMA_DIR_MemoryToPeripheral)
-    {
-        GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_4;
-        GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_4;
-        GDMA_InitStruct.GDMA_DestHandshake       = GDMA_Handshake_SPI0_TX;
-        GDMA_InitStruct.GDMA_DIR                 = dir_type;
-        GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
-        GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
-    }
-
-    GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
-    GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
-
-}
-
-void lcd_dma_single_block_start(uint32_t destination_addr, uint32_t source_addr, uint32_t len)
-{
-    GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len);
-    GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(LCD_SPI_BUS->DR));
-    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)source_addr);
-    GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
-    SPI_GDMACmd(LCD_SPI_BUS, SPI_GDMAReq_Tx, ENABLE);
-}
-
-void lcd_wait_lcd_control_transfer(uint32_t count)
-{
-    while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET)
-    {
-        platform_delay_us(10);
-    }
-    GDMA_ClearINTPendingBit(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
 }
 
 void rtk_lcd_hal_transfer_done(void)
@@ -403,44 +342,6 @@ void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len) //todo luke
     }
     while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
 #endif
-    return;
-#if 1
-    GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len);
-    GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(LCD_SPI_BUS->DR));
-    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)buf);
-    GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
-    SPI_GDMACmd(LCD_SPI_BUS, SPI_GDMAReq_Tx, ENABLE);
-#else
-    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
-    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = LCD_DMA_CHANNEL_IRQ;
-    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
-    NVIC_Init(&NVIC_InitStruct);
-    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
-    /* Initialize GDMA peripheral */
-    GDMA_InitTypeDef GDMA_InitStruct;
-    GDMA_StructInit(&GDMA_InitStruct);
-    GDMA_InitStruct.GDMA_ChannelNum          = LCD_DMA_CHANNEL_NUM;
-    GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToPeripheral;
-    GDMA_InitStruct.GDMA_BufferSize          = ST7571_LCD_WIDTH * ST7571_SEC_HEIGHT * INPUT_PIXEL_BYTES;
-    GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
-    GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
-    GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Byte;
-    GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Byte;
-    GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_4;
-    GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_4;
-    GDMA_InitStruct.GDMA_SourceAddr          = 0;
-    GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(LCD_SPI_BUS->DR);
-    GDMA_InitStruct.GDMA_DestHandshake       = LCD_SPI_DMA_TX_HANDSHAKE;
-    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
-
-    GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
-    GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
-    DBG_DIRECT("rtk_lcd_hal_start_transfer %d ", __LINE__);
-
-#endif
 }
 
 uint32_t rtk_lcd_hal_get_width(void)
@@ -458,13 +359,33 @@ uint32_t rtk_lcd_hal_get_pixel_bits(void)
 
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
-    for (int j = 0; j < len; j++)
-    {
-        while (!(LCD_SPI_BUS->SR & BIT(1)));
-        LCD_SPI_BUS->DR[0] = *buf++;
-    }
-    while (SPI_GetFlagState(LCD_SPI_BUS, SPI_FLAG_BUSY));
+    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
+    NVIC_InitTypeDef NVIC_InitStruct;
+    NVIC_InitStruct.NVIC_IRQChannel = LCD_DMA_CHANNEL_IRQ;
+    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+    NVIC_Init(&NVIC_InitStruct);
+    /* Initialize GDMA peripheral */
+    GDMA_InitTypeDef GDMA_InitStruct;
+    GDMA_StructInit(&GDMA_InitStruct);
+    GDMA_InitStruct.GDMA_ChannelNum          = LCD_DMA_CHANNEL_NUM;
+    GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToPeripheral;
+    GDMA_InitStruct.GDMA_BufferSize          = len;
+    GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
+    GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Fix;
+    GDMA_InitStruct.GDMA_SourceDataSize      = GDMA_DataSize_Byte;
+    GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Byte;
+    GDMA_InitStruct.GDMA_SourceMsize         = GDMA_Msize_4;
+    GDMA_InitStruct.GDMA_DestinationMsize    = GDMA_Msize_4;
+    GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)buf;
+    GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)(LCD_SPI_BUS->DR);
+    GDMA_InitStruct.GDMA_DestHandshake       = LCD_SPI_DMA_TX_HANDSHAKE;
+
+    GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
+    GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
+
+    GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
+    SPI_GDMACmd(LCD_SPI_BUS, SPI_GDMAReq_Tx, ENABLE);
 }
 
 uint32_t rtk_lcd_hal_power_on(void)
