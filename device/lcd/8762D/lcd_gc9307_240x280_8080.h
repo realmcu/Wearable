@@ -7,8 +7,8 @@ extern "C" {
 #include "stdint.h"
 
 
-#define GC9307_LCD_WIDTH                  320
-#define GC9307_LCD_HIGHT                  320
+#define GC9307_LCD_WIDTH                  240
+#define GC9307_LCD_HIGHT                  280
 #define INPUT_PIXEL_BYTES                   2
 #define OUTPUT_PIXEL_BYTES                  2
 #define GC9307_DRV_PIXEL_BITS               16

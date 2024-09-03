@@ -39,39 +39,6 @@ static void lcd_set_reset(bool reset)
     }
 }
 
-void lcd_gc9307_280_power_on(void)
-{
-    platform_delay_ms(20);
-    gc9307_280_write_cmd(0x11);                         //wakeup
-    platform_delay_ms(120);
-    gc9307_280_write_cmd(0x29);                         //DSTBYON/OFF
-
-    uint8_t read_chip_state_cmd = 0x09;
-    uint8_t chip_state[4] = {0, 0, 0, 0};
-    IF8080_Read(read_chip_state_cmd, chip_state, 5);//Read 7789 state
-    //APP_PRINT_INFO4("chip_state = 0x%x, %x, %x, %x", chip_state[0],chip_state[1],chip_state[2],chip_state[3]);
-
-    if ((chip_state[0] != 0xa4) || (chip_state[1] != 0xa4) || (chip_state[2] != 0x53) ||
-        (chip_state[3] != 0x4)) //gc9307_280 state is not normal, need reinitial
-    {
-        APP_PRINT_INFO0("lcd_st7789_280_reinit !!!");
-        platform_delay_ms(100);
-        lcd_set_reset(true);
-        platform_delay_ms(10);
-        lcd_set_reset(false);
-        platform_delay_ms(10);
-        lcd_set_reset(true);
-        platform_delay_ms(120);
-    }
-}
-
-void lcd_gc9307_280_power_off(void)
-{
-    gc9307_280_write_cmd(0x28);                                //DSTBYON/OFF
-    platform_delay_ms(120);
-    gc9307_280_write_cmd(0x10);
-    platform_delay_ms(150);
-}
 
 
 void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h)
@@ -111,17 +78,7 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
     IF8080_AutoModeCmd(IF8080_Auto_Mode_Direction_WRITE, ENABLE);
 }
 
-void gc9307_280_change_slide_mode(void)
-{
-}
 
-void gc9307_280_change_disp_mode(void)
-{
-//    gc9307_280_write_cmd(0xc3);
-//    gc9307_280_write_data(0x27);
-//    gc9307_280_write_cmd(0xc4);
-//    gc9307_280_write_data(0x18);
-}
 
 static void gc9307_init_1st(void)
 {
@@ -129,7 +86,7 @@ static void gc9307_init_1st(void)
     gc9307_280_write_cmd(0xfe);
     gc9307_280_write_cmd(0xef);
     gc9307_280_write_cmd(0x36);
-    gc9307_280_write_data(0x48);
+    gc9307_280_write_data(0x08);
     gc9307_280_write_cmd(0x3a);
     gc9307_280_write_data(0x05);
     //----------------------------------Power Control Registers Initial--------------------------------//
@@ -218,10 +175,11 @@ static void gc9307_init_1st(void)
     gc9307_280_write_data(0x28);
     gc9307_280_write_data(0x6f);
     //-----------------------------------end gamma setting------------------------------------------//
+    platform_delay_ms(20);
     gc9307_280_write_cmd(0x11);
     platform_delay_ms(120);
     gc9307_280_write_cmd(0x29);
-    gc9307_280_write_cmd(0x2c);
+    //gc9307_280_write_cmd(0x2c);
 }
 
 
@@ -341,11 +299,9 @@ void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_
 
     rtk_lcd_hal_set_window(xStart, yStart, w, h);
 
-    static uint32_t color_buf = 0;
-    color_buf = (color >> 8) | (color << 8);
-    color_buf = color_buf | color_buf << 16;
+    //static uint32_t color_buf = color;
 
-    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)&color_buf);
+    GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)&color);
     GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(&(IF8080->FIFO)));
 
 
@@ -374,15 +330,20 @@ void rtk_lcd_hal_init(void)
     lcd_pad_init();
     lcd_device_init();
     lcd_set_reset(true);
-    platform_delay_ms(50);
+    platform_delay_ms(120);
     lcd_set_reset(false);
-    platform_delay_ms(50);
+    platform_delay_ms(120);
+
     gc9307_init_1st();
 
+    //lcd_gc9307_280_power_on();
+    gc9307_280_write_cmd(0x21);
 
-    rtk_lcd_hal_rect_fill(0, 0, 240, 280, 0xF0F0F0F0);
 
-    while (1);
+    //rtk_lcd_hal_rect_fill(0, 0, 240, 280, 0x001F001F);// RED
+    rtk_lcd_hal_rect_fill(0, 0, 240, 280, 0xF800F800);// BLUE
+    //rtk_lcd_hal_rect_fill(0, 0, 240, 280, 0x07e007e0);// GREEN
+
 }
 
 
@@ -433,11 +394,13 @@ void rtk_lcd_hal_transfer_done(void)
 {
     while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET);
     GDMA_ClearINTPendingBit(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
-    uint32_t counter = 0;
-    while (counter != (pfb_tx_xnt * 2)) //LCD_SECTION_HEIGHT
+
+    while (IF8080_GetTxDataLen() != IF8080_GetTxCounter())
     {
-        counter = IF8080_GetTxCounter();
+        //counter = IF8080_GetTxCounter();
+        DBG_DIRECT("len = %d, tx cnt = %d ", IF8080_GetTxDataLen(), IF8080_GetTxCounter());
     }
+    IF8080_ClearFIFO();
     IF8080_SwitchMode(IF8080_MODE_MANUAL);
 }
 uint32_t rtk_lcd_hal_get_width(void)
