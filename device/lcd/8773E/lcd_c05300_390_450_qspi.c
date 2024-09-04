@@ -35,7 +35,7 @@ static void lcdc_write(uint8_t *buf, uint32_t len)
     DBIC_TX_NDF(len - 4);
     DBIC_CmdLength(1);
     DBIC_AddrLength(3);
-    DBIC_USER_LENGTH_t reg_val = {.d32 = DBIC->USER_LENGTH};
+    DBIC_USER_LENGTH_TypeDef reg_val = {.d32 = DBIC->USER_LENGTH};
     for (uint32_t i = 0; i < len; i++)
     {
         DBIC->DR[0].byte = buf[i];
@@ -229,7 +229,7 @@ void rtk_lcd_hal_init(void)
 
     LCD_CO5300_qspi_cmd_data_byte(0x51, 0xFF);// power or bright
 
-    DBIC_IMR_t dbic_reg_0x2c = {.d32 = DBIC->IMR};
+    DBIC_IMR_TypeDef dbic_reg_0x2c = {.d32 = DBIC->IMR};
     dbic_reg_0x2c.b.dreim = 1;
     DBIC->IMR = dbic_reg_0x2c.d32;
 
@@ -303,8 +303,8 @@ void rtk_lcd_hal_transfer_done(void)
     while (handler_reg_0x18.b.dma_enable != RESET);
 
     LCDC_HANDLER_OPERATE_CTR_t handler_reg_0x14;
-    LCDC_HANDLER_TX_LEN_t handler_reg_0x28;
-    LCDC_HANDLER_TX_CNT_t handler_reg_0x2c;
+    LCDC_HANDLER_TX_LEN_TypeDef handler_reg_0x28;
+    LCDC_HANDLER_TX_CNT_TypeDef handler_reg_0x2c;
 
     do
     {
@@ -327,7 +327,7 @@ void rtk_lcd_hal_transfer_done(void)
     LCDC_AXIMUXMode(LCDC_FW_MODE);
     DBIC_Cmd(DISABLE);
 
-    DBIC_FLUSH_FIFO_t dbic_reg_0x128 = {.d32 = DBIC->FLUSH_FIFO};
+    DBIC_FLUSH_FIFO_TypeDef dbic_reg_0x128 = {.d32 = DBIC->FLUSH_FIFO};
     dbic_reg_0x128.b.flush_dr_fifo = 1;
     DBIC->FLUSH_FIFO = dbic_reg_0x128.d32;
 }
