@@ -9,7 +9,7 @@ extern "C" {
 #define     DMA_MULTIBLOCK          1
 #define     INFINITE_MODE           1
 
-#define PIXEL_BYTES                 4
+#define PIXEL_BYTES                 2
 
 #define ST77903_WIDTH                   (400U)
 #define ST77903_HEIGHT                  (400U)
@@ -33,6 +33,38 @@ extern "C" {
 
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
+
+
+
+//1 QFN68 -  0 QFN88
+#if 0  // GROUP 1
+#define LCD_QSPI_RST                     P3_6
+// #define LCD_QSPI_BL                      P1_4
+#define LCD_QSPI_D0                      P4_2
+#define LCD_QSPI_D1                      P4_1
+#define LCD_QSPI_D2                      P3_2
+#define LCD_QSPI_D3                      P3_3
+#define LCD_QSPI_CS                      P4_3
+#define LCD_QSPI_CLK                     P4_0
+#define LCD_QSPI_TE                      P0_5
+
+//#define LCD_QSPI_IM0                      P0_1
+//#define LCD_QSPI_IM1                      P0_1
+#else // GROUP 2
+#define LCD_QSPI_RST                     P3_6
+//#define LCD_QSPI_BL                      P1_2
+#define LCD_QSPI_D0                      P4_2
+#define LCD_QSPI_D1                      P4_1
+#define LCD_QSPI_D2                      P0_6
+#define LCD_QSPI_D3                      P0_7
+#define LCD_QSPI_CS                      P4_3
+#define LCD_QSPI_CLK                     P4_0
+#define LCD_QSPI_TE                      P0_1
+//#define LCD_QSPI_IM0                      P0_1
+//#define LCD_QSPI_IM1                      P0_1
+
+#endif
+
 
 void rtk_lcd_hal_init(void);
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len);

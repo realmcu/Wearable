@@ -7,6 +7,7 @@
 #include "rtl_ramless_qspi.h"
 #include "rtl_nvic.h"
 #include "mem_config.h"
+#include "rtl_hal_peripheral.h"
 
 #define MAX_PARAM_COUNT     15
 
@@ -37,7 +38,7 @@ const cmd_struct cmd_table[] =
     {0xDE, 0xE6, 1, 14, {0xBE, 0xF5, 0xB1, 0x22, 0x22, 0x25, 0x10, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
     {0xDE, 0xEC, 1, 2, {0x40, 0x03}},
     {0xDE, 0x36, 1, 1, {0x0C}},
-    {0xDE, 0x3A, 1, 1, {0x07}},
+    {0xDE, 0x3A, 1, 1, {0x05}},
     {0xDE, 0xB2, 1, 1, {0x00}},
     {0xDE, 0xB3, 1, 1, {0x01}},
     {0xDE, 0xB4, 1, 1, {0x00}},
@@ -133,7 +134,7 @@ void st77903_update_framebuffer(uint8_t *buf, uint32_t line_bytes)
 
 static void st77903_framebuffer_init(uint8_t *buf)
 {
-    ST77903_qspi_enter_data_output_mode(ST77903_WIDTH * ST77903_HEIGHT * 3);
+    ST77903_qspi_enter_data_output_mode(ST77903_WIDTH * ST77903_HEIGHT * PIXEL_BYTES);
 #if DMA_MULTIBLOCK
     LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
     LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
@@ -143,8 +144,8 @@ static void st77903_framebuffer_init(uint8_t *buf)
     LCDC_DMA_InitStruct.LCDC_DMA_DestinationInc      = LCDC_DMA_DestinationInc_Fix;
     LCDC_DMA_InitStruct.LCDC_DMA_SourceDataSize      = LCDC_DMA_DataSize_Word;
     LCDC_DMA_InitStruct.LCDC_DMA_DestinationDataSize = LCDC_DMA_DataSize_Word;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = LCDC_DMA_Msize_8;
-    LCDC_DMA_InitStruct.LCDC_DMA_DestinationMsize    = LCDC_DMA_Msize_8;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = LCDC_DMA_Msize_16;
+    LCDC_DMA_InitStruct.LCDC_DMA_DestinationMsize    = LCDC_DMA_Msize_16;
     LCDC_DMA_InitStruct.LCDC_DMA_SourceAddr          = 0;
 
     LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_Mode   =
@@ -236,12 +237,11 @@ void rtk_lcd_hal_init(void)
 
     //From PLL1, SOURCE = 125M
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_en = 1;
-    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 0; //pll1_peri(0) or pll2(1, pll2 = 160M)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 1; //pll1_peri(0) or pll2(1, pll2 = 160M)
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel1 = 1; //pll(1) or xtal(0)
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_sel = 1; //div
 
     ST77903_pad_config();
-
     LCDC_RLSPI_initTypeDef rlspi_init_struct;
     rlspi_init_struct.VSA = ST77903_VSYNC;
     rlspi_init_struct.VBP = ST77903_VBP;
@@ -258,39 +258,40 @@ void rtk_lcd_hal_init(void)
     rlspi_init_struct.height = ST77903_HEIGHT;
     rlspi_init_struct.width = ST77903_WIDTH;
     RLSPI_Init(&rlspi_init_struct);
-    RAMLESS_QSPI->RLSPI_LINE_DELAY_IN_VACTIVE = 0xC80;// 40us for line delay
-    RAMLESS_QSPI->RLSPI_LINE_DELAY_OUT_VACTIVE = 0xC80;// 40us for line delay
-    RAMLESS_QSPI->RLSPI_FRAME_DELAY_INFINITE = 0x3D0900;    // 50ms for frame delay
+    RAMLESS_QSPI->RLSPI_LINE_DELAY_IN_VACTIVE = 0xC80 * 5 / 2;// 40us for line delay
+    RAMLESS_QSPI->RLSPI_LINE_DELAY_OUT_VACTIVE = 0xC80 * 5 / 2;// 40us for line delay
+    RAMLESS_QSPI->RLSPI_FRAME_DELAY_INFINITE = 0x3D0900 / 16;    // 50ms for frame delay
 
     LCDC_InitTypeDef lcdc_init = {0};
     lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
     lcdc_init.LCDC_RamlessEn = ENABLE;
-    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_ARGB8888;
-    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB888;
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB565;
+    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB565;
     lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
 #if TE_VALID
     lcdc_init.LCDC_TeEn = LCDC_TE_DISABLE;
     lcdc_init.LCDC_TePolarity = LCDC_TE_EDGE_FALLING;
     lcdc_init.LCDC_TeInputMux = LCDC_TE_LCD_INPUT;
 #endif
+    lcdc_init.LCDC_GroupSel = 2;
     lcdc_init.LCDC_DmaThreshold =
-        8;    //only support threshold = 8 for DMA MSIZE = 8; the other threshold setting will be support later
+        112;    //only support threshold = 8 for DMA MSIZE = 8; the other threshold setting will be support later
     lcdc_init.LCDC_InfiniteModeEn = 1;
     LCDC_Init(&lcdc_init);
 //    LCDC_HANDLER->INFINITE_MODE_CTR |= BIT31;
-    LCDC_MaskINTConfig(LCDC_INT_MASK_TX_AUTO_DONE, ENABLE);
-    LCDC_ClearINTPendingBit(LCDC_CLR_TX_AUTO_DONE);
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = Display_IRQn;
-    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStruct);
+    // LCDC_MaskINTConfig(LCDC_INT_MASK_TX_AUTO_DONE, ENABLE);
+    // LCDC_ClearINTPendingBit(LCDC_CLR_TX_AUTO_DONE);
+    // NVIC_InitTypeDef NVIC_InitStruct;
+    // NVIC_InitStruct.NVIC_IRQChannel = Display_IRQn;
+    // NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
+    // NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    // NVIC_Init(&NVIC_InitStruct);
     DBG_DIRECT("LCDC_HANDLER->DMA_FIFO_IMR = 0x%x\n", LCDC_HANDLER->DMA_FIFO_IMR);
     DBG_DIRECT("LCDC_HANDLER->DMA_FIFO_SR = 0x%x\n", LCDC_HANDLER->DMA_FIFO_SR);
     DBG_DIRECT("LCDC_HANDLER->DMA_FIFO_ICR = 0x%x\n", LCDC_HANDLER->DMA_FIFO_ICR);
 
     LCDC_DBICCfgTypeDef dbic_init = {0};
-    dbic_init.DBIC_SPEED_SEL         = 1;
+    dbic_init.DBIC_SPEED_SEL         = 2;
     dbic_init.DBIC_TxThr             = 0;//0 or 4
     dbic_init.DBIC_RxThr             = 0;
     dbic_init.SCPOL                  = DBIC_SCPOL_LOW;
@@ -314,10 +315,10 @@ void rtk_lcd_hal_init(void)
     DBIC_SwitchDirect(DBIC_TMODE_TX);
 
     st77903_init_cmds();
-    uint32_t *pixel = (uint32_t *)SPIC1_ADDR;
-    for (uint32_t i = 0; i < ST77903_WIDTH * PIXEL_BYTES; i++)
+    uint16_t *pixel = (uint16_t *)SPIC1_ADDR;
+    for (uint32_t i = 0; i < ST77903_WIDTH * ST77903_HEIGHT; i++)
     {
-        pixel[i] = 0xFF00FFFF;
+        pixel[i] = 0xF800;
     }
     st77903_framebuffer_init((uint8_t *)pixel);
 }
@@ -325,4 +326,31 @@ void rtk_lcd_hal_init(void)
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
     LCDC_DMA_Infinite_Buf_Update(buf, (uint32_t)buf + ST77903_WIDTH * PIXEL_BYTES);
+}
+
+uint32_t rtk_lcd_hal_get_width(void)
+{
+    return ST77903_WIDTH;
+}
+uint32_t rtk_lcd_hal_get_height(void)
+{
+    return ST77903_HEIGHT;
+}
+uint32_t rtk_lcd_hal_get_pixel_bits(void)
+{
+    return PIXEL_BYTES * 8;
+}
+void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
+{
+    return;
+}
+
+void rtk_lcd_hal_transfer_done(void)
+{
+    return;
+}
+
+void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h)
+{
+    return;
 }
