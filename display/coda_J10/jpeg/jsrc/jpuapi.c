@@ -99,16 +99,18 @@ JpgRet JPU_Init()
         return JPG_RET_FAILURE;
     }
 
-
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     pjip = (jpu_instance_pool_t *)jdi_get_instance_pool();
     if (!pjip)
     {
         return JPG_RET_FAILURE;
     }
-
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
 
     InitJpgInstancePool();
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JPU_SWReset();
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     return JPG_RET_SUCCESS;
 }
 void JPU_DeInit()
@@ -506,7 +508,9 @@ JpgRet JPU_SWReset()
     PhysicalAddress streamWrPtr;
     PhysicalAddress streamRdPtr;
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpgEnterLock();
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
 
     streamBufStartAddr = JpuReadReg(MJPEG_BBC_BAS_ADDR_REG);
     streamBufEndAddr = JpuReadReg(MJPEG_BBC_END_ADDR_REG);
@@ -514,6 +518,7 @@ JpgRet JPU_SWReset()
     streamWrPtr = JpuReadReg(MJPEG_BBC_WR_PTR_REG);
 
     JpuWriteReg(MJPEG_PIC_START_REG, (1 << JPG_START_INIT));
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
 
     do
     {
@@ -521,7 +526,7 @@ JpgRet JPU_SWReset()
     }
     while ((val & (1 << JPG_START_INIT)) == (1 << JPG_START_INIT));
 
-
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpuWriteReg(MJPEG_BBC_BAS_ADDR_REG, streamBufStartAddr);
     JpuWriteReg(MJPEG_BBC_END_ADDR_REG, streamBufEndAddr);
     JpuWriteReg(MJPEG_BBC_RD_PTR_REG, streamRdPtr);
@@ -794,8 +799,9 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
             }
         }
     }
-
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     val = JpegDecodeHeader(pDecInfo);
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     if (val == 0)
     {
         JpgLeaveLock();
@@ -826,6 +832,7 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
         }
     }
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     if (val == -1)      //stream empty case
     {
         if (pDecInfo->streamEndflag == 1)
@@ -838,6 +845,7 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
         return JPG_RET_BIT_EMPTY;
     }
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     if (pDecInfo->streamRdPtr == pDecInfo->streamBufEndAddr)
     {
         JpuWriteReg(MJPEG_BBC_CUR_POS_REG, 0);
@@ -857,6 +865,7 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
 
     JpuWriteReg(MJPEG_BBC_BAS_ADDR_REG, pDecInfo->streamBufStartAddr);
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     if (pDecInfo->streamEndflag == 1)
     {
         val = JpuReadReg(MJPEG_BBC_STRM_CTRL_REG);
@@ -884,10 +893,13 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
     JpuWriteReg(MJPEG_ROT_INFO_REG, 0);
     JpuWriteReg(MJPEG_OP_INFO_REG,
                 pDecInfo->lineNum << 16 | pDecInfo->bufNum << 3 | pDecInfo->busReqNum);
+    // MCU DE
     JpuWriteReg(MJPEG_MCU_INFO_REG,
                 pDecInfo->mcuBlockNum << 16 | pDecInfo->compNum << 12 | pDecInfo->compInfo[0] << 8 |
                 pDecInfo->compInfo[1] << 4 | pDecInfo->compInfo[2]);
 
+    // YUV data format
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     if (pDecInfo->packedFormat == PACKED_FORMAT_NONE)
     {
         JpuWriteReg(MJPEG_DPB_CONFIG_REG,
@@ -945,7 +957,9 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
         return JPG_RET_INVALID_PARAM;
     }
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpgDecGramSetup(pDecInfo);
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
 
     JpuWriteReg(MJPEG_RST_INDEX_REG, 0);    // RST index at the beginning.
     JpuWriteReg(MJPEG_RST_COUNT_REG, 0);
@@ -1034,8 +1048,8 @@ JpgRet JPU_DecStartOneFrame(JpgDecHandle handle, JpgDecParam *param)
     }
 
 
-    Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_HIGH);
-
+    // Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpuWriteReg(MJPEG_PIC_START_REG, (1 << JPG_START_PIC));
 
     // while (1)
@@ -1921,6 +1935,8 @@ JpgRet JPU_EncStartOneFrame(JpgEncHandle handle, JpgEncParam *param)
     JpuWriteReg(MJPEG_GBU_BBHR_REG, 256 / 4);   // 64 * 4 byte == 32 * 8 byte
     JpuWriteReg(MJPEG_PIC_CTRL_REG, 0x18 | pEncInfo->usePartial | (0 << 2));
     JpuWriteReg(MJPEG_SCL_INFO_REG, 0);
+
+    // YUV data format
     if (pEncInfo->packedFormat == PACKED_FORMAT_NONE)
     {
         JpuWriteReg(MJPEG_DPB_CONFIG_REG,
@@ -1965,8 +1981,18 @@ JpgRet JPU_EncStartOneFrame(JpgEncHandle handle, JpgEncParam *param)
     JpuWriteReg(MJPEG_PIC_SIZE_REG, pEncInfo->alignedWidth << 16 | pEncInfo->alignedHeight);
     JpuWriteReg(MJPEG_ROT_INFO_REG, (rotMirEnable | rotMirMode));
 
+    // MCU setting  EN
     JpuWriteReg(MJPEG_MCU_INFO_REG, pEncInfo->mcuBlockNum << 16 | pEncInfo->compNum << 12
                 | pEncInfo->compInfo[0] << 8 | pEncInfo->compInfo[1] << 4 | pEncInfo->compInfo[2]);
+    DBG_DIRECT("MCU: Ori 0x%x", pEncInfo->mcuBlockNum << 16 | pEncInfo->compNum << 12
+               | pEncInfo->compInfo[0] << 8 | pEncInfo->compInfo[1] << 4 | pEncInfo->compInfo[2]);
+
+    // 422
+    // JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00043955);
+    // 444
+    // JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00133555);
+    // 420
+    // JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00063A55);
 
     //JpgEncGbuResetReg
     JpuWriteReg(MJPEG_GBU_CTRL_REG,

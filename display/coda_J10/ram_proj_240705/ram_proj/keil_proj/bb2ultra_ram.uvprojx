@@ -17,7 +17,7 @@
         <TargetCommonOption>
           <Device>ARMCM33_DSP_FP</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.9.0</PackID>
+          <PackID>ARM.CMSIS.5.4.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x20200000,0x00020000) IROM(0x00000000,0x00200000) IROM2(0x00200000,0x00200000) CPUTYPE("Cortex-M33") FPU3(SFPU) DSP CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1443,6 +1443,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\jpeg\jsrc\jpeg_encoder.c</FilePath>
             </File>
+            <File>
+              <FileName>arm_ahb_cache_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\arm_ahb_cache_ctrl.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2680,6 +2685,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\jpeg\jsrc\jpeg_encoder.c</FilePath>
             </File>
+            <File>
+              <FileName>arm_ahb_cache_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\jpeg\jsrc\arm_ahb_cache_ctrl.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2687,6 +2697,16 @@
   </Targets>
 
   <RTE>
+    <packages>
+      <filter>
+        <targetInfos/>
+      </filter>
+      <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.4.0">
+        <targetInfos>
+          <targetInfo name="TEST_ROM" versionMatchMode="fixed"/>
+        </targetInfos>
+      </package>
+    </packages>
     <apis/>
     <components/>
     <files/>

@@ -342,6 +342,62 @@ int jdi_read_memory(unsigned int addr, unsigned char *data, int len, int endian)
     return len;
 }
 
+// static uint8_t encoder_jpg[40 * 1024] __attribute__((section(".ARM.__at_0x20200000")));
+// static uint8_t __attribute__((aligned(8)))   encoder_jpg[40 * 1024];
+int jdi_allocate_vb_memory_en(jpu_buffer_t *vb)
+{
+    int i;
+    int ret = 0;
+    unsigned long offset;
+    jpudrv_buffer_t jdb = {0, };
+    static uint8_t cnt = 0;
+
+    cnt ++;
+    if (!s_pjip || s_jpu_fd == -1 || s_jpu_fd == 0x00)
+    {
+        DBG_DIRECT("jdi_allocate_dma_memory FAILD %d!!\n", cnt);
+        return -1;
+    }
+
+    jdb.size = vb->size;
+    // jdb.phys_addr = (unsigned long)jmem_alloc(&s_pjip->vmem, jdb.size, 0);
+
+    // jdb.phys_addr = (unsigned long)jpg_malloc_align(jdb.size, 8);
+//    memset(encoder_jpg, 0, sizeof(encoder_jpg));
+//    jdb.phys_addr = (unsigned long)encoder_jpg;
+    DBG_DIRECT("jdi_allocate_dma_memory get 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
+               jdb.size + 7);
+
+    if (jdb.phys_addr == (unsigned long) - 1)
+    {
+        return -1;    // not enough memory
+    }
+
+    offset = (unsigned long)(jdb.phys_addr - s_jdb_video_memory.phys_addr);
+    jdb.base = (unsigned long)s_jdb_video_memory.base + offset;
+    jdb.virt_addr = jdb.phys_addr;
+
+    vb->phys_addr = (unsigned long)jdb.phys_addr;
+    vb->base = (unsigned long)jdb.base;
+    vb->virt_addr = (unsigned long)jdb.phys_addr;
+
+
+    for (i = 0; i < MAX_JPU_BUFFER_POOL; i++)
+    {
+        if (s_jpu_buffer_pool[i].inuse == 0)
+        {
+            s_jpu_buffer_pool[i].jdb = jdb;
+            s_jpu_buffer_pool_count++;
+            s_jpu_buffer_pool[i].inuse = 1;
+            DBG_DIRECT("jdi_allocate_dma_memory i %d 0x%x 0x%x sz %d\n", i, &(s_jpu_buffer_pool[i].jdb),
+                       s_jpu_buffer_pool[i].jdb.phys_addr, s_jpu_buffer_pool[i].jdb.size);
+            break;
+        }
+    }
+
+    return 0;
+}
+
 int jdi_allocate_dma_memory(jpu_buffer_t *vb)
 {
     int i;

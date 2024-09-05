@@ -45,10 +45,14 @@ int main(void)
     irq_init();
     __enable_irq();
     _system_init_();
+    SYSBLKCTRL->u_218.BITS_218.BIT_DATA_MEM_EN = 1;
+    SYSBLKCTRL->u_238.BITS_238.BIT_SOC_ACTCK_DATA_MEM0_EN = 1;
 //  init_timer();
 //  delay_us(100);
 //  Pad_Config(P2_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE, PAD_OUT_LOW);
 
+    extern void arm_ahb_cache_setup(bool enable);
+    arm_ahb_cache_setup(false);
     DBG_DIRECT("Hello");
 
     // Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_HIGH);
@@ -57,7 +61,7 @@ int main(void)
 
 
     // Pad_Config(P2_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
-    // CODA_Test(3);
+//    CODA_Test(3);
     CODA_Test(4);
     DBG_DIRECT("Done");
 

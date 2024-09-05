@@ -49,7 +49,7 @@ JpgRet InitJpgInstancePool(void)
     {
         return JPG_RET_INVALID_HANDLE;
     }
-
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     if (jip->instance_pool_inited == 0)
     {
         for (i = 0; i < MAX_NUM_INSTANCE; i++)
@@ -489,18 +489,24 @@ void JpgDecGramSetup(JpgDecInfo *jpg)
     dExtBitBufCurPos    = jpg->pagePtr;
     dExtBitBufBaseAddr  = jpg->streamBufStartAddr;
 
-
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpuWriteReg(MJPEG_BBC_CUR_POS_REG, dExtBitBufCurPos);
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpuWriteReg(MJPEG_BBC_EXT_ADDR_REG, dExtBitBufBaseAddr + (dExtBitBufCurPos << 8));
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpuWriteReg(MJPEG_BBC_INT_ADDR_REG, (dExtBitBufCurPos & 1) << 6);
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpuWriteReg(MJPEG_BBC_DATA_CNT_REG, 256 / 4);   // 64 * 4 byte == 32 * 8 byte
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     JpuWriteReg(MJPEG_BBC_COMMAND_REG, (jpg->streamEndian << 1) | 0);
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     while (dMibStatus == 1)
     {
         dMibStatus = JpuReadReg(MJPEG_BBC_BUSY_REG);
     }
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     dMibStatus          = 1;
     dExtBitBufCurPos    = dExtBitBufCurPos + 1;
 
@@ -510,11 +516,13 @@ void JpgDecGramSetup(JpgDecInfo *jpg)
     JpuWriteReg(MJPEG_BBC_DATA_CNT_REG, 256 / 4);   // 64 * 4 byte == 32 * 8 byte
     JpuWriteReg(MJPEG_BBC_COMMAND_REG, (jpg->streamEndian << 1) | 0);
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     while (dMibStatus == 1)
     {
         dMibStatus = JpuReadReg(MJPEG_BBC_BUSY_REG);
     }
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     dMibStatus          = 1;
     dExtBitBufCurPos    = dExtBitBufCurPos + 1;
 
@@ -527,6 +535,7 @@ void JpgDecGramSetup(JpgDecInfo *jpg)
     JpuWriteReg(MJPEG_GBU_BBSR_REG, 0);
     JpuWriteReg(MJPEG_GBU_BBER_REG, ((256 / 4) * 2) - 1);
 
+    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     if (jpg->pagePtr & 1)
     {
         JpuWriteReg(MJPEG_GBU_BBIR_REG, 0);
@@ -1810,6 +1819,7 @@ DONE_DEC_HEADER:
     jpg->huffAcIdx = temp;
 
 
+    // DEC req num
     switch (jpg->format)
     {
     case FORMAT_420:
@@ -2454,6 +2464,7 @@ int JpgEncEncodeHeader(JpgEncHandle handle, JpgEncParamSet *para)
 
 
     frameFormat = pEncInfo->format;
+    // frameFormat = FORMAT_420;
     if (pEncInfo->rotationEnable && (pEncInfo->rotationAngle == 90 || pEncInfo->rotationAngle == 270))
     {
         frameFormat = (frameFormat == FORMAT_422) ? FORMAT_224 : (frameFormat == FORMAT_224) ? FORMAT_422 :

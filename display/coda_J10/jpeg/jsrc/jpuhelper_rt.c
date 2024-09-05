@@ -1335,7 +1335,14 @@ int LoadYuvImageBurstFormat(uint8_t *src, int picWidth, int picHeight,
             }
             else if (rgbType == JPG_RGB565)
             {
-                picWidth *= 2;
+                if (packed == PACKED_FORMAT_444)
+                {
+                    picWidth *= 3;
+                }
+                else
+                {
+                    picWidth *= 2;
+                }
             }
         }
         else
@@ -1360,6 +1367,9 @@ int LoadYuvImageBurstFormat(uint8_t *src, int picWidth, int picHeight,
     if (picWidth == stride) // for fast write
     {
         JpuWriteMem(addr, (uint8_t *)(puc), lumaSize, endian);
+        // memset((void *)addr, 0xA5, 20);
+        // unsigned long *reg_addr = (unsigned long *)(addr);
+        // *(volatile unsigned long *)reg_addr = 0xA55A;
 
         if (format == FORMAT_400)
         {
@@ -1440,6 +1450,7 @@ int LoadYuvImageBurstFormat(uint8_t *src, int picWidth, int picHeight,
             puc = src + lumaSize;
             addr = addrCb;
             JpuWriteMem(addr, (uint8_t *)puc, chromaSize, endian);
+            // memset((void *)addr, 0x5A, 20);
 
             puc = src + lumaSize + chromaSize;
             addr = addrCr;

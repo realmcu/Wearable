@@ -38,7 +38,7 @@ NIEUPORT REGISTERS
 
 #define MJPEG_PIC_CTRL_REG          (NPT_BASE + 0x010)  // [12:7] huffman table index [6] - user huffman en, [4] - TC direction, [3] - encoder enable, [1:0] - operation mode
 #define MJPEG_PIC_SIZE_REG          (NPT_BASE + 0x014)
-#define MJPEG_MCU_INFO_REG          (NPT_BASE + 0x018)
+#define MJPEG_MCU_INFO_REG          (NPT_BASE + 0x018)  //
 #define MJPEG_ROT_INFO_REG          (NPT_BASE + 0x01C)  // [4] - rot-mir enable, [3:0] - rot-mir mode
 
 #define MJPEG_SCL_INFO_REG          (NPT_BASE + 0x020)
@@ -46,7 +46,7 @@ NIEUPORT REGISTERS
 #define MJPEG_CLP_INFO_REG          (NPT_BASE + 0x028)
 #define MJPEG_OP_INFO_REG           (NPT_BASE + 0x02C)  // [31:16] - # of line in 1 partial buffer, [5:3] - # of partial buffers [2:0] - # of request
 
-#define MJPEG_DPB_CONFIG_REG        (NPT_BASE + 0x030)
+#define MJPEG_DPB_CONFIG_REG        (NPT_BASE + 0x030)  //
 #define MJPEG_DPB_BASE00_REG        (NPT_BASE + 0x034)
 #define MJPEG_DPB_BASE01_REG        (NPT_BASE + 0x038)
 #define MJPEG_DPB_BASE02_REG        (NPT_BASE + 0x03C)

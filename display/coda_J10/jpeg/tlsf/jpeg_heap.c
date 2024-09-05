@@ -2,13 +2,14 @@
 #include "tlsf.h"
 #include "jpeg_heap.h"
 #include "trace.h"
-
+#include "string.h"
 
 
 #define TLSF_BUFF_NUM_MAX  (16)
 
-static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE];
-
+static uint8_t  mem_array[TLSF_MEM_SIZE]  __attribute__((section(".ARM.__at_0x20200000")));
+//static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE] __attribute__((section(".ARM.__at_0x100000")));
+// static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE];
 static tlsf_t jpg_tlsf = NULL;
 
 
@@ -36,6 +37,7 @@ void *jpg_malloc(size_t size)
         DBG_DIRECT("jpg_malloc assert!");
         while (1);
     }
+    memset(ptr, 0, size);
     return ptr;
 }
 
@@ -88,3 +90,48 @@ void jpg_free(void *ptr)
     tlsf_free(jpg_tlsf, ptr);
 }
 
+
+#include "trace.h"
+static uint8_t myisprint(uint8_t ch)
+{
+    if ((ch >= 0x20) && (ch <= 0x7e)) { return 1; }
+    else { return 0; }
+}
+
+void log_hex(uint8_t *addr, uint32_t n)
+{
+    uint32_t i = 0, j = 1;
+
+    if (!addr)
+    {
+        DBG_DIRECT("LOG NULL!");
+    }
+    else
+    {
+        DBG_DIRECT("--------------------- LOG start: 0x%x, len: %d -----------------------------------------",
+                   addr, n);
+    }
+    DBG_DIRECT("\t \t 1 \t 2 \t 3 \t 4 \t 5 \t 6 \t 7 \t 8 \t 9 \t 10 \t|");
+    while (i < n)
+    {
+        DBG_DIRECT("0x%x: %d> \t %02x \t %02x \t %02x \t %02x \t %02x \t %02x \t %02x \t %02x \t %02x \t %02x  \t|%c%c%c%c%c%c%c%c%c%c|",
+                   (uint8_t *)addr + (j - 1) * 10, j\
+                   , *((uint8_t *)addr + i), *((uint8_t *)addr + i + 1), *((uint8_t *)addr + i + 2),
+                   *((uint8_t *)addr + i + 3), *((uint8_t *)addr + i + 4)\
+                   , *((uint8_t *)addr + i + 5), *((uint8_t *)addr + i + 6), *((uint8_t *)addr + i + 7),
+                   *((uint8_t *)addr + i + 8), *((uint8_t *)addr + i + 9)\
+                   , myisprint(*(addr + i)) ? * (addr + i) : '.', myisprint(*(addr + i + 1)) ? * (addr + i + 1) : '.'\
+                   , myisprint(*(addr + i + 2)) ? * (addr + i + 2) : '.',
+                   myisprint(*(addr + i + 3)) ? * (addr + i + 3) : '.'\
+                   , myisprint(*(addr + i + 4)) ? * (addr + i + 4) : '.',
+                   myisprint(*(addr + i + 5)) ? * (addr + i + 5) : '.'\
+                   , myisprint(*(addr + i + 6)) ? * (addr + i + 6) : '.',
+                   myisprint(*(addr + i + 7)) ? * (addr + i + 7) : '.'\
+                   , myisprint(*(addr + i + 8)) ? * (addr + i + 8) : '.',
+                   myisprint(*(addr + i + 9)) ? * (addr + i + 9) : '.');
+
+        i += 10;
+        if (j % 5 == 0) { DBG_DIRECT("\n"); }
+        j++;
+    }
+}
