@@ -390,6 +390,7 @@ void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
     rtl_gui_dma_single_block_init();
     lcd_dma_single_block_start(buf, len * 2);
 }
+
 void rtk_lcd_hal_transfer_done(void)
 {
     while (GDMA_GetTransferINTStatus(LCD_DMA_CHANNEL_NUM) != SET);
@@ -398,7 +399,7 @@ void rtk_lcd_hal_transfer_done(void)
     while (IF8080_GetTxDataLen() != IF8080_GetTxCounter())
     {
         //counter = IF8080_GetTxCounter();
-        DBG_DIRECT("len = %d, tx cnt = %d ", IF8080_GetTxDataLen(), IF8080_GetTxCounter());
+        //DBG_DIRECT("len = %d, tx cnt = %d ", IF8080_GetTxDataLen(), IF8080_GetTxCounter());
     }
     IF8080_ClearFIFO();
     IF8080_SwitchMode(IF8080_MODE_MANUAL);
