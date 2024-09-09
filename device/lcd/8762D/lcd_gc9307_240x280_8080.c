@@ -86,7 +86,7 @@ static void gc9307_init_1st(void)
     gc9307_280_write_cmd(0xfe);
     gc9307_280_write_cmd(0xef);
     gc9307_280_write_cmd(0x36);
-    gc9307_280_write_data(0x08);
+    gc9307_280_write_data(0x08);//0X00 means RGB for ARM2D, 0x08 means BGR for LVGL
     gc9307_280_write_cmd(0x3a);
     gc9307_280_write_data(0x05);
     //----------------------------------Power Control Registers Initial--------------------------------//
@@ -246,7 +246,7 @@ static void lcd_device_init(void)
     }
     else if (SystemCpuClock == 90000000)
     {
-        IF8080_InitStruct.IF8080_ClockDiv          = IF8080_CLOCK_DIV_5;
+        IF8080_InitStruct.IF8080_ClockDiv          = IF8080_CLOCK_DIV_6;
     }
     else if (SystemCpuClock == 8000000)
     {
@@ -377,16 +377,19 @@ void rtl_gui_dma_single_block_init(void)
 
 void lcd_dma_single_block_start(uint8_t *source_addr, uint32_t len)
 {
+    while ((len >> 2) > 4096)
+    {
+        DBG_DIRECT("BUFFER SIZE ERROR!!");
+    }
     GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len >> 2);
     GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(&(IF8080->FIFO)));
     GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)source_addr);
     GDMA_Cmd(LCD_DMA_CHANNEL_NUM, ENABLE);
 }
 
-static uint32_t pfb_tx_xnt = 0;
+
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
 {
-    pfb_tx_xnt = len;
     rtl_gui_dma_single_block_init();
     lcd_dma_single_block_start(buf, len * 2);
 }
@@ -399,7 +402,7 @@ void rtk_lcd_hal_transfer_done(void)
     while (IF8080_GetTxDataLen() != IF8080_GetTxCounter())
     {
         //counter = IF8080_GetTxCounter();
-        //DBG_DIRECT("len = %d, tx cnt = %d ", IF8080_GetTxDataLen(), IF8080_GetTxCounter());
+        //DBG_DIRECT("LINE = %d, len = %d, tx cnt = %d ", __LINE__, IF8080_GetTxDataLen(), IF8080_GetTxCounter());
     }
     IF8080_ClearFIFO();
     IF8080_SwitchMode(IF8080_MODE_MANUAL);
