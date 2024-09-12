@@ -136,7 +136,7 @@ void rtk_lcd_hal_transfer_done(void)
 
 static void lcd_address(uint8_t page, uint8_t column)
 {
-    DBG_DIRECT("lcd_address page : %d, column %d", page, column);
+    // DBG_DIRECT("lcd_address page : %d, column %d", page, column);
     st7571_write_cmd(0xB0 + page);
     st7571_write_cmd(((column >> 4) & 0x0f) + 0x10);
     st7571_write_cmd(column & 0x0f);
@@ -464,7 +464,6 @@ static void lcd_st7571_init(void)
     // platform_delay_ms(10);
 }
 
-uint8_t frame_buffer[128 * 128 / 4];
 void rtk_lcd_hal_init(void)
 {
     lcd_device_init();
@@ -473,7 +472,6 @@ void rtk_lcd_hal_init(void)
     lcd_set_reset(false);
     platform_delay_ms(50);
     lcd_st7571_init();
-
 
     fill_screen(0x0);
     st7571_write_cmd(0xAF); //Display ON
