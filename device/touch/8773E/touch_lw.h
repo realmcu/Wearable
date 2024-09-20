@@ -24,7 +24,7 @@
 #define TOUCH_INT_APBPeriph_CLK                   APBPeriph_GPIOB_CLOCK
 #define TOUCH_INT_GROUP                           GPIOB
 #define TOUCH_INT                                 P4_1
-#define TOUCH_INT_HANDLER                         GPIOB8_Handler  //GPIOA2_Handler
+//#define TOUCH_INT_HANDLER                         GPIOB8_Handler  //GPIOA2_Handler
 #define TOUCH_INT_IRQ                             GPIO40_IRQn      //GPIO2_IRQn
 #define TOUCH_INT_VECTORn                         GPIOB8_VECTORn  //GPIOA2_VECTORn
 
