@@ -49,6 +49,9 @@
 #include "os_sync.h"
 #include "stdint.h"
 #include "trace.h"
+#include "watch_clock.h"
+
+#include "cJSON.h"
 /*============================================================================*
  *                              Macros
  *============================================================================*/
@@ -62,16 +65,16 @@ void *app_custom_task_handle = NULL;
 void *tuya_custom_queue_handle = NULL;
 
 tuya_ble_device_param_t device_param = {0};
-static const char device_local_name[] = "TY";
+static const char device_local_name[] = "TuYa";
 
+// static const char auth_key_test[]   =
+//     "11QxzWt9BZOJsGanh8mZbgxtA5lfGLYj";//"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy";
+// static const char device_id_test[]  = "tuyabcadf3808d6e";//"zzzzzzzzzzzzzzzz";
+// static const uint8_t mac_test[]     = "DC234EA457DC";
 static const char auth_key_test[]   =
-    "11QxzWt9BZOJsGanh8mZbgxtA5lfGLYj";//"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy";
-static const char device_id_test[]  = "tuyabcadf3808d6e";//"zzzzzzzzzzzzzzzz";
-static const uint8_t mac_test[]     = "DC234EA457DC";
-//static const char auth_key_test[]   =
-//    "9maUDqnKbIOwWdAbAK7JCTM9G9gx8SBG";//"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy";
-//static const char device_id_test[]  = "tuya65c3674dee93";//"zzzzzzzzzzzzzzzz";
-//static const uint8_t mac_test[]     = "DC234E355E3F";
+    "9maUDqnKbIOwWdAbAK7JCTM9G9gx8SBG";//"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy";
+static const char device_id_test[]  = "tuya65c3674dee93";//"zzzzzzzzzzzzzzzz";
+static const uint8_t mac_test[]     = "DC234E355E3F";
 #define APP_CUSTOM_EVENT_1  1
 #define APP_CUSTOM_EVENT_2  2
 #define APP_CUSTOM_EVENT_3  3
@@ -137,6 +140,7 @@ void app_custom_task(void *p_param)
         if (os_msg_recv(tuya_custom_queue_handle, &event, 0xFFFFFFFF) == true)
         {
             int16_t result = 0;
+#if 1
             switch (event.evt)
             {
             case TUYA_BLE_CB_EVT_CONNECTE_STATUS:
@@ -267,6 +271,8 @@ void app_custom_task(void *p_param)
                 uint32_t rsp_len = 2;
                 rsp_data[1] = event.weather_req_response_data.status;
                 tuya_ble_sdk_test_send(TY_UARTV_CMD_GET_WEATHER, rsp_data, rsp_len);
+                TUYA_APP_LOG_INFO("send weather date request!!!");
+
 #endif
                 break;
 
@@ -277,16 +283,51 @@ void app_custom_task(void *p_param)
 
                     tuya_ble_wd_object_t *object;
                     uint16_t object_len = 0;
-
+#if 0
+                    cJSON *root;
+                    root = cJSON_CreateObject();
+                    char key[15];
                     for (;;)
                     {
                         object = (tuya_ble_wd_object_t *)(event.weather_received_data.p_data + object_len);
 
                         TUYA_APP_LOG_DEBUG("weather data, n_day=[%d] key=[0x%08x] val_type=[%d] val_len=[%d]", \
                                            object->n_day, object->key_type, object->val_type, object->value_len);
-                        TUYA_APP_LOG_HEXDUMP_DEBUG("vaule :", (uint8_t *)object->vaule, object->value_len);
+                        TUYA_BLE_LOG_HEXDUMP_DEBUG("vaule:", object->vaule, object->value_len);
+                        // TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
 
                         // TODO .. YOUR JOBS
+                        cJSON *fmt;
+                        switch (object->key_type)
+                        {
+                        case WKT_TEMP:
+                            {
+                                cJSON_AddNumberToObject(root, "current", object->vaule[3]);
+                                break;
+                            }
+                        case WKT_THIHG:
+                            {
+                                sprintf(key, "high_%d", object->n_day);
+                                cJSON_AddNumberToObject(root, key, object->vaule[3]);
+                                break;
+                            }
+                        case WKT_TLOW:
+                            {
+                                sprintf(key, "low_%d", object->n_day);
+                                cJSON_AddNumberToObject(root, key, object->vaule[3]);
+                                break;
+                            }
+                        case WKT_CONDITION:
+                            {
+                                TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
+                                TUYA_BLE_LOG_DEBUG("!!!value : %d", object->vaule);
+                                sprintf(key, "condition_%d", object->n_day);
+                                cJSON_AddStringToObject(root, key, object->vaule);
+                                break;
+                            }
+                        default:
+                            break;
+                        }
 
                         object_len += (sizeof(tuya_ble_wd_object_t) + object->value_len);
                         if (object_len >= event.weather_received_data.data_len)
@@ -294,10 +335,15 @@ void app_custom_task(void *p_param)
                             break;
                         }
                     }
-
+                    extern char *cjson_weather;
+                    char *temp = cjson_weather;
+                    cjson_weather = cJSON_PrintUnformatted(root);
+                    gui_free(temp);
+                    cJSON_Delete(root);
+#endif
 #if TUYA_BLE_SDK_TEST_ENABLE
-                    tuya_ble_sdk_test_send(TY_UARTV_CMD_GET_WEATHER, event.weather_received_data.p_data,
-                                           event.weather_received_data.data_len);
+                    // tuya_ble_sdk_test_send(TY_UARTV_CMD_GET_WEATHER, event.weather_received_data.p_data,
+                    //                        event.weather_received_data.data_len);
 #endif
                 }
                 break;
@@ -524,7 +570,7 @@ void app_custom_task(void *p_param)
                 TUYA_APP_LOG_WARNING("app_tuya_cb_queue msg: unknown event type 0x%04x", event.evt);
                 break;
             }
-
+#endif
             tuya_ble_event_response(&event);
         }
     }
