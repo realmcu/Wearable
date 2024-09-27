@@ -284,62 +284,100 @@ void app_custom_task(void *p_param)
                     tuya_ble_wd_object_t *object;
                     uint16_t object_len = 0;
 #if 0
-                    cJSON *root;
-                    root = cJSON_CreateObject();
-                    char key[15];
-                    for (;;)
+                    // creat new cjson
+                    // cJSON *root = cJSON_CreateObject();
+                    // cJSON *compass_array = cJSON_CreateArray();
+                    // cJSON *compass_item = cJSON_CreateObject();
+                    // cJSON_AddItemToArray(compass_array, compass_item);
+                    // cJSON_AddNumberToObject(compass_item, "degree", 90);
+                    // cJSON_AddItemToObject(root, "compass", compass_array);
+
+                    // cJSON *activity_array = cJSON_CreateArray();
+                    // cJSON *activity_item = cJSON_CreateObject();
+                    // cJSON_AddItemToArray(activity_array, activity_item);
+                    // cJSON_AddNumberToObject(activity_item, "move", 1);
+                    // cJSON_AddNumberToObject(activity_item, "ex", 1);
+                    // cJSON_AddNumberToObject(activity_item, "stand", 1);
+                    // cJSON_AddItemToObject(root, "activity", activity_array);
+
+                    // cJSON *weather_array = cJSON_CreateArray();
+                    // cJSON *weather_item = cJSON_CreateObject();
+                    // cJSON_AddItemToArray(weather_array, weather_item);
+                    extern char *cjson_content;
+                    cJSON *root = cJSON_Parse(cjson_content);
+                    if (!root) { return; }
+                    cJSON *weather_array = cJSON_GetObjectItem(root, "weather");
+                    if (weather_array != NULL && cJSON_GetArraySize(weather_array) > 0)
                     {
-                        object = (tuya_ble_wd_object_t *)(event.weather_received_data.p_data + object_len);
-
-                        TUYA_APP_LOG_DEBUG("weather data, n_day=[%d] key=[0x%08x] val_type=[%d] val_len=[%d]", \
-                                           object->n_day, object->key_type, object->val_type, object->value_len);
-                        TUYA_BLE_LOG_HEXDUMP_DEBUG("vaule:", object->vaule, object->value_len);
-                        // TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
-
-                        // TODO .. YOUR JOBS
-                        cJSON *fmt;
-                        switch (object->key_type)
+                        char key[15];
+                        cJSON *weather_item = cJSON_GetArrayItem(weather_array, 0);
+                        for (;;)
                         {
-                        case WKT_TEMP:
-                            {
-                                cJSON_AddNumberToObject(root, "current", object->vaule[3]);
-                                break;
-                            }
-                        case WKT_THIHG:
-                            {
-                                sprintf(key, "high_%d", object->n_day);
-                                cJSON_AddNumberToObject(root, key, object->vaule[3]);
-                                break;
-                            }
-                        case WKT_TLOW:
-                            {
-                                sprintf(key, "low_%d", object->n_day);
-                                cJSON_AddNumberToObject(root, key, object->vaule[3]);
-                                break;
-                            }
-                        case WKT_CONDITION:
-                            {
-                                TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
-                                TUYA_BLE_LOG_DEBUG("!!!value : %d", object->vaule);
-                                sprintf(key, "condition_%d", object->n_day);
-                                cJSON_AddStringToObject(root, key, object->vaule);
-                                break;
-                            }
-                        default:
-                            break;
-                        }
+                            object = (tuya_ble_wd_object_t *)(event.weather_received_data.p_data + object_len);
 
-                        object_len += (sizeof(tuya_ble_wd_object_t) + object->value_len);
-                        if (object_len >= event.weather_received_data.data_len)
-                        {
-                            break;
+                            TUYA_APP_LOG_DEBUG("weather data, n_day=[%d] key=[0x%08x] val_type=[%d] val_len=[%d]", \
+                                               object->n_day, object->key_type, object->val_type, object->value_len);
+                            TUYA_BLE_LOG_HEXDUMP_DEBUG("vaule:", object->vaule, object->value_len);
+                            // TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
+
+                            // TODO .. YOUR JOBS
+                            cJSON *fmt;
+                            switch (object->key_type)
+                            {
+                            case WKT_TEMP:
+                                {
+                                    if (object->n_day == 1)
+                                    {
+                                        // cJSON_AddNumberToObject(weather_item, "cur", object->vaule[3]);
+                                        cJSON_ReplaceItemInObject(weather_item, "cur", cJSON_CreateNumber(object->vaule[3]));
+                                    }
+                                    break;
+                                }
+                            case WKT_THIHG:
+                                {
+                                    if (object->n_day == 1)
+                                    {
+                                        // cJSON_AddNumberToObject(weather_item, "high", object->vaule[3]);
+                                        cJSON_ReplaceItemInObject(weather_item, "high", cJSON_CreateNumber(object->vaule[3]));
+                                    }
+                                    break;
+                                }
+                            case WKT_TLOW:
+                                {
+                                    if (object->n_day == 1)
+                                    {
+                                        // cJSON_AddNumberToObject(weather_item, "low", object->vaule[3]);
+                                        cJSON_ReplaceItemInObject(weather_item, "low", cJSON_CreateNumber(object->vaule[3]));
+                                    }
+                                    break;
+                                }
+                            case WKT_CONDITION:
+                                {
+                                    // TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
+                                    // TUYA_BLE_LOG_DEBUG("!!!value : %d", object->vaule);
+                                    sprintf(key, "condition_%d", object->n_day);
+                                    // cJSON_AddStringToObject(weather_item, key, object->vaule);
+                                    cJSON_ReplaceItemInObject(weather_item, key, cJSON_CreateString(object->vaule));
+                                    break;
+                                }
+                            default:
+                                break;
+                            }
+
+                            object_len += (sizeof(tuya_ble_wd_object_t) + object->value_len);
+                            if (object_len >= event.weather_received_data.data_len)
+                            {
+                                break;
+                            }
                         }
+                        // cJSON_AddItemToObject(root, "weather", weather_array);
+                        // extern char *cjson_content;
+                        char *temp = cJSON_PrintUnformatted(root);
+                        sprintf(cjson_content, "%s", temp);
+                        gui_log("cjson_content: %x\n", cjson_content);
+                        gui_free(temp);
+                        cJSON_Delete(root);
                     }
-                    extern char *cjson_weather;
-                    char *temp = cjson_weather;
-                    cjson_weather = cJSON_PrintUnformatted(root);
-                    gui_free(temp);
-                    cJSON_Delete(root);
 #endif
 #if TUYA_BLE_SDK_TEST_ENABLE
                     // tuya_ble_sdk_test_send(TY_UARTV_CMD_GET_WEATHER, event.weather_received_data.p_data,
