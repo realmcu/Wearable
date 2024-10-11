@@ -284,28 +284,52 @@ void app_custom_task(void *p_param)
                     tuya_ble_wd_object_t *object;
                     uint16_t object_len = 0;
 #if 0
-                    // creat new cjson
-                    // cJSON *root = cJSON_CreateObject();
-                    // cJSON *compass_array = cJSON_CreateArray();
-                    // cJSON *compass_item = cJSON_CreateObject();
-                    // cJSON_AddItemToArray(compass_array, compass_item);
-                    // cJSON_AddNumberToObject(compass_item, "degree", 90);
-                    // cJSON_AddItemToObject(root, "compass", compass_array);
-
-                    // cJSON *activity_array = cJSON_CreateArray();
-                    // cJSON *activity_item = cJSON_CreateObject();
-                    // cJSON_AddItemToArray(activity_array, activity_item);
-                    // cJSON_AddNumberToObject(activity_item, "move", 1);
-                    // cJSON_AddNumberToObject(activity_item, "ex", 1);
-                    // cJSON_AddNumberToObject(activity_item, "stand", 1);
-                    // cJSON_AddItemToObject(root, "activity", activity_array);
-
-                    // cJSON *weather_array = cJSON_CreateArray();
-                    // cJSON *weather_item = cJSON_CreateObject();
-                    // cJSON_AddItemToArray(weather_array, weather_item);
                     extern char *cjson_content;
                     cJSON *root = cJSON_Parse(cjson_content);
                     if (!root) { return; }
+                    extern uint16_t xorshift16();
+                    cJSON *compass_array = cJSON_GetObjectItem(root, "compass");
+                    if (compass_array != NULL && cJSON_GetArraySize(compass_array) > 0)
+                    {
+                        cJSON *compass_item = cJSON_GetArrayItem(compass_array, 0);
+                        cJSON_ReplaceItemInObject(compass_item, "degree", cJSON_CreateNumber(xorshift16() % 359));
+                    }
+
+                    cJSON *activity_array = cJSON_GetObjectItem(root, "activity");
+                    if (activity_array != NULL && cJSON_GetArraySize(activity_array) > 0)
+                    {
+                        cJSON *activity_item = cJSON_GetArrayItem(activity_array, 0);
+                        cJSON_ReplaceItemInObject(activity_item, "move", cJSON_CreateNumber(xorshift16() % 20000));
+                        cJSON_ReplaceItemInObject(activity_item, "ex", cJSON_CreateNumber(xorshift16() % 60));
+                        cJSON_ReplaceItemInObject(activity_item, "stand", cJSON_CreateNumber(xorshift16() % 30));
+                    }
+
+                    cJSON *heart_rate_array = cJSON_GetObjectItem(root, "heart_rate");
+                    if (heart_rate_array != NULL && cJSON_GetArraySize(heart_rate_array) > 0)
+                    {
+                        cJSON *heart_rate_item = cJSON_GetArrayItem(heart_rate_array, 0);
+                        {
+                            uint16_t temp = xorshift16() % 110;
+                            temp = temp > 60 ? temp : 68;
+                            cJSON_ReplaceItemInObject(heart_rate_item, "AM12", cJSON_CreateNumber(temp));
+                        }
+                        {
+                            uint16_t temp = xorshift16() % 110;
+                            temp = temp > 60 ? temp : 73;
+                            cJSON_ReplaceItemInObject(heart_rate_item, "AM6", cJSON_CreateNumber(temp));
+                        }
+                        {
+                            uint16_t temp = xorshift16() % 110;
+                            temp = temp > 60 ? temp : 82;
+                            cJSON_ReplaceItemInObject(heart_rate_item, "PM12", cJSON_CreateNumber(temp));
+                        }
+                        {
+                            uint16_t temp = xorshift16() % 110;
+                            temp = temp > 60 ? temp : 94;
+                            cJSON_ReplaceItemInObject(heart_rate_item, "PM6", cJSON_CreateNumber(temp));
+                        }
+                    }
+
                     cJSON *weather_array = cJSON_GetObjectItem(root, "weather");
                     if (weather_array != NULL && cJSON_GetArraySize(weather_array) > 0)
                     {
@@ -321,7 +345,6 @@ void app_custom_task(void *p_param)
                             // TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
 
                             // TODO .. YOUR JOBS
-                            cJSON *fmt;
                             switch (object->key_type)
                             {
                             case WKT_TEMP:
@@ -378,7 +401,7 @@ void app_custom_task(void *p_param)
                         gui_free(temp);
                         cJSON_Delete(root);
                     }
-#endif
+#endif                 
 #if TUYA_BLE_SDK_TEST_ENABLE
                     // tuya_ble_sdk_test_send(TY_UARTV_CMD_GET_WEATHER, event.weather_received_data.p_data,
                     //                        event.weather_received_data.data_len);
