@@ -89,6 +89,23 @@ typedef struct
     uint8_t data[50];
 } custom_data_type_t;
 
+// void *data_generate_handle;   //!< APP Task handle
+
+// void data_generate_task_entry()
+// {
+//     while(true)
+//     {
+//         extern void json_refreash();
+//         json_refreash();
+//         osif_delay(2000);
+//     }
+// }
+
+// void data_generate_init(void)
+// {
+//     os_task_create(&data_generate_handle, "data_generate_task", data_generate_task_entry, 0, 1024 * 2, 2);
+// }
+
 void custom_data_process(int32_t evt_id, void *data)
 {
     custom_data_type_t *event_1_data;
@@ -287,48 +304,6 @@ void app_custom_task(void *p_param)
                     extern char *cjson_content;
                     cJSON *root = cJSON_Parse(cjson_content);
                     if (!root) { return; }
-                    extern uint16_t xorshift16();
-                    cJSON *compass_array = cJSON_GetObjectItem(root, "compass");
-                    if (compass_array != NULL && cJSON_GetArraySize(compass_array) > 0)
-                    {
-                        cJSON *compass_item = cJSON_GetArrayItem(compass_array, 0);
-                        cJSON_ReplaceItemInObject(compass_item, "degree", cJSON_CreateNumber(xorshift16() % 359));
-                    }
-
-                    cJSON *activity_array = cJSON_GetObjectItem(root, "activity");
-                    if (activity_array != NULL && cJSON_GetArraySize(activity_array) > 0)
-                    {
-                        cJSON *activity_item = cJSON_GetArrayItem(activity_array, 0);
-                        cJSON_ReplaceItemInObject(activity_item, "move", cJSON_CreateNumber(xorshift16() % 20000));
-                        cJSON_ReplaceItemInObject(activity_item, "ex", cJSON_CreateNumber(xorshift16() % 60));
-                        cJSON_ReplaceItemInObject(activity_item, "stand", cJSON_CreateNumber(xorshift16() % 30));
-                    }
-
-                    cJSON *heart_rate_array = cJSON_GetObjectItem(root, "heart_rate");
-                    if (heart_rate_array != NULL && cJSON_GetArraySize(heart_rate_array) > 0)
-                    {
-                        cJSON *heart_rate_item = cJSON_GetArrayItem(heart_rate_array, 0);
-                        {
-                            uint16_t temp = xorshift16() % 110;
-                            temp = temp > 60 ? temp : 68;
-                            cJSON_ReplaceItemInObject(heart_rate_item, "AM12", cJSON_CreateNumber(temp));
-                        }
-                        {
-                            uint16_t temp = xorshift16() % 110;
-                            temp = temp > 60 ? temp : 73;
-                            cJSON_ReplaceItemInObject(heart_rate_item, "AM6", cJSON_CreateNumber(temp));
-                        }
-                        {
-                            uint16_t temp = xorshift16() % 110;
-                            temp = temp > 60 ? temp : 82;
-                            cJSON_ReplaceItemInObject(heart_rate_item, "PM12", cJSON_CreateNumber(temp));
-                        }
-                        {
-                            uint16_t temp = xorshift16() % 110;
-                            temp = temp > 60 ? temp : 94;
-                            cJSON_ReplaceItemInObject(heart_rate_item, "PM6", cJSON_CreateNumber(temp));
-                        }
-                    }
 
                     cJSON *weather_array = cJSON_GetObjectItem(root, "weather");
                     if (weather_array != NULL && cJSON_GetArraySize(weather_array) > 0)
@@ -351,7 +326,6 @@ void app_custom_task(void *p_param)
                                 {
                                     if (object->n_day == 1)
                                     {
-                                        // cJSON_AddNumberToObject(weather_item, "cur", object->vaule[3]);
                                         cJSON_ReplaceItemInObject(weather_item, "cur", cJSON_CreateNumber(object->vaule[3]));
                                     }
                                     break;
@@ -360,7 +334,6 @@ void app_custom_task(void *p_param)
                                 {
                                     if (object->n_day == 1)
                                     {
-                                        // cJSON_AddNumberToObject(weather_item, "high", object->vaule[3]);
                                         cJSON_ReplaceItemInObject(weather_item, "high", cJSON_CreateNumber(object->vaule[3]));
                                     }
                                     break;
@@ -369,7 +342,6 @@ void app_custom_task(void *p_param)
                                 {
                                     if (object->n_day == 1)
                                     {
-                                        // cJSON_AddNumberToObject(weather_item, "low", object->vaule[3]);
                                         cJSON_ReplaceItemInObject(weather_item, "low", cJSON_CreateNumber(object->vaule[3]));
                                     }
                                     break;
@@ -379,7 +351,6 @@ void app_custom_task(void *p_param)
                                     // TUYA_BLE_LOG_DEBUG("!!!value_len : %d", object->value_len);
                                     // TUYA_BLE_LOG_DEBUG("!!!value : %d", object->vaule);
                                     sprintf(key, "condition_%d", object->n_day);
-                                    // cJSON_AddStringToObject(weather_item, key, object->vaule);
                                     cJSON_ReplaceItemInObject(weather_item, key, cJSON_CreateString(object->vaule));
                                     break;
                                 }
@@ -397,11 +368,10 @@ void app_custom_task(void *p_param)
                         // extern char *cjson_content;
                         char *temp = cJSON_PrintUnformatted(root);
                         sprintf(cjson_content, "%s", temp);
-                        gui_log("cjson_content: %x\n", cjson_content);
                         gui_free(temp);
                         cJSON_Delete(root);
                     }
-#endif                 
+#endif
 #if TUYA_BLE_SDK_TEST_ENABLE
                     // tuya_ble_sdk_test_send(TY_UARTV_CMD_GET_WEATHER, event.weather_received_data.p_data,
                     //                        event.weather_received_data.data_len);
