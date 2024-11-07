@@ -9,7 +9,7 @@ extern "C" {
 #define     DMA_MULTIBLOCK          1
 #define     INFINITE_MODE           1
 
-#define PIXEL_BYTES                 2
+#define PIXEL_BYTES                 3
 
 #define ST77903_WIDTH                   (400U)
 #define ST77903_HEIGHT                  (400U)

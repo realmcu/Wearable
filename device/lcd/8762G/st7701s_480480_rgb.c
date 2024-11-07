@@ -362,11 +362,11 @@ void rtk_lcd_hal_init(void)
     //*******************************/
 #include "st7701s_rgb.txt"
     uint8_t *buf = (uint8_t *)SPIC1_ADDR;
-    for (int i = 0; i < 480 * 480 * 3; i = i + 3)
+    for (int i = 0; i < 480 * 480 * ST7701S_DRV_PIXEL_BITS / 8; i = i + ST7701S_DRV_PIXEL_BITS / 8)
     {
-        buf[i] = 0xFF;
+        buf[i] = 0xF8;
         buf[i + 1] = 0;
-        buf[i + 2] = 0;
+        // buf[i + 2] = 0;
     }
     rtk_lcd_hal_update_framebuffer((uint8_t *)SPIC1_ADDR,
                                    ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT);
@@ -424,6 +424,74 @@ bool rtk_lcd_hal_power_off(void)
 
 bool rtk_lcd_hal_power_on(void)
 {
+    RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK, ENABLE);
+
+    //from XTAL SOURCE = 40M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_ck_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_func_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_mux_clk_cg_en = 1;
+
+    //From PLL1, SOURCE = 125M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 0; //pll1_peri(0) or pll2(1, pll2 = 160M)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel1 = 1; //pll(1) or xtal(0)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_sel = 1; //div
+
+    LCDC_InitTypeDef lcdc_init = {0};
+    lcdc_init.LCDC_Interface = LCDC_IF_DPI;
+#if ST7701S_DRV_PIXEL_BITS == 16
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB565;
+    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB565;
+#else
+    lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB888;
+    lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB888;
+#endif
+    lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
+    lcdc_init.LCDC_GroupSel = 1;
+
+    lcdc_init.LCDC_DmaThreshold =
+        8;    //only support threshold = 8 for DMA MSIZE = 8; the other threshold setting will be support later
+    lcdc_init.LCDC_InfiniteModeEn = 1;
+    LCDC_Init(&lcdc_init);
+
+    uint32_t HSA = 10, HFP = 50, HBP = 50, HACT = ST7701S_480480_LCD_WIDTH;
+    uint32_t VSA = 10, VFP = 20, VBP = 20, VACT = ST7701S_480480_LCD_HEIGHT;
+
+    LCDC_eDPICfgTypeDef eDPICfg;//480*640  ---->   500 * 660
+    eDPICfg.eDPI_ClockDiv = 0x3;
+
+    eDPICfg.eDPI_HoriSyncWidth = HSA;
+    eDPICfg.eDPI_VeriSyncHeight = VSA;
+    eDPICfg.eDPI_AccumulatedHBP = HSA + HBP;
+    eDPICfg.eDPI_AccumulatedVBP = VSA + VBP;
+    eDPICfg.eDPI_AccumulatedActiveW = HSA + HBP + HACT;
+    eDPICfg.eDPI_AccumulatedActiveH = VSA + VBP + VACT;
+    eDPICfg.eDPI_TotalWidth = HSA + HBP + HACT + HFP;
+    eDPICfg.eDPI_TotalHeight = VSA + VBP + VACT + VFP;
+    eDPICfg.eDPI_HoriSyncPolarity = 0;
+    eDPICfg.eDPI_VeriSyncPolarity = 0;
+    eDPICfg.eDPI_DataEnPolarity = 1;
+    eDPICfg.eDPI_LineIntMask = 1;
+#if ST7701S_DRV_PIXEL_BITS == 16
+    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB565_2;
+#else
+    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB888;
+#endif
+    eDPICfg.eDPI_OperateMode = 0;//video mode
+    eDPICfg.eDPI_LcdArc = 0;
+    eDPICfg.eDPI_ShutdnPolarity = 0;
+    eDPICfg.eDPI_ColorModePolarity = 0;
+    eDPICfg.eDPI_ShutdnEn = 0;
+    eDPICfg.eDPI_ColorModeEn = 0;
+    eDPICfg.eDPI_UpdateCfgEn = 0;
+    eDPICfg.eDPI_TearReq = 0;
+    eDPICfg.eDPI_Halt = 0;
+    eDPICfg.eDPI_CmdMaxLatency = 0;//todo
+    eDPICfg.eDPI_LineBufferPixelThreshold = eDPICfg.eDPI_TotalWidth / 2;
+
+    EDPI_Init(&eDPICfg);
+
+    st7701s_dma_init((uint8_t *)SPIC1_ADDR);
     return 0;
 }
 

@@ -170,11 +170,21 @@ void rtk_touch_hal_int_config(bool enable)
 }
 bool rtk_touch_hal_power_off(void)
 {
+    // keep holding gpio pin level in sleep
+    drv_pin_mode(TOUCH_GT911_INT, PIN_MODE_INPUT);
+    Pad_Config(TOUCH_GT911_RST, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE,
+               PAD_OUT_HIGH);
+    Pad_Config(TOUCH_GT911_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
+               PAD_OUT_HIGH);
+
+    // GPIO wake-up pin
+    System_WakeUpPinEnable(TOUCH_GT911_INT, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
     return true;
 }
 
 bool rtk_touch_hal_power_on(void)
 {
+    Pad_Config(TOUCH_GT911_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     return true;
 }
 
@@ -185,6 +195,14 @@ bool rtk_touch_hal_dlps_check(void)
 
 bool rtk_touch_wake_up(void)
 {
+    if (System_WakeUpInterruptValue(TOUCH_GT911_INT) == SET)
+    {
+        Pad_ClearWakeupINTPendingBit(TOUCH_GT911_INT);
+        System_WakeUpPinDisable(TOUCH_GT911_INT);
+        DBG_DIRECT("Touch Wake up");
+        // tp_indicate(NULL);
+        return true;
+    }
     return false;
 }
 
@@ -204,8 +222,13 @@ void rtk_touch_hal_init(void)
     drv_pin_write(TOUCH_GT911_INT, 1);
     platform_delay_ms(10);
     drv_pin_write(TOUCH_GT911_RST, 1);
-    platform_delay_ms(30);
-    drv_pin_mode(TOUCH_GT911_INT, PIN_MODE_INPUT);
+    platform_delay_ms(10);
+    drv_pin_write(TOUCH_GT911_INT, 0);
+    platform_delay_ms(80);
+
+    // drv_pin_mode(TOUCH_GT911_INT, PIN_MODE_INPUT);
+    drv_pin_mode(TOUCH_GT911_INT, PIN_IRQ_MODE_RISING);
+    drv_pin_irq_enable(TOUCH_GT911_INT, false);
 
     uint8_t iic_write_buf[2] = {0x81, 0x40};
     uint8_t iic_read_buf[5] = {0};

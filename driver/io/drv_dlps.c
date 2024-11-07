@@ -87,12 +87,12 @@ static void app_enter_dlps_config(void)
     for (node = dlps_slist_first(&(drv_dlps_enter_slist)); node; node = dlps_slist_next(node))
     {
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
-        DBG_DIRECT("DLPS ENTER CB %s", p_item->name);
+        // DBG_DIRECT("DLPS ENTER CB %s", p_item->name);
         p_item->dlps_cb();
     }
 
     dlps_flag = true;
-    DBG_DIRECT("DLPS ENTER END");
+    // DBG_DIRECT("DLPS ENTER END");
 }
 
 /**
@@ -116,12 +116,12 @@ static void app_exit_dlps_config(void)
     for (node = dlps_slist_first(&(drv_dlps_exit_slist)); node; node = dlps_slist_next(node))
     {
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
-        DBG_DIRECT("DLPS EXIT CB %s", p_item->name);
+        // DBG_DIRECT("DLPS EXIT CB %s", p_item->name);
         p_item->dlps_cb();
     }
 
     dlps_flag = false;
-    DBG_DIRECT("DLPS EXIT END");
+    // DBG_DIRECT("DLPS EXIT END");
 #ifdef SENSOR_MODE
     POWERScenarioMode mode = power_scenario_mode_get(POWER_SCENARIO_OPERATION_MODE);
     if (mode == SCENARIO_OPERATION_SENSOR_MODE)
