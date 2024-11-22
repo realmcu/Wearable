@@ -309,11 +309,16 @@ void rtk_lcd_hal_transfer_done(void)
     do
     {
         handler_reg_0x14.d32 = LCDC_HANDLER->OPERATE_CTR;
+    }
+    while (handler_reg_0x14.b.auto_write_start != RESET);
+    do
+    {
         handler_reg_0x28.d32 = LCDC_HANDLER->TX_LEN;
         handler_reg_0x2c.d32 = LCDC_HANDLER->TX_CNT;
     }
-    while (handler_reg_0x14.b.auto_write_start != RESET &&
-           handler_reg_0x2c.b.tx_output_pixel_cnt < handler_reg_0x28.b.tx_output_pixel_num);
+    while (handler_reg_0x2c.b.tx_output_pixel_cnt < handler_reg_0x28.b.tx_output_pixel_num);
+
+    platform_delay_us(1);
 
 #if (TE_VALID == 1)
     if (use_TE == LCDC_TE_TYPE_HW_TE)
