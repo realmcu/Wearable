@@ -15,7 +15,7 @@
 
 #include "trace.h"
 
-#define MAX_JPU_BUFFER_POOL 8
+#define MAX_JPU_BUFFER_POOL 22
 
 // #define JpuWriteMem( ADDR, DATA, LEN, ENDIAN )    {DBG_DIRECT("JpuWriteMem NOT DEFINE!!!");}
 // #define JpuReadMem( ADDR, DATA, LEN, ENDIAN )     {DBG_DIRECT("JpuReadMem NOT DEFINE!!!");}

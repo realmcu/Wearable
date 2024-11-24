@@ -5,25 +5,36 @@
 #include "string.h"
 
 
-#define TLSF_BUFF_NUM_MAX  (16)
+#define TLSF_BUFF_NUM_MAX  (8)
 
 static uint8_t  mem_array[TLSF_MEM_SIZE]  __attribute__((section(".ARM.__at_0x20200000")));
-//static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE] __attribute__((section(".ARM.__at_0x100000")));
+// static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE] __attribute__((section(".ARM.__at_0x100000")));
 // static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE];
+// static uint8_t  *mem_array;
 static tlsf_t jpg_tlsf = NULL;
+uint8_t *pheap = NULL;
 
-
+// align buffer
 static J_HEAP_BUFF_t jheap_buffer[TLSF_BUFF_NUM_MAX];
 
 uint8_t *jpeg_heap_get_mem()
 {
-    return mem_array;
+    return pheap;
 }
 
 void jpg_tlsf_init(void)
 {
     DBG_DIRECT("jpg_tlsf_init mem_array 0x%x\n", mem_array);
     jpg_tlsf = tlsf_create_with_pool(mem_array, TLSF_MEM_SIZE);
+    pheap = mem_array;
+}
+
+void jpg_tlsf_init_psrm(void)
+{
+    // SPIC0
+    DBG_DIRECT("jpg_tlsf_init mem_array 0x%x\n", 0x22000000);
+    jpg_tlsf = tlsf_create_with_pool((void *)0x22000000, TLSF_MEM_SIZE);
+    pheap = (uint8_t *)0x22000000;
 }
 
 void *jpg_malloc(size_t size)
@@ -57,6 +68,11 @@ void *jpg_malloc_align(size_t size, uint8_t align)
             break;
         }
     }
+    if (i == TLSF_BUFF_NUM_MAX)
+    {
+        DBG_DIRECT("---->jpg malloc align assert: Buffer num not enough!");
+        while (1);
+    }
     if ((uint32_t)ptr % align)
     {
         ptr = (void *)((((uint32_t)ptr + align - 1) / align) * align);
@@ -74,8 +90,11 @@ void jpg_free(void *ptr)
 
     for (i = 0; i < TLSF_BUFF_NUM_MAX; i++)
     {
-        if ((ptr > jheap_buffer[i].ptr) && (ptr < jheap_buffer[i].ptr + jheap_buffer[i].align) &&
-            (ptr < jheap_buffer[i].ptr + jheap_buffer[i].sz))
+        // DBG_DIRECT("--jpg free align ck i:%d 0x%x %d sz: %d", i, jheap_buffer[i].ptr, jheap_buffer[i].align,
+        //                jheap_buffer[i].sz);
+        if ((ptr == jheap_buffer[i].ptr) || ((ptr > jheap_buffer[i].ptr) &&
+                                             (ptr < jheap_buffer[i].ptr + jheap_buffer[i].align) &&
+                                             (ptr < jheap_buffer[i].ptr + jheap_buffer[i].sz)))
         {
             DBG_DIRECT("---->jpg free align i:%d 0x%x %d sz: %d", i, jheap_buffer[i].ptr, jheap_buffer[i].align,
                        jheap_buffer[i].sz);

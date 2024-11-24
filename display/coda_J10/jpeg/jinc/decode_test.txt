@@ -1,3 +1,27 @@
+
+
+// sjpeg
+// #include "pic_03_420_176x16_0.txt"
+// #include "pic_03_420_176x16_1.txt"
+// #include "pic_03_420_176x16_2.txt"
+// #include "pic_03_420_176x16_3.txt"
+// #include "pic_03_420_176x16_4.txt"
+// #include "pic_03_420_176x16_5.txt"
+
+// #include "pic_04_420_176x16_0.txt"
+// #include "pic_04_420_176x16_1.txt"
+// #include "pic_04_420_176x16_2.txt"
+// #include "pic_04_420_176x16_3.txt"
+// #include "pic_04_420_176x16_4.txt"
+// #include "pic_04_420_176x16_5.txt"
+#include "pic_04_420_176x16_6.txt"
+
+
+
+
+
+
+
 // #include "pic_hex_01_94_168_400_96x168_95.txt"
 // #include "pic_hex_01_94_168_420_96x176_95.txt"
 // #include "pic_hex_01_94_168_422_96x176_95.txt"
@@ -26,7 +50,7 @@
 // #include "pic_hex_06_152_101_400_152x104_95.txt"
 // #include "pic_hex_06_152_101_420_160x112_95.txt"
 // #include "pic_hex_06_152_101_422_160x112_95.txt"
-#include "pic_hex_06_152_101_444_152x104_95.txt"
+// #include "pic_hex_06_152_101_444_152x104_95.txt"
 
 // #include "pic_hex_07_168_94_400_168x96_95.txt"
 // #include "pic_hex_07_168_94_420_176x96_95.txt"
@@ -52,3 +76,107 @@
 // #include "pic_hex_11_130_130_420_144x144_95.txt"
 // #include "pic_hex_11_130_130_422_144x144_95.txt"
 // #include "pic_hex_11_130_130_444_136x136_95.txt"
+
+
+
+// flash img
+struct flash_img
+{
+    char *name;
+    void *addr;
+    int sz;
+};
+
+#define flash_offset  (0x08000000)
+
+const struct flash_img f_img[] = {
+{.name = "1_94_168_400_96x168_95.hex", .addr = (void*)(0x08005600+flash_offset), .sz = 6936},
+{.name = "1_94_168_420_96x176_95.hex", .addr = (void*)(0x08007118+flash_offset), .sz = 8923},
+{.name = "1_94_168_422_96x176_95.hex", .addr = (void*)(0x080093F8+flash_offset), .sz = 9936},
+{.name = "1_94_168_444_96x168_95.hex", .addr = (void*)(0x0800BAC8+flash_offset), .sz = 11727},
+{.name = "2_94_168_400_96x168_95.hex", .addr = (void*)(0x0800E898+flash_offset), .sz = 9385},
+{.name = "2_94_168_420_96x176_95.hex", .addr = (void*)(0x08010D48+flash_offset), .sz = 11335},
+{.name = "2_94_168_422_96x176_95.hex", .addr = (void*)(0x08013990+flash_offset), .sz = 12425},
+{.name = "2_94_168_444_96x168_95.hex", .addr = (void*)(0x08016A20+flash_offset), .sz = 14704},
+{.name = "3_168_94_400_168x96_95.hex", .addr = (void*)(0x0801A390+flash_offset), .sz = 11243},
+{.name = "3_168_94_420_176x96_95.hex", .addr = (void*)(0x0801CF80+flash_offset), .sz = 13754},
+{.name = "3_168_94_422_176x96_95.hex", .addr = (void*)(0x08020540+flash_offset), .sz = 16006},
+{.name = "3_168_94_444_168x96_95.hex", .addr = (void*)(0x080243C8+flash_offset), .sz = 19787},
+{.name = "4_168_104_400_168x104_95.hex", .addr = (void*)(0x08029118+flash_offset), .sz = 7146},
+{.name = "4_168_104_420_176x112_95.hex", .addr = (void*)(0x0802AD08+flash_offset), .sz = 8464},
+{.name = "4_168_104_422_176x112_95.hex", .addr = (void*)(0x0802CE18+flash_offset), .sz = 8928},
+{.name = "4_168_104_444_168x104_95.hex", .addr = (void*)(0x0802F0F8+flash_offset), .sz = 9971},
+{.name = "5_152_101_400_152x104_95.hex", .addr = (void*)(0x080317F0+flash_offset), .sz = 9938},
+{.name = "5_152_101_420_160x112_95.hex", .addr = (void*)(0x08033EC8+flash_offset), .sz = 13078},
+{.name = "5_152_101_422_160x112_95.hex", .addr = (void*)(0x080371E0+flash_offset), .sz = 15609},
+{.name = "5_152_101_444_152x104_95.hex", .addr = (void*)(0x0803AEE0+flash_offset), .sz = 20118},
+{.name = "6_152_101_400_152x104_95.hex", .addr = (void*)(0x0803FD78+flash_offset), .sz = 6230},
+{.name = "6_152_101_420_160x112_95.hex", .addr = (void*)(0x080415D0+flash_offset), .sz = 8186},
+{.name = "6_152_101_422_160x112_95.hex", .addr = (void*)(0x080435D0+flash_offset), .sz = 9292},
+{.name = "6_152_101_444_152x104_95.hex", .addr = (void*)(0x08045A20+flash_offset), .sz = 11194},
+{.name = "7_168_94_400_168x96_95.hex", .addr = (void*)(0x080485E0+flash_offset), .sz = 7475},
+{.name = "7_168_94_420_176x96_95.hex", .addr = (void*)(0x0804A318+flash_offset), .sz = 8573},
+{.name = "7_168_94_422_176x96_95.hex", .addr = (void*)(0x0804C498+flash_offset), .sz = 9135},
+{.name = "7_168_94_444_168x96_95.hex", .addr = (void*)(0x0804E848+flash_offset), .sz = 10042},
+{.name = "8_108_144_400_112x144_95.hex", .addr = (void*)(0x08050F88+flash_offset), .sz = 7632},
+{.name = "8_108_144_420_112x144_95.hex", .addr = (void*)(0x08052D58+flash_offset), .sz = 8666},
+{.name = "8_108_144_422_112x144_95.hex", .addr = (void*)(0x08054F38+flash_offset), .sz = 9259},
+{.name = "8_108_144_444_112x144_95.hex", .addr = (void*)(0x08057368+flash_offset), .sz = 10267},
+{.name = "9_96_144_400_96x144_95.hex", .addr = (void*)(0x08059B88+flash_offset), .sz = 7871},
+{.name = "9_96_144_420_96x144_95.hex", .addr = (void*)(0x0805BA48+flash_offset), .sz = 9648},
+{.name = "9_96_144_422_96x144_95.hex", .addr = (void*)(0x0805DFF8+flash_offset), .sz = 11096},
+{.name = "9_96_144_444_96x144_95.hex", .addr = (void*)(0x08060B50+flash_offset), .sz = 13802},
+{.name = "10_130_130_400_136x136_95.hex", .addr = (void*)(0x08064140+flash_offset), .sz = 9405},
+{.name = "10_130_130_420_144x144_95.hex", .addr = (void*)(0x08066600+flash_offset), .sz = 11861},
+{.name = "10_130_130_422_144x144_95.hex", .addr = (void*)(0x08069458+flash_offset), .sz = 13476},
+{.name = "10_130_130_444_136x136_95.hex", .addr = (void*)(0x0806C900+flash_offset), .sz = 16393},
+{.name = "11_130_130_400_136x136_95.hex", .addr = (void*)(0x08070910+flash_offset), .sz = 10161},
+{.name = "11_130_130_420_144x144_95.hex", .addr = (void*)(0x080730C8+flash_offset), .sz = 12487},
+{.name = "11_130_130_422_144x144_95.hex", .addr = (void*)(0x08076190+flash_offset), .sz = 13779},
+{.name = "11_130_130_444_136x136_95.hex", .addr = (void*)(0x08079768+flash_offset), .sz = 15597}};  // 0x807D455
+
+// const struct flash_img f_img[] = {
+// {.name = "1_94_168_400_96x168_95.hex", .addr = (void*)0x400a000, .sz = 6936},
+// {.name = "1_94_168_420_96x176_95.hex", .addr = (void*)0x400f000, .sz = 8923},
+// {.name = "1_94_168_422_96x176_95.hex", .addr = (void*)0x4014000, .sz = 9936},
+// {.name = "1_94_168_444_96x168_95.hex", .addr = (void*)0x4019000, .sz = 11727},
+// {.name = "2_94_168_400_96x168_95.hex", .addr = (void*)0x401e000, .sz = 9385},
+// {.name = "2_94_168_420_96x176_95.hex", .addr = (void*)0x4023000, .sz = 11335},
+// {.name = "2_94_168_422_96x176_95.hex", .addr = (void*)0x4028000, .sz = 12425},
+// {.name = "2_94_168_444_96x168_95.hex", .addr = (void*)0x402d000, .sz = 14704},
+// {.name = "3_168_94_400_168x96_95.hex", .addr = (void*)0x4032000, .sz = 11243},
+// {.name = "3_168_94_420_176x96_95.hex", .addr = (void*)0x4037000, .sz = 13754},
+// {.name = "3_168_94_422_176x96_95.hex", .addr = (void*)0x403c000, .sz = 16006},
+// {.name = "3_168_94_444_168x96_95.hex", .addr = (void*)0x4041000, .sz = 19787},
+// {.name = "4_168_104_400_168x104_95.hex", .addr = (void*)0x4046000, .sz = 7146},
+// {.name = "4_168_104_420_176x112_95.hex", .addr = (void*)0x404b000, .sz = 8464},
+// {.name = "4_168_104_422_176x112_95.hex", .addr = (void*)0x4050000, .sz = 8928},
+// {.name = "4_168_104_444_168x104_95.hex", .addr = (void*)0x4055000, .sz = 9971},
+// {.name = "5_152_101_400_152x104_95.hex", .addr = (void*)0x405a000, .sz = 9938},
+// {.name = "5_152_101_420_160x112_95.hex", .addr = (void*)0x405f000, .sz = 13078},
+// {.name = "5_152_101_422_160x112_95.hex", .addr = (void*)0x4064000, .sz = 15609},
+// {.name = "5_152_101_444_152x104_95.hex", .addr = (void*)0x4069000, .sz = 20118},
+// {.name = "6_152_101_400_152x104_95.hex", .addr = (void*)0x406e000, .sz = 6230},
+// {.name = "6_152_101_420_160x112_95.hex", .addr = (void*)0x4073000, .sz = 8186},
+// {.name = "6_152_101_422_160x112_95.hex", .addr = (void*)0x4078000, .sz = 9292},
+// {.name = "6_152_101_444_152x104_95.hex", .addr = (void*)0x407d000, .sz = 11194},
+// {.name = "7_168_94_400_168x96_95.hex", .addr = (void*)0x4082000, .sz = 7475},
+// {.name = "7_168_94_420_176x96_95.hex", .addr = (void*)0x4087000, .sz = 8573},
+// {.name = "7_168_94_422_176x96_95.hex", .addr = (void*)0x408c000, .sz = 9135},
+// {.name = "7_168_94_444_168x96_95.hex", .addr = (void*)0x4091000, .sz = 10042},
+// {.name = "8_108_144_400_112x144_95.hex", .addr = (void*)0x4096000, .sz = 7632},
+// {.name = "8_108_144_420_112x144_95.hex", .addr = (void*)0x409b000, .sz = 8666},
+// {.name = "8_108_144_422_112x144_95.hex", .addr = (void*)0x40a0000, .sz = 9259},
+// {.name = "8_108_144_444_112x144_95.hex", .addr = (void*)0x40a5000, .sz = 10267},
+// {.name = "9_96_144_400_96x144_95.hex", .addr = (void*)0x40aa000, .sz = 7871},
+// {.name = "9_96_144_420_96x144_95.hex", .addr = (void*)0x40af000, .sz = 9648},
+// {.name = "9_96_144_422_96x144_95.hex", .addr = (void*)0x40b4000, .sz = 11096},
+// {.name = "9_96_144_444_96x144_95.hex", .addr = (void*)0x40b9000, .sz = 13802},
+// {.name = "10_130_130_400_136x136_95.hex", .addr = (void*)0x40be000, .sz = 9405},
+// {.name = "10_130_130_420_144x144_95.hex", .addr = (void*)0x40c3000, .sz = 11861},
+// {.name = "10_130_130_422_144x144_95.hex", .addr = (void*)0x40c8000, .sz = 13476},
+// {.name = "10_130_130_444_136x136_95.hex", .addr = (void*)0x40cd000, .sz = 16393},
+// {.name = "11_130_130_400_136x136_95.hex", .addr = (void*)0x40d2000, .sz = 10161},
+// {.name = "11_130_130_420_144x144_95.hex", .addr = (void*)0x40d7000, .sz = 12487},
+// {.name = "11_130_130_422_144x144_95.hex", .addr = (void*)0x40dc000, .sz = 13779},
+// {.name = "11_130_130_444_136x136_95.hex", .addr = (void*)0x40e1000, .sz = 15597}};

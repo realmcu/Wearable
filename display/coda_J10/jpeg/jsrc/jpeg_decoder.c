@@ -28,15 +28,50 @@
 
 // #include "pic_hex_444_184x96_95.txt"  // 444 95
 // #include "pic_hex_440_192x96_95.txt"   // 440 95
-// #include "decode_test.txt"
+#include "decode_test.txt"
 
-#define TEST_FLASH
+// #define SRC_FLASH
 
-#ifdef TEST_FLASH
 
-const uint8_t *pic = (uint8_t *)0x04055000;
+uint8_t flg_cache_ram = 0;
+uint8_t f_img_index = 4;
+struct Dec_ret
+{
+    int format;
+    int w;
+    int h;
+    int pix;
+    int clk;
+    int speed;
+    int rate;
+};
 
-#endif
+struct Dec_ret dec_ret[44];
+
+void coda_dec_auto(void)
+{
+    for (uint32_t i = 0; i < 44; i++)
+    {
+        f_img_index = i;
+        CODA_Test(3);
+    }
+
+}
+
+void coda_dec_res_log(void)
+{
+    for (uint32_t i = 0; i < 44; i++)
+    {
+        DBG_DIRECT("\n[%d] format %d pix %dx%d=%d clk %d speed %d r= %d\n", (i + 3) / 4, \
+                   dec_ret[i].format, \
+                   dec_ret[i].w, dec_ret[i].h, \
+                   dec_ret[i].pix, \
+                   dec_ret[i].clk, \
+                   dec_ret[i].speed, dec_ret[i].rate);
+
+    }
+
+}
 
 
 //PCC config functin
@@ -70,7 +105,7 @@ uint32_t CODA_Test_read(uint32_t addr)
     reg_addr = (uint32_t *)(addr);
     // data = *(uint32_t *)reg_addr;
     data = jdi_read_register(addr);
-    DBG_DIRECT("JPEG rd 0x%03x: 0x%08x %d\n", addr & 0XFFF, data, data);
+    DBG_DIRECT("JPEG rd 0x%03x: 0x%x %d\n", addr & 0XFFF, data, data);
     return data;
 }
 uint32_t CODA_Test_write(uint32_t addr, uint32_t val)
@@ -80,7 +115,7 @@ uint32_t CODA_Test_write(uint32_t addr, uint32_t val)
     uint32_t *reg_addr = (uint32_t *)(addr);
     // *reg_addr = val;
     jdi_write_register(addr, val);
-    DBG_DIRECT("JPEG wr 0x%03x: 0x%08x\n", addr & 0XFFF, val);
+    DBG_DIRECT("JPEG wr 0x%03x: 0x%x\n", addr & 0XFFF, val);
 
     CODA_Test_read(addr);
     return 0;
@@ -94,6 +129,7 @@ uint32_t CODA_Test_write(uint32_t addr, uint32_t val)
 
 static DecConfigParam jdec_config;
 
+#if 0
 static int coda_decode_partial(void)
 {
     JpgDecHandle handle     = {0};
@@ -684,7 +720,7 @@ ERR_DEC_INIT:
 
 }
 
-
+#endif
 
 static int coda_decode(void)
 {
@@ -722,38 +758,57 @@ static int coda_decode(void)
     instIdx = jdec_config.instNum;
 
     // source image buffer
-    bufInfo.buf = pic;
-#ifdef TEST_FLASH
-    bufInfo.size = 20 * 1024 + 1;
+#ifdef SRC_FLASH
+    DBG_DIRECT("%s 0x%x\n", f_img[f_img_index].name, f_img[f_img_index].addr);
+    // bufInfo.size = 20 * 1024 + 1;
+    bufInfo.buf = f_img[f_img_index].addr;
+    bufInfo.size = f_img[f_img_index].sz;
 #else
+    bufInfo.buf = pic;
     bufInfo.size = sizeof(pic) / sizeof(pic[0]);
 #endif
 
 
-    // if (jdec_config.loc_src == JPG_SRC_FLASH)
-    // {
-    //     uint8_t *tmp = (uint8_t *)jpg_malloc_align(bufInfo.size, 8);
-    //     memcpy(tmp, pic, bufInfo.size);
-    //     bufInfo.buf = tmp;
-    // }
+    if (flg_cache_ram && jdec_config.loc_src == JPG_SRC_FLASH)
+    {
+        uint8_t *tmp = (uint8_t *)jpg_malloc_align(bufInfo.size, 8);
+        memcpy(tmp, bufInfo.buf, bufInfo.size);
+        bufInfo.buf = tmp;
+    }
 
-    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
+    DBG_DIRECT("%s %d  JpgInst sz %d\n", __FUNCTION__, __LINE__, sizeof(JpgInst));
     ret = JPU_Init();
     if (ret != JPG_RET_SUCCESS &&
         ret != JPG_RET_CALLED_BEFORE)
     {
         suc = 0;
         DBG_DIRECT("JPU_Init failed Error code is 0x%x \n", ret);
-        goto ERR_DEC_INIT;
+        // goto ERR_DEC_INIT;
     }
     DBG_DIRECT("JPU_Init Done\n");
-
+#if 1
     // Open an instance and get initial information for decoding.
     vbStream.size = ((bufInfo.size + 1023) >> 10 << 10);
 
     // vbStream.size = STREAM_BUF_SIZE;
     if (jdec_config.loc_src == JPG_SRC_FLASH)
     {
+        // data ram: 0x20200000   psram: 0x22000000
+        // bufInfo.buf = (void*)0x22000000;
+        // cp to data ram
+        // DBG_DIRECT("memcpy 0x%x->0x%x, %d\n", bufInfo.buf, 0x20200100, bufInfo.size);
+        // memcpy((void *)0x20200100, bufInfo.buf, bufInfo.size);
+        // log_hex((void *)0x20200100, 100);
+        // bufInfo.buf = (void*)0x20200100;
+
+
+        // // cp to psram
+        // bufInfo.buf = (void*)0x22000000;
+        // DBG_DIRECT("memcpy 0x%x->0x%x, %d\n", bufInfo.buf, (void*)0x22000000, bufInfo.size);
+        // memcpy((void*)0x22000000, bufInfo.buf, bufInfo.size);
+        // bufInfo.buf = (void*)0x22000000;
+        // log_hex((void*)bufInfo.buf, 100);
+
         jdi_register_extern_memory(&vbStream, bufInfo.buf, bufInfo.size);
         DBG_DIRECT("jdi_register_extern_memory Done\n");
     }
@@ -780,6 +835,12 @@ static int coda_decode(void)
     decOP.roiOffsetY = jdec_config.roiOffsetY;
     decOP.roiWidth = jdec_config.roiWidth;
     decOP.roiHeight = jdec_config.roiHeight;
+
+    if (1)
+    {
+        DBG_DIRECT("roiWidth %d, roiHeight %d \n", decOP.roiWidth, decOP.roiHeight);
+        DBG_DIRECT("roiOffsetX %d, roiOffsetY %d \n", decOP.roiOffsetX, decOP.roiOffsetY);
+    }
 
     ret = JPU_DecOpen(&handle, &decOP);
     if (ret != JPG_RET_SUCCESS)
@@ -1045,9 +1106,13 @@ static int coda_decode(void)
 
     {
         // wrapper
-        CODA_Test_write(MJPEG_WRAPPER_ENABLE_REG, jdec_config.useWrapper ? 0x01 : 0x00);
+        uint32_t reg =  jdec_config.rgbType | ((jdec_config.rgbType == 0x0 ? jdec_config.opacity : 0x0) <<
+                                               8);
+        DBG_DIRECT("wrapper %d, type: %d opacity: 0x%x, 0x%x \n", jdec_config.useWrapper,
+                   jdec_config.rgbType, jdec_config.opacity, reg);
+        CODA_Test_write(REG_MJPEG_WRAP_CFG_REG, (jdec_config.useWrapper ? 0x01 : 0x00));
         // CODA_Test_write(MJPEG_WRAPPER_ENABLE_REG, 0x00);
-        CODA_Test_write(MJPEG_WRAPPER_RGB_FORMAT_REG, jdec_config.rgbType);
+        CODA_Test_write(REG_MJPEG_RGB_PF_REG, reg);
     }
 
 //    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
@@ -1106,6 +1171,32 @@ static int coda_decode(void)
             DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
             int_reason = JPU_WaitInterrupt(JPU_INTERRUPT_TIMEOUT_MS);
             DBG_DIRECT("%s %d int_reason 0x%x\n", __FUNCTION__, __LINE__, int_reason);
+            // check wrapper done flg
+            if (jdec_config.useWrapper)
+            {
+                uint16_t cnt_wait = 0;
+                while (1)
+                {
+                    if (jdi_read_register(REG_MJPEG_WRAP_CFG_DONE))
+                    {
+                        DBG_DIRECT("REG_MJPEG_WRAP_CFG_DONE\n");
+                        break;
+                    }
+
+                    DBG_DIRECT("REG_MJPEG_WRAP_CFG_DONE  Waiting...\n");
+                    cnt_wait++;
+                    if (cnt_wait > 50)
+                    {
+                        CODA_Test_write(REG_MJPEG_WRAP_CFG_REG, (false ? 0x01 : 0x00));
+                    }
+
+                    //Sleep(1); // 1ms sec
+                    //if (count++ > timeout)
+                    //  return -1;
+                }
+                CODA_Test_write(REG_MJPEG_WRAP_CFG_REG, (true ? 0x01 : 0x00));
+            }
+
             if (int_reason == -1)
             {
                 DBG_DIRECT("Error : timeout happened\n");
@@ -1223,6 +1314,7 @@ JPU_END_OF_STREAM:
                 errPosY = (outputInfo.numOfErrMBs & 0x00000FFF);
                 DBG_DIRECT("Error restart Idx : %d, MCU x:%d, y:%d\n", errRstIdx, errPosX, errPosY);
             }
+            goto ERR_DEC_OPEN;
             break;
         }
 
@@ -1243,79 +1335,71 @@ SKIP_BUF_DUMP:
         break;
     }
 
-ERR_DEC_OPEN:
+
     // Now that we are done with decoding, close the open instance.
+    // Unit: M pix/sec x 100  (200 M Hz)
     float speed = initialInfo.picWidth * initialInfo.picHeight * 20000.f / decode_cnt_clk;
     float speed_vendor = 0;
+    uint32_t format_n;
     if (initialInfo.sourceFormat == FORMAT_400)
     {
         speed_vendor = 180;
+        format_n = 400;
     }
     else if (initialInfo.sourceFormat == FORMAT_444)
     {
         speed_vendor = 100;
+        format_n = 444;
     }
     else if (initialInfo.sourceFormat == FORMAT_420)
     {
         speed_vendor = 230;
+        format_n = 420;
     }
     else if (initialInfo.sourceFormat == FORMAT_422)
     {
         speed_vendor = 160;
+        format_n = 422;
     }
     float rate = speed / speed_vendor;
     // 0: FORMAT_420, 1:FORMAT_422, 3:FORMAT_444, 4:FORMAT_400
-    DBG_DIRECT("\nformat %d pix %d clk %d speed %f. r= %f\n", initialInfo.sourceFormat,
-               initialInfo.picWidth * initialInfo.picHeight, decode_cnt_clk, \
+    DBG_DIRECT("\nformat %d pix %dx%d=%d clk %d speed %f. r= %f\n", format_n,
+               initialInfo.picWidth, initialInfo.picHeight, \
+               initialInfo.picWidth * initialInfo.picHeight, \
+               decode_cnt_clk, \
                speed, rate);
+
+#ifdef SRC_FLASH
+    dec_ret[f_img_index].format = format_n;
+    dec_ret[f_img_index].w = initialInfo.picWidth;
+    dec_ret[f_img_index].h = initialInfo.picHeight;
+    dec_ret[f_img_index].pix = initialInfo.picWidth * initialInfo.picHeight;
+    dec_ret[f_img_index].clk = decode_cnt_clk;
+    dec_ret[f_img_index].speed = speed;
+    dec_ret[f_img_index].rate  = rate;
+#endif
 //    DBG_DIRECT("\n decoded addr: 0x%x 0x%x, %d\n", );
-    // {
-    //     // check data
-    //     uint8_t *yuv_buf = (uint8_t *)0x04013500;
-    //     uint8_t *yuv_dec = (uint8_t *)0x20200c78;
-    //     for(uint32_t i=0; i < 33793; i++)
-    //     {
-    //         if(i < 20)
-    //         {
-    //             DBG_DIRECT("\n i %d dec 0x%x(0x%x) - flash 0x%x(0x%x) \n", i, yuv_dec[i], yuv_dec+i,  yuv_buf[i],  yuv_buf+i);
-    //         }
-    //         yuv_buf[i] =yuv_dec[i];
-    //     }
-    //     DBG_DIRECT("\n wr done \n ");
 
-    // }
-    // {
-    //     // check data
-    //     uint8_t *yuv_adr = (uint8_t *)0x0400B000;
-    //     uint8_t *yuv_dec = (uint8_t *)0x20202f60;
-    //     for(uint32_t i=0; i < 33793; i++)
-    //     {
-    //         if(yuv_dec[i] != yuv_adr[i])
-    //         {
-    //             DBG_DIRECT("\n i %d dec 0x%x(0x%x) - flash 0x%x(0x%x) \n", i, yuv_dec[i], yuv_dec+i,  yuv_adr[i],  yuv_adr+i);
-    //         }
-    //     }
-    //     DBG_DIRECT("\n check done \n ");
-
-    // }
-
-
-
+ERR_DEC_OPEN:
     ret = JPU_DecClose(handle);
 
 ERR_DEC_INIT:
     // DBG_DIRECT("\nEnter ERR_DEC_INIT. \n");
 
     // yuv/RGB buffer
-    // FreeFrameBuffer(instIdx);
+    FreeFrameBuffer(instIdx);
+
     // jpg buffer
-    // jdi_free_dma_memory(&vbStream);
+    if (flg_cache_ram || jdec_config.loc_src == JPG_SRC_RAM)
+    {
+        jdi_free_dma_memory(&vbStream);
+    }
 
     //sw_mixer_close(instIdx);
     JPU_DeInit();
 
-
-    while (1);
+#endif
+    // while (1);
     return suc;
 }
 
@@ -1394,6 +1478,10 @@ JpgRet coda_prepare(DecConfigParam *jdc)
     jdec_config.useWrapper = jdc->useWrapper;
     //  0-JPG_ARGB8888, 1-JPG_RGB888, 2-JPG_RGB565
     jdec_config.rgbType = jdc->rgbType;
+    if (jdec_config.rgbType == 0)
+    {
+        jdec_config.opacity = jdc->opacity;
+    }
 
 
     if (jdec_config.usePartialMode && jdec_config.roiEnable)
@@ -1404,7 +1492,7 @@ JpgRet coda_prepare(DecConfigParam *jdc)
     if (jdec_config.packedFormat && jdec_config.roiEnable)
     {
         DBG_DIRECT("Invalid operation mode : packed mode and ROI mode can not be worked\n");
-        return JPG_RET_INVALID_PARAM;
+        // return JPG_RET_INVALID_PARAM;
     }
     if ((jdec_config.iHorScaleMode || jdec_config.iVerScaleMode) && jdec_config.roiEnable)
     {
@@ -1449,6 +1537,13 @@ uint32_t CODA_Test(uint8_t cmd)
 
             {
                 decConfig.roiEnable = 0;
+                if (decConfig.roiEnable)
+                {
+                    decConfig.roiOffsetX = 0;
+                    decConfig.roiOffsetY = 16;
+                    decConfig.roiWidth  = 96;
+                    decConfig.roiHeight = 88;
+                }
                 // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
                 decConfig.packedFormat = 1;
                 // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
@@ -1474,12 +1569,19 @@ uint32_t CODA_Test(uint8_t cmd)
                 decConfig.outNum = 1;
 
                 // jpg data location: 0-JPG_SRC_RAM, 1-JPG_SRC_FLASH, 2-JPG_SRC_PSRAM
-                decConfig.loc_src = 1;
+                decConfig.loc_src = 0;
+                // cache jpg to ram
+                flg_cache_ram = 0;
 
                 // Wrapper enable: 0-OFF, 1-ON
                 decConfig.useWrapper = 1;
                 //  0-JPG_ARGB8888, 1-JPG_RGB888, 2-JPG_RGB565
                 decConfig.rgbType = 2;
+                // ARGB: A(8 bit)
+                if (decConfig.rgbType == 0)
+                {
+                    decConfig.opacity = 0xa5;
+                }
             }
 
             ret = coda_prepare(&decConfig);
@@ -1499,7 +1601,7 @@ uint32_t CODA_Test(uint8_t cmd)
         }
         break;
     case 4: // encoder
-//        CODA_encoder_Test(4);
+        CODA_encoder_Test(4);
         break;
     }
     return 0;

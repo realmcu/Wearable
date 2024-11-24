@@ -1603,6 +1603,7 @@ int JpegDecodeHeader(JpgDecInfo *jpg)
 
         code = get_bits(&jpg->gbc, 16); //getbit 2byte
 
+        DBG_DIRECT("code 0x%x", code);
         switch (code)
         {
         case SOI_Marker:
@@ -1819,11 +1820,12 @@ DONE_DEC_HEADER:
     jpg->huffAcIdx = temp;
 
 
-    // DEC req num
+    // DEC req num,  JPG format
     switch (jpg->format)
     {
     case FORMAT_420:
         jpg->busReqNum = 2;
+        // jpg->busReqNum = 1;
         jpg->mcuBlockNum = 6;
         jpg->compNum = 3;
         jpg->compInfo[0] = 10;
@@ -1950,8 +1952,11 @@ JpgRet CheckJpgEncParam(JpgEncHandle handle, JpgEncParam *param)
         }
         if (pEncInfo->packedFormat == PACKED_FORMAT_444)
         {
+            DBG_DIRECT("check %d %d", param->sourceFrame->stride, pEncInfo->openParam.picWidth * 3);
             if (param->sourceFrame->stride < pEncInfo->openParam.picWidth * 3)
             {
+                DBG_DIRECT("JPG_RET_INVALID_PARAM %d %d", param->sourceFrame->stride,
+                           pEncInfo->openParam.picWidth * 3);
                 return JPG_RET_INVALID_PARAM;
             }
         }

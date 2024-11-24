@@ -69,6 +69,7 @@ int jdi_init()
     memset((void *)&s_jpu_buffer_pool, 0x00, sizeof(jpu_buffer_pool_t)*MAX_JPU_BUFFER_POOL);
     s_jpu_buffer_pool_count = 0;
 
+    // DBG_DIRECT("s_jpu_fd %d\n", s_jpu_fd);
     if (!(s_pjip = jdi_get_instance_pool()))
     {
         DBG_DIRECT("[jdi] fail to create instance pool for saving context \n");
@@ -91,7 +92,9 @@ int jdi_init()
     //  s_jdb_video_memory.size = JDI_DRAM_PHYSICAL_SIZE;
     // }
 
+    DBG_DIRECT("s_jpu_fd %d\n", s_jpu_fd);
     uint8_t *pmem = jpeg_heap_get_mem();
+    DBG_DIRECT("s_jpu_fd %d\n", s_jpu_fd);
     s_jdb_video_memory.phys_addr = (unsigned long)pmem;
     s_jdb_video_memory.size = TLSF_MEM_SIZE;
     DBG_DIRECT("pmem 0x%x, 0x%x \n", pmem, s_jdb_video_memory.phys_addr);
@@ -99,7 +102,7 @@ int jdi_init()
 
 // DBG_DIRECT("%s %d: phys_addr 0x%x, %d \n", __FUNCTION__, __LINE__, s_jdb_video_memory.phys_addr, s_jdb_video_memory.size);
 //  DBG_DIRECT("phys_addr 0x%x, %d \n", s_jdb_video_memory.phys_addr, s_jdb_video_memory.size);
-
+    DBG_DIRECT("s_jpu_fd %d\n", s_jpu_fd);
 
     s_jdb_register.phys_addr = JPU_BIT_REG_BASE;
     s_jdb_register.virt_addr = JPU_BIT_REG_BASE;
@@ -108,6 +111,7 @@ int jdi_init()
     jdi_set_clock_gate(1);
 
     s_task_num++;
+    DBG_DIRECT("s_jpu_fd %d\n", s_jpu_fd);
     return s_jpu_fd;
 
 ERR_JDI_INIT:
@@ -344,7 +348,7 @@ int jdi_read_memory(unsigned int addr, unsigned char *data, int len, int endian)
 
 // static uint8_t encoder_jpg[40 * 1024] __attribute__((section(".ARM.__at_0x20200000")));
 // static uint8_t __attribute__((aligned(8)))   encoder_jpg[40 * 1024];
-int jdi_allocate_vb_memory_en(jpu_buffer_t *vb)
+int jdi_register_dma_memory(jpu_buffer_t *vb, void *addr)
 {
     int i;
     int ret = 0;
@@ -365,6 +369,7 @@ int jdi_allocate_vb_memory_en(jpu_buffer_t *vb)
     // jdb.phys_addr = (unsigned long)jpg_malloc_align(jdb.size, 8);
 //    memset(encoder_jpg, 0, sizeof(encoder_jpg));
 //    jdb.phys_addr = (unsigned long)encoder_jpg;
+    jdb.phys_addr = (unsigned long)addr;
     DBG_DIRECT("jdi_allocate_dma_memory get 0x%x,0x%x %d\n", jdb.phys_addr, jdb.phys_addr + jdb.size,
                jdb.size + 7);
 
@@ -531,6 +536,46 @@ void jdi_free_dma_memory(jpu_buffer_t *vb)
     memset(vb, 0, sizeof(jpu_buffer_t));
 }
 
+void jdi_clean_dma_memory(jpu_buffer_t *vb)
+{
+    int i;
+    int ret = 0;
+    jpudrv_buffer_t jdb = {0, };
+
+
+    if (!s_pjip || s_jpu_fd == -1 || s_jpu_fd == 0x00)
+    {
+        return ;
+    }
+
+    if (vb->size == 0)
+    {
+        return ;
+    }
+
+
+
+    for (i = 0; i < MAX_JPU_BUFFER_POOL; i++)
+    {
+        if (s_jpu_buffer_pool[i].jdb.phys_addr == vb->phys_addr)
+        {
+            s_jpu_buffer_pool[i].inuse = 0;
+            s_jpu_buffer_pool_count--;
+            jdb = s_jpu_buffer_pool[i].jdb;
+            break;
+        }
+    }
+
+    if (!jdb.size)
+    {
+        DBG_DIRECT("[JDI] invalid buffer to free address = 0x%x\n", (int)jdb.virt_addr);
+        return ;
+    }
+
+    // jmem_free(&s_pjip->vmem, (unsigned long)jdb.phys_addr, 0);
+    // jpg_free((void *)jdb.phys_addr);
+    memset(vb, 0, sizeof(jpu_buffer_t));
+}
 
 int jdi_set_clock_gate(int enable)
 {

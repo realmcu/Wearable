@@ -1,3 +1,24 @@
+
+
+// #include "pic_rgb565_striped_pattern_565_176_80_dt.txt"
+// #include "pic_yuyv_striped_pattern_565_176_80_yuyv.txt"
+// #include "pic_yuyv_striped_pattern_565_176_80_yuyv_raw.txt"
+
+#include "pic_rgb565_03_168_94_422_176x96_95_dt.txt"
+// #include "pic_rgb565_04_168_104_422_176x112_95_dt.txt"
+// #include "pic_rgb565_05_152_101_422_160x112_95_dt.txt"
+
+// #include "pic_yuyv_03_168_94_422_176x96_95_yuyv.txt"
+
+// #include "pic_yuyv_04_168_104_422_176x112_95_yuyv.txt"
+
+// #include "pic_yuyv_05_152_101_422_160x112_95_yuyv.txt"
+
+
+
+
+
+
 // #include "pic_yuv_02_94_168_444_96x168_95.txt"
 // #include "pic_yuyv_02_94_168_422_96x176_95.txt"
 // #include "pic_yuyv_02_94_168_422_96x168_95.txt"
@@ -36,4 +57,40 @@
 // #include "pic_rgb565_10_130_130_444_136x136_95.txt"
 
 // #include "pic_rgb565_11_130_130_422_144x144_95.txt"
-#include "pic_rgb565_11_130_130_444_136x136_95.txt"
+// #include "pic_rgb565_11_130_130_444_136x136_95.txt"
+
+
+struct flash_img_en
+{
+    char *name;
+    void *addr;
+    int w;
+    int h; 
+    int sz;
+};
+
+#define flash_offset  (0x08000000)
+
+const struct flash_img_en f_img_en[] = {
+{.name = "01_94_168_422_96x176_95.hex", .addr = (void*)(0x0807D500+flash_offset), .w =  96, .h = 176, .sz = 33793}, 
+{.name = "01_94_168_444_96x168_95.hex", .addr = (void*)(0x08085908+flash_offset), .w =  96, .h = 168, .sz = 32257}, 
+{.name = "02_94_168_422_96x176_95.hex", .addr = (void*)(0x0808D710+flash_offset), .w =  96, .h = 176, .sz = 33793}, 
+{.name = "02_94_168_444_96x168_95.hex", .addr = (void*)(0x08095B18+flash_offset), .w =  96, .h = 168, .sz = 32257}, 
+{.name = "03_168_94_422_176x96_95.hex", .addr = (void*)(0x0809D920+flash_offset), .w = 176, .h = 96, .sz = 33793}, 
+{.name = "03_168_94_444_168x96_95.hex", .addr = (void*)(0x080A5D28+flash_offset), .w = 168, .h = 96, .sz = 32257}, 
+{.name = "04_168_104_422_176x112_95.hex", .addr = (void*)(0x080ADB30+flash_offset), .w = 176, .h = 112, .sz = 39425}, 
+{.name = "04_168_104_444_168x104_95.hex", .addr = (void*)(0x080B7538+flash_offset), .w = 168, .h = 104, .sz = 34945}, 
+{.name = "05_152_101_422_160x112_95.hex", .addr = (void*)(0x080BFDC0+flash_offset), .w = 160, .h = 112, .sz = 35841}, 
+{.name = "05_152_101_444_152x104_95.hex", .addr = (void*)(0x080C89C8+flash_offset), .w = 152, .h = 104, .sz = 31617}, 
+{.name = "06_152_101_422_160x112_95.hex", .addr = (void*)(0x080D0550+flash_offset), .w = 160, .h = 112, .sz = 35841}, 
+{.name = "06_152_101_444_152x104_95.hex", .addr = (void*)(0x080D9158+flash_offset), .w = 152, .h = 104, .sz = 31617}, 
+{.name = "07_168_94_422_176x96_95.hex", .addr = (void*)(0x080E0CE0+flash_offset), .w = 176, .h = 96, .sz = 33793}, 
+{.name = "07_168_94_444_168x96_95.hex", .addr = (void*)(0x080E90E8+flash_offset), .w = 168, .h = 96, .sz = 32257}, 
+{.name = "08_108_144_422_112x144_95.hex", .addr = (void*)(0x080F0EF0+flash_offset), .w = 112, .h = 144, .sz = 32257}, 
+{.name = "08_108_144_444_112x144_95.hex", .addr = (void*)(0x080F8CF8+flash_offset), .w = 112, .h = 144, .sz = 32257}, 
+{.name = "09_96_144_422_96x144_95.hex", .addr = (void*)(0x08100B00+flash_offset), .w =  96, .h = 144, .sz = 27649}, 
+{.name = "09_96_144_444_96x144_95.hex", .addr = (void*)(0x08107708+flash_offset), .w =  96, .h = 144, .sz = 27649}, 
+{.name = "10_130_130_422_144x144_95.hex", .addr = (void*)(0x0810E310+flash_offset), .w = 144, .h = 144, .sz = 41473}, 
+{.name = "10_130_130_444_136x136_95.hex", .addr = (void*)(0x08118518+flash_offset), .w = 136, .h = 136, .sz = 36993}, 
+{.name = "11_130_130_422_144x144_95.hex", .addr = (void*)(0x081215A0+flash_offset), .w = 144, .h = 144, .sz = 41473}, 
+{.name = "11_130_130_444_136x136_95.hex", .addr = (void*)(0x0812B7A8+flash_offset), .w = 136, .h = 136, .sz = 36993}}; 

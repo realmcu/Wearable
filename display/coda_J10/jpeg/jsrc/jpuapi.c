@@ -266,23 +266,34 @@ JpgRet JPU_DecGetInitialInfo(JpgDecHandle handle, JpgDecInitialInfo *info)
 
     if (pDecInfo->roiEnable)
     {
+        DBG_DIRECT("roiWidth %d, roiHeight %d \n", pDecInfo->roiWidth, pDecInfo->roiHeight);
+        DBG_DIRECT("roiOffsetX %d, roiOffsetY %d \n", pDecInfo->roiOffsetX, pDecInfo->roiOffsetY);
+
 
         pDecInfo->roiMcuWidth = pDecInfo->roiWidth / pDecInfo->mcuWidth;
         pDecInfo->roiMcuHeight = pDecInfo->roiHeight / pDecInfo->mcuHeight;
         pDecInfo->roiMcuOffsetX = pDecInfo->roiOffsetX / pDecInfo->mcuWidth;
         pDecInfo->roiMcuOffsetY = pDecInfo->roiOffsetY / pDecInfo->mcuHeight;
 
+        DBG_DIRECT("roiMcuWidth %d, roiMcuHeight %d \n", pDecInfo->roiMcuWidth, pDecInfo->roiMcuHeight);
+        DBG_DIRECT("roiMcuOffsetX %d, roiMcuOffsetY %d \n", pDecInfo->roiMcuOffsetX,
+                   pDecInfo->roiMcuOffsetY);
+
+        DBG_DIRECT("alignedWidth %d, alignedHeight %d \n", pDecInfo->alignedWidth, pDecInfo->alignedHeight);
+        DBG_DIRECT("mcuWidth %d, mcuHeight %d \n", pDecInfo->mcuWidth, pDecInfo->mcuHeight);
         if ((pDecInfo->roiOffsetX > pDecInfo->alignedWidth)
             || (pDecInfo->roiOffsetY > pDecInfo->alignedHeight)
             || (pDecInfo->roiOffsetX + pDecInfo->roiWidth > pDecInfo->alignedWidth)
             || (pDecInfo->roiOffsetY + pDecInfo->roiHeight > pDecInfo->alignedHeight))
         {
+            DBG_DIRECT("JPU_DecGetInitialInfo roiEnable JPG_RET_INVALID_PARAM 1\n");
             return JPG_RET_INVALID_PARAM;
         }
 
         if (((pDecInfo->roiOffsetX + pDecInfo->roiWidth) < pDecInfo->mcuWidth)
             || ((pDecInfo->roiOffsetY + pDecInfo->roiHeight) < pDecInfo->mcuHeight))
         {
+            DBG_DIRECT("JPU_DecGetInitialInfo roiEnable JPG_RET_INVALID_PARAM 2\n");
             return JPG_RET_INVALID_PARAM;
         }
 
@@ -1599,6 +1610,7 @@ JpgRet JPU_EncGetInitialInfo(JpgEncHandle handle, JpgEncInitialInfo *info)
         pEncInfo->compNum = 3;
     }
 
+    // ENC req num
     if (pEncInfo->format == FORMAT_420)
     {
         pEncInfo->mcuBlockNum = 6;
@@ -1988,11 +2000,24 @@ JpgRet JPU_EncStartOneFrame(JpgEncHandle handle, JpgEncParam *param)
                | pEncInfo->compInfo[0] << 8 | pEncInfo->compInfo[1] << 4 | pEncInfo->compInfo[2]);
 
     // 422
-    // JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00043955);
+    if (pEncInfo->format == FORMAT_422)
+    {
+        DBG_DIRECT("Encode to 422 JPG");
+        JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00043955);
+    }
     // 444
-    // JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00133555);
+    if (pEncInfo->format == FORMAT_444)
+    {
+        DBG_DIRECT("Encode to 444 JPG");
+        // different from sw package original value
+        JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00133555);
+    }
     // 420
-    // JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00063A55);
+    if (pEncInfo->format == FORMAT_420)
+    {
+        DBG_DIRECT("Encode to 420 JPG");
+        JpuWriteReg(MJPEG_MCU_INFO_REG, 0x00063A55);
+    }
 
     //JpgEncGbuResetReg
     JpuWriteReg(MJPEG_GBU_CTRL_REG,

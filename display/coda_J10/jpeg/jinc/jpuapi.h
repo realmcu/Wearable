@@ -18,7 +18,11 @@ typedef enum
 {
     JPG_SRC_RAM   = 0,
     JPG_SRC_FLASH = 1,
-    JPG_SRC_PSRAM = 2
+    JPG_SRC_PSRAM = 2,
+    JPG_SRC_HEAP  = 3,
+
+    JPG_SRC_TYPE_ARRAY = 0,
+    JPG_SRC_TYPE_BIN   = 1,
 } JpgSrc;
 typedef enum
 {
@@ -229,6 +233,7 @@ typedef struct
 {
     int useWrapper;
     int rgbType;
+    uint8_t opacity;
     int loc_src;
     int outNum;
     int rotAngle;
@@ -336,6 +341,8 @@ typedef struct
     // wrapper
     int useWrapper;
     int rgbType;
+    int loc_src;
+    int src_type;
 
     int picWidth;
     int picHeight;

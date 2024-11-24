@@ -26,7 +26,103 @@ typedef struct
 static fb_context s_fb[MAX_NUM_INSTANCE];
 
 
+int RegisterFrameBuffer(int instIdx, int format, int width, int height, int frameBufNum, int pack,
+                        void *addr)
+{
+    int  divX, divY;
+    int  i;
+    int  lum_size, chr_size;
+    fb_context *fb;
 
+    fb = &s_fb[instIdx];
+
+    divX = format == FORMAT_420 || format == FORMAT_422 ? 2 : 1;
+    divY = format == FORMAT_420 || format == FORMAT_224 ? 2 : 1;
+
+    switch (format)
+    {
+    case FORMAT_420:
+        height = (height + 1) / 2 * 2;
+        width = (width + 1) / 2 * 2;
+        break;
+    case FORMAT_224:
+        height = (height + 1) / 2 * 2;
+        break;
+    case FORMAT_422:
+        width = (width + 1) / 2 * 2;
+        break;
+    case FORMAT_444:
+        height = (height + 1) / 2 * 2;
+        width = (width + 1) / 2 * 2;
+        break;
+    case FORMAT_400:
+        height = (height + 1) / 2 * 2;
+        width = (width + 1) / 2 * 2;
+        break;
+    }
+
+    lum_size   = width * height;
+
+    if (pack)
+    {
+        chr_size   = 0;
+    }
+    else
+    {
+        chr_size   = lum_size / divX / divY;
+    }
+
+
+    if (format == FORMAT_400)
+    {
+        chr_size = 0;
+    }
+
+    fb->vb_base.size = lum_size + chr_size * 2;
+    fb->vb_base.size *= frameBufNum;
+    extern int jdi_register_dma_memory(jpu_buffer_t *vb, void *addr);
+    if (jdi_register_dma_memory(&fb->vb_base, addr) < 0)
+    {
+        DBG_DIRECT("Fail to allocate frame buffer size=%d\n", fb->vb_base.size);
+        return 0;
+    }
+
+    fb->last_addr = fb->vb_base.phys_addr;
+
+
+    for (i = fb->last_num; i < fb->last_num + frameBufNum; i++)
+    {
+        fb->frameBuf[i].Format = format;
+        fb->frameBuf[i].Index  = i;
+
+        fb->frameBuf[i].vbY.phys_addr = fb->last_addr;
+        fb->frameBuf[i].vbY.size = lum_size;
+
+        fb->last_addr += fb->frameBuf[i].vbY.size;
+        fb->last_addr = ((fb->last_addr + 7) & ~7);
+
+        if (chr_size)
+        {
+            fb->frameBuf[i].vbCb.phys_addr = fb->last_addr;
+            fb->frameBuf[i].vbCb.size = chr_size;
+
+            fb->last_addr += fb->frameBuf[i].vbCb.size;
+            fb->last_addr = ((fb->last_addr + 7) & ~7);
+
+            fb->frameBuf[i].vbCr.phys_addr = fb->last_addr;
+            fb->frameBuf[i].vbCr.size = chr_size;
+
+            fb->last_addr += fb->frameBuf[i].vbCr.size;
+            fb->last_addr = ((fb->last_addr + 7) & ~7);
+        }
+
+        fb->frameBuf[i].strideY = width;
+        fb->frameBuf[i].strideC = width / divX;
+    }
+    fb->last_num += frameBufNum;
+
+    return 1;
+}
 int AllocateFrameBuffer(int instIdx, int format, int width, int height, int frameBufNum, int pack)
 {
     int  divX, divY;
@@ -212,6 +308,22 @@ void FreeFrameBuffer(int instIdx)
     fb->last_addr = -1;
 
     jdi_free_dma_memory(&fb->vb_base);
+    fb->vb_base.base = 0;
+    fb->vb_base.size = 0;
+    memset(fb->frameBuf, 0, sizeof(fb->frameBuf));
+}
+
+void CleanFrameBuffer(int instIdx)
+{
+    fb_context *fb;
+
+    fb = &s_fb[instIdx];
+
+    fb->last_num = 0;
+    fb->last_addr = -1;
+
+    extern void jdi_clean_dma_memory(jpu_buffer_t *vb);
+    jdi_clean_dma_memory(&fb->vb_base);
     fb->vb_base.base = 0;
     fb->vb_base.size = 0;
     memset(fb->frameBuf, 0, sizeof(fb->frameBuf));
