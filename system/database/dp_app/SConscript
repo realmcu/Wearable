@@ -9,6 +9,8 @@ list = os.listdir(cwd)
 
 if GetDepend(['CONFIG_REALTEK_BR_TASK']) or GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     src += ['dp_app.c']
+    if GetDepend(['CONFIG_REALTEK_CUSTOM_DB']):
+        SrcRemove(src,'dp_app.c')
 if GetDepend(['CONFIG_REALTEK_BLE_TASK']):
     src += ['dp_ble_info.c']
     src += ['dp_dataqueue.c']
