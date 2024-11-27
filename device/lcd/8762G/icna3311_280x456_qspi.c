@@ -361,6 +361,7 @@ static void incna3311_chip_reset(void)
 
 bool drv_lcd_power_off(void)
 {
+    rtk_lcd_hal_transfer_done();
     incna3311_cmd(0x28);             /*sleep in*/
     platform_delay_ms(25);
     incna3311_cmd(0x10);             /*power off*/
