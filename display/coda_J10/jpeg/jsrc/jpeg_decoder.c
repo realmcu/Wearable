@@ -30,10 +30,15 @@
 // #include "pic_hex_440_192x96_95.txt"   // 440 95
 #include "decode_test.txt"
 
+
+
+
+#define BLOCK_ALIGN(x,n) (((x + (n) - 1) / (n)) * (n))
+
+
 // #define SRC_FLASH
 
 
-uint8_t flg_cache_ram = 0;
 uint8_t f_img_index = 4;
 struct Dec_ret
 {
@@ -722,7 +727,14 @@ ERR_DEC_INIT:
 
 #endif
 
-static int coda_decode(void)
+
+
+
+
+
+
+
+static int coda_decode(uint8_t *jpg_addr, uint64_t jpg_sz)
 {
     JpgDecHandle handle     = {0};
     JpgDecOpenParam decOP       = {0};
@@ -753,30 +765,13 @@ static int coda_decode(void)
     DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
     memset(&pFrame, 0x00, sizeof(FRAME_BUF *)*NUM_FRAME_BUF);
     memset(&frameBuf, 0x00, sizeof(FrameBuffer)*NUM_FRAME_BUF);
-    DBG_DIRECT("%s %d\n", __FUNCTION__, __LINE__);
 
     instIdx = jdec_config.instNum;
 
     // source image buffer
-#ifdef SRC_FLASH
-    DBG_DIRECT("%s 0x%x\n", f_img[f_img_index].name, f_img[f_img_index].addr);
-    // bufInfo.size = 20 * 1024 + 1;
-    bufInfo.buf = f_img[f_img_index].addr;
-    bufInfo.size = f_img[f_img_index].sz;
-#else
-    bufInfo.buf = pic;
-    bufInfo.size = sizeof(pic) / sizeof(pic[0]);
-#endif
+    bufInfo.buf = jpg_addr;
+    bufInfo.size = jpg_sz;
 
-
-    if (flg_cache_ram && jdec_config.loc_src == JPG_SRC_FLASH)
-    {
-        uint8_t *tmp = (uint8_t *)jpg_malloc_align(bufInfo.size, 8);
-        memcpy(tmp, bufInfo.buf, bufInfo.size);
-        bufInfo.buf = tmp;
-    }
-
-    DBG_DIRECT("%s %d  JpgInst sz %d\n", __FUNCTION__, __LINE__, sizeof(JpgInst));
     ret = JPU_Init();
     if (ret != JPG_RET_SUCCESS &&
         ret != JPG_RET_CALLED_BEFORE)
@@ -786,32 +781,13 @@ static int coda_decode(void)
         // goto ERR_DEC_INIT;
     }
     DBG_DIRECT("JPU_Init Done\n");
-#if 1
+
+
     // Open an instance and get initial information for decoding.
     vbStream.size = ((bufInfo.size + 1023) >> 10 << 10);
-
-    // vbStream.size = STREAM_BUF_SIZE;
-    if (jdec_config.loc_src == JPG_SRC_FLASH)
-    {
-        // data ram: 0x20200000   psram: 0x22000000
-        // bufInfo.buf = (void*)0x22000000;
-        // cp to data ram
-        // DBG_DIRECT("memcpy 0x%x->0x%x, %d\n", bufInfo.buf, 0x20200100, bufInfo.size);
-        // memcpy((void *)0x20200100, bufInfo.buf, bufInfo.size);
-        // log_hex((void *)0x20200100, 100);
-        // bufInfo.buf = (void*)0x20200100;
-
-
-        // // cp to psram
-        // bufInfo.buf = (void*)0x22000000;
-        // DBG_DIRECT("memcpy 0x%x->0x%x, %d\n", bufInfo.buf, (void*)0x22000000, bufInfo.size);
-        // memcpy((void*)0x22000000, bufInfo.buf, bufInfo.size);
-        // bufInfo.buf = (void*)0x22000000;
-        // log_hex((void*)bufInfo.buf, 100);
-
-        jdi_register_extern_memory(&vbStream, bufInfo.buf, bufInfo.size);
-        DBG_DIRECT("jdi_register_extern_memory Done\n");
-    }
+    jdi_register_extern_memory(&vbStream, bufInfo.buf, bufInfo.size);
+    DBG_DIRECT("jdi_register_extern_memory Done\n");
+#if 0
     else
     {
         if (jdi_allocate_dma_memory(&vbStream) < 0)
@@ -821,6 +797,7 @@ static int coda_decode(void)
         }
         DBG_DIRECT("jdi_allocate_dma_memory Done\n");
     }
+#endif
 
     decOP.streamEndian = jdec_config.StreamEndian;
     decOP.frameEndian = jdec_config.FrameEndian;
@@ -836,11 +813,6 @@ static int coda_decode(void)
     decOP.roiWidth = jdec_config.roiWidth;
     decOP.roiHeight = jdec_config.roiHeight;
 
-    if (1)
-    {
-        DBG_DIRECT("roiWidth %d, roiHeight %d \n", decOP.roiWidth, decOP.roiHeight);
-        DBG_DIRECT("roiOffsetX %d, roiOffsetY %d \n", decOP.roiOffsetX, decOP.roiOffsetY);
-    }
 
     ret = JPU_DecOpen(&handle, &decOP);
     if (ret != JPG_RET_SUCCESS)
@@ -850,18 +822,18 @@ static int coda_decode(void)
     }
     DBG_DIRECT("JPU_DecOpen Done\n");
 
-    if (jdec_config.loc_src == JPG_SRC_FLASH)
+    // load img
+    ret = SyncJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
+                             decOP.bitstreamBuffer + decOP.bitstreamBufferSize, 0, 0, &streameos, decOP.streamEndian);
+    if (ret != JPG_RET_SUCCESS)
     {
-        ret = SyncJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
-                                 decOP.bitstreamBuffer + decOP.bitstreamBufferSize, 0, 0, &streameos, decOP.streamEndian);
-        if (ret != JPG_RET_SUCCESS)
-        {
-            DBG_DIRECT("SyncJpgBsBufHelper failed Error code is 0x%x \n", ret);
-            goto ERR_DEC_OPEN;
-        }
-        DBG_DIRECT("WriteJpgBsBufHelper Done\n");
-        DBG_DIRECT("No need to load src\n");
+        DBG_DIRECT("SyncJpgBsBufHelper failed Error code is 0x%x \n", ret);
+        goto ERR_DEC_OPEN;
     }
+    DBG_DIRECT("SyncJpgBsBufHelper Done\n");
+    DBG_DIRECT("No need to load src\n");
+
+#if 0
     else
     {
         ret = WriteJpgBsBufHelper(handle, &bufInfo, decOP.bitstreamBuffer,
@@ -873,6 +845,7 @@ static int coda_decode(void)
         }
         DBG_DIRECT("WriteJpgBsBufHelper Done\n");
     }
+#endif
 
     DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(decOP.bitstreamBuffer));
     ret = JPU_DecGetInitialInfo(handle, &initialInfo);
@@ -913,20 +886,20 @@ static int coda_decode(void)
     {
         if (initialInfo.sourceFormat == FORMAT_420 || initialInfo.sourceFormat == FORMAT_422)
         {
-            framebufWidth = ((initialInfo.picWidth + 15) / 16) * 16;
+            framebufWidth = BLOCK_ALIGN(initialInfo.picWidth, 16);
         }
         else
         {
-            framebufWidth = ((initialInfo.picWidth + 7) / 8) * 8;
+            framebufWidth = BLOCK_ALIGN(initialInfo.picWidth, 8);
         }
 
         if (initialInfo.sourceFormat == FORMAT_420 || initialInfo.sourceFormat == FORMAT_224)
         {
-            framebufHeight = ((initialInfo.picHeight + 15) / 16) * 16;
+            framebufHeight = BLOCK_ALIGN(initialInfo.picHeight, 16);
         }
         else
         {
-            framebufHeight = ((initialInfo.picHeight + 7) / 8) * 8;
+            framebufHeight = BLOCK_ALIGN(initialInfo.picHeight, 8);
         }
 
 
@@ -972,7 +945,7 @@ static int coda_decode(void)
 
     if (jdec_config.iHorScaleMode || jdec_config.iVerScaleMode)
     {
-        framebufStride = ((framebufStride + 15) / 16) * 16;
+        framebufStride = BLOCK_ALIGN(framebufStride, 16);
     }
 
     DBG_DIRECT(" initialInfo.sourceFormat %d", initialInfo.sourceFormat);
@@ -1040,7 +1013,7 @@ static int coda_decode(void)
 
     DBG_DIRECT("framebufFormat %d initialInfo.sourceFormat %d", framebufFormat,
                initialInfo.sourceFormat);
-    framebufSize = GetFrameBufSize(framebufFormat, initialInfo.picWidth, initialInfo.picHeight);
+    // framebufSize = GetFrameBufSize(framebufFormat, initialInfo.picWidth, initialInfo.picHeight);
     DBG_DIRECT("framebufSize %d frame width: %d, stride : %d, height = %d\n", framebufSize,
                framebufWidth, framebufStride, framebufHeight);
 
@@ -1115,7 +1088,6 @@ static int coda_decode(void)
         CODA_Test_write(REG_MJPEG_RGB_PF_REG, reg);
     }
 
-//    DBG_DIRECT("\nbs  0x%x\n", *(volatile unsigned long *)(0x101548 + 0xab8));
     uint32_t decode_cnt_clk = 0;
     while (1)
     {
@@ -1185,16 +1157,11 @@ static int coda_decode(void)
 
                     DBG_DIRECT("REG_MJPEG_WRAP_CFG_DONE  Waiting...\n");
                     cnt_wait++;
-                    if (cnt_wait > 50)
-                    {
-                        CODA_Test_write(REG_MJPEG_WRAP_CFG_REG, (false ? 0x01 : 0x00));
-                    }
-
-                    //Sleep(1); // 1ms sec
-                    //if (count++ > timeout)
-                    //  return -1;
+                    // if (cnt_wait > 50)
+                    // {
+                    //     CODA_Test_write(REG_MJPEG_WRAP_CFG_REG, (false ? 0x01 : 0x00));
+                    // }
                 }
-                CODA_Test_write(REG_MJPEG_WRAP_CFG_REG, (true ? 0x01 : 0x00));
             }
 
             if (int_reason == -1)
@@ -1390,7 +1357,7 @@ ERR_DEC_INIT:
     FreeFrameBuffer(instIdx);
 
     // jpg buffer
-    if (flg_cache_ram || jdec_config.loc_src == JPG_SRC_RAM)
+    if (jdec_config.loc_src == JPG_SRC_HEAP)
     {
         jdi_free_dma_memory(&vbStream);
     }
@@ -1398,16 +1365,44 @@ ERR_DEC_INIT:
     //sw_mixer_close(instIdx);
     JPU_DeInit();
 
-#endif
     // while (1);
     return suc;
 }
 
 
 
-JpgRet coda_prepare(DecConfigParam *jdc)
+JpgRet coda_prepare(DecConfigSetting *jdc)
 {
     memset(&jdec_config, 0, sizeof(DecConfigParam));
+
+    // default config: not export to user for now
+    {
+        // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
+        jdec_config.chromaInterleave = 0;
+        jdec_config.StreamEndian = JPU_STREAM_ENDIAN;
+        jdec_config.FrameEndian = JPU_FRAME_ENDIAN;
+
+        // partial Mode(0: OFF 1: ON);
+        jdec_config.usePartialMode = 0;
+        // Num of Frame Buffer[ 2 ~ 4 ] ;
+        jdec_config.partialBufNum = 4;
+
+        //// Can NOT do rotation and mirror, when partial mode enable.
+        // rotation angle in degrees(0, 90, 180, 270);
+        jdec_config.rotAngle = 0;
+        // mirror direction(0-no mirror, 1-vertical, 2-horizontal, 3-both);
+        jdec_config.mirDir = 0;
+        // scalerMode: 0-no scaler, 1-1/2, 2-1/4, 3-1/8
+        jdec_config.iHorScaleMode = 0;
+        jdec_config.iVerScaleMode = 0;
+
+        // Number of Images that you want to decode(0: decode continue, -1: loop);
+        jdec_config.outNum = 1;
+    }
+
+
+
+
 
     jdec_config.roiEnable = jdc->roiEnable;
     if (jdec_config.roiEnable)
@@ -1416,24 +1411,26 @@ JpgRet coda_prepare(DecConfigParam *jdc)
         jdec_config.roiOffsetY = jdc->roiOffsetY;
         jdec_config.roiWidth  = jdc->roiWidth;
         jdec_config.roiHeight = jdc->roiHeight;
+        DBG_DIRECT("roiWidth %d, roiHeight %d \n", jdec_config.roiWidth, jdec_config.roiHeight);
+        DBG_DIRECT("roiOffsetX %d, roiOffsetY %d \n", jdec_config.roiOffsetX, jdec_config.roiOffsetY);
     }
 
     // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
     jdec_config.packedFormat = jdc->packedFormat;
     // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
-    jdec_config.chromaInterleave = jdc->chromaInterleave;
-    jdec_config.StreamEndian = jdc->StreamEndian;
-    jdec_config.FrameEndian = jdc->FrameEndian;
+    // jdec_config.chromaInterleave = jdc->chromaInterleave;
+    // jdec_config.StreamEndian = jdc->StreamEndian;
+    // jdec_config.FrameEndian = jdc->FrameEndian;
 
 
     if (!jdec_config.roiEnable && !jdec_config.packedFormat)
     {
         // partial Mode(0: OFF 1: ON);
-        jdec_config.usePartialMode = jdc->usePartialMode;
+        // jdec_config.usePartialMode = jdc->usePartialMode;
         if (jdec_config.usePartialMode)
         {
             // Num of Frame Buffer[ 2 ~ 4 ] ;
-            jdec_config.partialBufNum = jdc->partialBufNum;
+            // jdec_config.partialBufNum = jdc->partialBufNum;
             if (jdec_config.partialBufNum > 4)
             {
                 jdec_config.partialBufNum = 4;
@@ -1444,7 +1441,7 @@ JpgRet coda_prepare(DecConfigParam *jdc)
     if (!jdec_config.usePartialMode)
     {
         // rotation angle in degrees(0, 90, 180, 270);
-        jdec_config.rotAngle = jdc->rotAngle;
+        // jdec_config.rotAngle = jdc->rotAngle;
         if (jdec_config.rotAngle != 0 && jdec_config.rotAngle != 90 && jdec_config.rotAngle != 180 &&
             jdec_config.rotAngle != 270)
         {
@@ -1452,7 +1449,7 @@ JpgRet coda_prepare(DecConfigParam *jdc)
             return JPG_RET_INVALID_PARAM;
         }
         // mirror direction(0-no mirror, 1-vertical, 2-horizontal, 3-both);
-        jdec_config.mirDir = jdc->mirDir;
+        // jdec_config.mirDir = jdc->mirDir;
         if (jdec_config.mirDir != 0 && jdec_config.mirDir != 1 && jdec_config.mirDir != 2 &&
             jdec_config.mirDir != 3)
         {
@@ -1465,8 +1462,8 @@ JpgRet coda_prepare(DecConfigParam *jdc)
         }
     }
 
-    jdec_config.iHorScaleMode = jdc->iHorScaleMode;
-    jdec_config.iVerScaleMode = jdc->iVerScaleMode;
+    // jdec_config.iHorScaleMode = jdc->iHorScaleMode;
+    // jdec_config.iVerScaleMode = jdc->iVerScaleMode;
 
 
     // Number of Images that you want to decode(0: decode continue, -1: loop);
@@ -1531,58 +1528,78 @@ uint32_t CODA_Test(uint8_t cmd)
         break;
     case 3: // decoder
         {
-            DecConfigParam  decConfig;
-            memset((void *)&decConfig, 0x00, sizeof(DecConfigParam));
+            DecConfigSetting  decConfig;
+            memset((void *)&decConfig, 0x00, sizeof(DecConfigSetting));
 
-
+            // export config
             {
+                // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
+                decConfig.packedFormat = 1;
+
                 decConfig.roiEnable = 0;
-                if (decConfig.roiEnable)
                 {
                     decConfig.roiOffsetX = 0;
                     decConfig.roiOffsetY = 16;
                     decConfig.roiWidth  = 96;
                     decConfig.roiHeight = 88;
                 }
-                // Packed stream format output [0](PLANAR) [1](YUYV) [2](UYVY) [3](YVYU) [4](VYUY) [5](YUV_444 PACKED)
-                decConfig.packedFormat = 1;
-                // Chroma format type [0](SEPARATED CHROMA) [1](CBCR INTERLEAVED) [2](CRCB INTERLEAVED)
-                decConfig.chromaInterleave = 0;
-                decConfig.StreamEndian = JPU_STREAM_ENDIAN;
-                decConfig.FrameEndian = JPU_FRAME_ENDIAN;
-
-                // partial Mode(0: OFF 1: ON);
-                decConfig.usePartialMode = 0;
-                // Num of Frame Buffer[ 2 ~ 4 ] ;
-                decConfig.partialBufNum = 4;
-
-                //// Can NOT do rotation and mirror, when partial mode enable.
-                // rotation angle in degrees(0, 90, 180, 270);
-                decConfig.rotAngle = 0;
-                // mirror direction(0-no mirror, 1-vertical, 2-horizontal, 3-both);
-                decConfig.mirDir = 0;
-                // scalerMode: 0-no scaler, 1-1/2, 2-1/4, 3-1/8
-                decConfig.iHorScaleMode = 0;
-                decConfig.iVerScaleMode = 0;
-
-                // Number of Images that you want to decode(0: decode continue, -1: loop);
-                decConfig.outNum = 1;
-
-                // jpg data location: 0-JPG_SRC_RAM, 1-JPG_SRC_FLASH, 2-JPG_SRC_PSRAM
-                decConfig.loc_src = 0;
-                // cache jpg to ram
-                flg_cache_ram = 0;
 
                 // Wrapper enable: 0-OFF, 1-ON
                 decConfig.useWrapper = 1;
                 //  0-JPG_ARGB8888, 1-JPG_RGB888, 2-JPG_RGB565
                 decConfig.rgbType = 2;
                 // ARGB: A(8 bit)
-                if (decConfig.rgbType == 0)
-                {
-                    decConfig.opacity = 0xa5;
-                }
+                decConfig.opacity = 0xa5;
             }
+
+
+
+            // test differnt mem only
+            // jpg data location: 0-JPG_SRC_RAM, 1-JPG_SRC_FLASH, 2-JPG_SRC_PSRAM, 3-JPG_SRC_HEAP
+            decConfig.loc_src = 3;
+
+            uint8_t *jpg_addr = NULL; // should align to 8
+            uint64_t jpg_sz = 0;
+            {
+#ifdef SRC_FLASH
+                DBG_DIRECT("%s 0x%x\n", f_img[f_img_index].name, f_img[f_img_index].addr);
+                // bufInfo.size = 20 * 1024 + 1;
+                jpg_addr = f_img[f_img_index].addr;
+                jpg_sz = f_img[f_img_index].sz;
+#else
+                jpg_addr = pic;
+                jpg_sz = sizeof(pic) / sizeof(pic[0]);
+#endif
+
+                // copy img from flash to heap (should align to 8)
+                if (decConfig.loc_src == JPG_SRC_HEAP)
+                {
+                    uint8_t *tmp = (uint8_t *)jpg_malloc_align(jpg_sz, 8);
+                    memcpy(tmp, jpg_addr, jpg_sz);
+                    jpg_addr = tmp;
+                }
+                else if (decConfig.loc_src == JPG_SRC_PSRAM)
+                {
+                    // // cp to psram
+                    // DBG_DIRECT("memcpy 0x%x->0x%x, %d\n", bufInfo.buf, (void*)0x22000000, bufInfo.size);
+                    // memcpy((void*)0x22000000, bufInfo.buf, bufInfo.size);
+                    // bufInfo.buf = (void*)0x22000000;
+                    // log_hex((void*)bufInfo.buf, 100);
+                }
+                else if (decConfig.loc_src == JPG_SRC_RAM)// copy to ram
+                {
+                    // data ram: 0x20200000   psram: 0x22000000
+                    // cp to data ram
+                    // DBG_DIRECT("memcpy 0x%x->0x%x, %d\n", bufInfo.buf, 0x20200100, bufInfo.size);
+                    // memcpy((void *)0x20200100, bufInfo.buf, bufInfo.size);
+                    // log_hex((void *)0x20200100, 100);
+                    // bufInfo.buf = (void*)0x20200100;
+                }
+                else {} // flash
+
+            }
+
+
 
             ret = coda_prepare(&decConfig);
             if (ret != JPG_RET_SUCCESS)
@@ -1592,12 +1609,14 @@ uint32_t CODA_Test(uint8_t cmd)
             }
 
             DBG_DIRECT("\nCODA: Decode start \n");
-            ret = coda_decode();
+            ret = coda_decode(jpg_addr, jpg_sz);
             if (!ret)
             {
-                DBG_DIRECT("\nCODA: Failed to DecodeTest %d\n", ret);
+                DBG_DIRECT("\nCODA: Failed to Decode %d\n", ret);
             }
             DBG_DIRECT("\nCODA: Decode Done \n");
+
+
         }
         break;
     case 4: // encoder

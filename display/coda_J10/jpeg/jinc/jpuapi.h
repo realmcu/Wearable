@@ -275,6 +275,28 @@ typedef struct
 } DecConfigParam;
 
 
+typedef struct
+{
+    //packed
+    int packedFormat;
+
+    //ROI
+    int roiEnable;
+    int roiWidth;
+    int roiHeight;
+    int roiOffsetX;
+    int roiOffsetY;
+
+    //wrapper
+    int useWrapper;
+    int rgbType;
+    uint8_t opacity;
+
+    // test
+    int loc_src;
+
+} DecConfigSetting;
+
 //------------------------------------------------------------------------------
 // encode struct and definition
 //------------------------------------------------------------------------------

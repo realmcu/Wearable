@@ -7,9 +7,9 @@
 
 #define TLSF_BUFF_NUM_MAX  (8)
 
-static uint8_t  mem_array[TLSF_MEM_SIZE]  __attribute__((section(".ARM.__at_0x20200000")));
+// static uint8_t  mem_array[TLSF_MEM_SIZE]  __attribute__((section(".ARM.__at_0x20200000")));
 // static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE] __attribute__((section(".ARM.__at_0x100000")));
-// static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE];
+static uint8_t __attribute__((aligned(8)))  mem_array[TLSF_MEM_SIZE];
 // static uint8_t  *mem_array;
 static tlsf_t jpg_tlsf = NULL;
 uint8_t *pheap = NULL;

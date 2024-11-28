@@ -354,12 +354,9 @@ int jdi_register_dma_memory(jpu_buffer_t *vb, void *addr)
     int ret = 0;
     unsigned long offset;
     jpudrv_buffer_t jdb = {0, };
-    static uint8_t cnt = 0;
 
-    cnt ++;
     if (!s_pjip || s_jpu_fd == -1 || s_jpu_fd == 0x00)
     {
-        DBG_DIRECT("jdi_allocate_dma_memory FAILD %d!!\n", cnt);
         return -1;
     }
 

@@ -14,7 +14,7 @@
 // #include "pic_04_420_176x16_3.txt"
 // #include "pic_04_420_176x16_4.txt"
 // #include "pic_04_420_176x16_5.txt"
-#include "pic_04_420_176x16_6.txt"
+// #include "pic_04_420_176x16_6.txt"
 
 
 
@@ -38,7 +38,7 @@
 // #include "pic_hex_03_168_94_444_168x96_95.txt"
 
 // #include "pic_hex_04_168_104_400_168x104_95.txt"
-// #include "pic_hex_04_168_104_420_176x112_95.txt"
+#include "pic_hex_04_168_104_420_176x112_95.txt"
 // #include "pic_hex_04_168_104_422_176x112_95.txt"
 // #include "pic_hex_04_168_104_444_168x104_95.txt"
 

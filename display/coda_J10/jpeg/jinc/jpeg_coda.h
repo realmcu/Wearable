@@ -16,7 +16,7 @@
 uint32_t coda_init(void);
 uint32_t coda_deinit(void);
 
-JpgRet coda_prepare(DecConfigParam *jdc);
+JpgRet coda_prepare(DecConfigSetting *jdc);
 // JpgRet coda_decode(void);
 uint32_t CODA_Test_read(uint32_t addr);
 uint32_t CODA_Test_write(uint32_t addr, uint32_t val);
